@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bakery Store favicon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3d261f" />
+      <stop offset="100%" stop-color="#6f4335" />
+    </linearGradient>
+    <linearGradient id="bread" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c98c" />
+      <stop offset="100%" stop-color="#c78346" />
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="url(#bg)" />
+
+  <path d="M14 38c0-10 8-17 18-17s18 7 18 17c0 6-4 11-10 12H24c-6-1-10-6-10-12z" fill="url(#bread)" />
+  <path d="M26 23c-4 3-5 7-3 11" stroke="#fff2d9" stroke-width="2.6" stroke-linecap="round" fill="none" />
+  <path d="M35 22c-4 3-5 7-3 11" stroke="#fff2d9" stroke-width="2.6" stroke-linecap="round" fill="none" />
+  <path d="M44 23c-4 3-5 7-3 11" stroke="#fff2d9" stroke-width="2.6" stroke-linecap="round" fill="none" />
+</svg>
