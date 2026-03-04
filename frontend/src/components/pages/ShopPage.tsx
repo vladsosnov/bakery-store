@@ -259,6 +259,9 @@ export function ShopPage() {
                           <S.ProductTag key={tag}>{tag}</S.ProductTag>
                         ))}
                       </S.ProductTags>
+                      <S.ProductActions>
+                        <S.AddToCartButton type="button">Add to cart</S.AddToCartButton>
+                      </S.ProductActions>
                     </S.ProductBody>
                   </S.ProductCard>
                 ))}

@@ -225,6 +225,27 @@ export const ProductTags = styled.div`
   flex-wrap: wrap;
 `;
 
+export const ProductActions = styled.div`
+  margin-top: 12px;
+`;
+
+export const AddToCartButton = styled.button`
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #2f6f51;
+  background: #2f6f51;
+  color: #fff;
+  padding: 9px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 170ms ease, box-shadow 170ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 16px rgba(47, 111, 81, 0.25);
+  }
+`;
+
 export const ProductTag = styled.span`
   border-radius: 999px;
   background: #f5ece5;

@@ -2,8 +2,9 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 
 import { ROUTES } from '@src/app/routes';
-import { ChatWidget } from './ChatWidget';
-import * as S from './SiteLayout.styles';
+import { CartAuthPanel } from '@src/components/layout/CartAuthPanel';
+import { ChatWidget } from '@src/components/layout/ChatWidget';
+import * as S from '@src/components/layout/SiteLayout.styles';
 
 const navItems = [
   { to: ROUTES.home, label: 'Home', end: true },
@@ -14,6 +15,7 @@ const navItems = [
 export function SiteLayout() {
   const location = useLocation();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
     <S.Wrapper>
@@ -33,22 +35,36 @@ export function SiteLayout() {
           ))}
         </S.Nav>
 
-        <S.Auth>
-          <S.AuthLink
-            to={ROUTES.signIn}
-            $variant="ghost"
-            className={({ isActive }) => (isActive ? 'active' : undefined)}
+        <S.HeaderActions>
+          <S.CartButton
+            type="button"
+            $open={isCartOpen}
+            aria-label={isCartOpen ? 'Close cart' : 'Open cart'}
+            onClick={() => {
+              setIsCartOpen((prev) => !prev);
+              setIsChatOpen(false);
+            }}
           >
-            Sign in
-          </S.AuthLink>
-          <S.AuthLink
-            to={ROUTES.signUp}
-            $variant="solid"
-            className={({ isActive }) => (isActive ? 'active' : undefined)}
-          >
-            Sign up
-          </S.AuthLink>
-        </S.Auth>
+            Cart
+          </S.CartButton>
+
+          <S.Auth>
+            <S.AuthLink
+              to={ROUTES.signIn}
+              $variant="ghost"
+              className={({ isActive }) => (isActive ? 'active' : undefined)}
+            >
+              Sign in
+            </S.AuthLink>
+            <S.AuthLink
+              to={ROUTES.signUp}
+              $variant="solid"
+              className={({ isActive }) => (isActive ? 'active' : undefined)}
+            >
+              Sign up
+            </S.AuthLink>
+          </S.Auth>
+        </S.HeaderActions>
       </S.Header>
 
       <S.Content>
@@ -61,13 +77,17 @@ export function SiteLayout() {
         </S.ContentInner>
       </S.Content>
 
+      {isCartOpen ? <CartAuthPanel onClose={() => setIsCartOpen(false)} /> : null}
       {isChatOpen ? <ChatWidget onClose={() => setIsChatOpen(false)} /> : null}
 
       <S.ChatButton
         type="button"
         $open={isChatOpen}
         aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
-        onClick={() => setIsChatOpen((prev) => !prev)}
+        onClick={() => {
+          setIsChatOpen((prev) => !prev);
+          setIsCartOpen(false);
+        }}
       >
         {isChatOpen ? 'Hide chat' : 'Chat'}
       </S.ChatButton>

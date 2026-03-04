@@ -28,4 +28,22 @@ describe('SiteLayout chat', () => {
     await user.click(within(panel).getByRole('button', { name: /close chat/i }));
     expect(screen.queryByRole('region', { name: /support chat panel/i })).not.toBeInTheDocument();
   });
+
+  it('opens cart panel with authorize-first message', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={[ROUTES.home]}>
+        <Routes>
+          <Route path={ROUTES.home} element={<SiteLayout />}>
+            <Route index element={<div>Home content</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole('button', { name: /open cart/i }));
+    expect(screen.getByRole('region', { name: /cart panel/i })).toBeInTheDocument();
+    expect(screen.getByText(/authorize first/i)).toBeInTheDocument();
+  });
 });

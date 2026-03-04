@@ -18,6 +18,7 @@ describe('ShopPage', () => {
     expect(screen.getByRole('searchbox', { name: /search products/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cakes' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /add to cart/i }).length).toBeGreaterThan(0);
   });
 
   it('filters products by search text', async () => {

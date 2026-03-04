@@ -48,6 +48,28 @@ export const Auth = styled.div`
   gap: 10px;
 `;
 
+export const HeaderActions = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+export const CartButton = styled.button<{ $open: boolean }>`
+  border-radius: 999px;
+  border: 1px solid ${(props) => (props.$open ? '#2f6f51' : '#d7b9a6')};
+  background: ${(props) => (props.$open ? '#2f6f51' : '#fff7f0')};
+  color: ${(props) => (props.$open ? '#fff' : '#513333')};
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 170ms ease, box-shadow 170ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 14px rgba(81, 51, 51, 0.14);
+  }
+`;
+
 const authLinkVariants = {
   ghost: css`
     border: 1px solid #d7b9a6;
