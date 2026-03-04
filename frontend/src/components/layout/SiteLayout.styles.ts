@@ -95,17 +95,23 @@ export const Footer = styled.footer`
   color: #76554a;
 `;
 
-export const ChatButton = styled.button`
+export const ChatButton = styled.button<{ $open: boolean }>`
   position: fixed;
   right: 18px;
   bottom: 18px;
   border: none;
   border-radius: 999px;
-  background: #2f6f51;
+  background: ${(props) => (props.$open ? '#513333' : '#2f6f51')};
   color: #fff;
   padding: 14px 18px;
   font-weight: 700;
   box-shadow: 0 10px 24px rgba(31, 90, 64, 0.35);
   cursor: pointer;
   z-index: 30;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 26px rgba(31, 90, 64, 0.42);
+  }
 `;
