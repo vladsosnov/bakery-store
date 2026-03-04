@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { fadeInLift } from '../../styles/animations';
+import { fadeInLift } from '@src/styles/animations';
 
 type AuthVariant = 'ghost' | 'solid';
 

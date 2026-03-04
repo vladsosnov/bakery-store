@@ -8,6 +8,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': ['ts-jest', { useESM: true, tsconfig: '<rootDir>/tsconfig.json' }]
   },
   moduleNameMapper: {
+    '^@src/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1'
   }
 };

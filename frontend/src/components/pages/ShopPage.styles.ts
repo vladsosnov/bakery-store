@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { fadeInLift } from '../../styles/animations';
+import { fadeInLift } from '@src/styles/animations';
 
 export const Main = styled.main`
   width: min(1200px, 94vw);

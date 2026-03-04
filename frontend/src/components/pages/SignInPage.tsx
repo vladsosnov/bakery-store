@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import { ROUTES } from '../../app/routes';
+import { ROUTES } from '@src/app/routes';
 import * as S from './SignInPage.styles';
 
 export function SignInPage() {

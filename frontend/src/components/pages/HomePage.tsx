@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { shopRoutes } from '../../app/routes';
+import { shopRoutes } from '@src/app/routes';
 import * as S from './HomePage.styles';
 
 type Slide = {

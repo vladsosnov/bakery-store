@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
-import { shopRoutes } from '../../../app/routes';
+import { shopRoutes } from '@src/app/routes';
 import { ShopPage } from '../ShopPage';
 
 describe('ShopPage', () => {

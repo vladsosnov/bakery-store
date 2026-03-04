@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { fadeInLift } from '../../styles/animations';
+import { fadeInLift } from '@src/styles/animations';
 
 export const Panel = styled.section`
   position: fixed;

@@ -6,7 +6,7 @@ import { SignInPage } from '../components/pages/SignInPage';
 import { SignUpPage } from '../components/pages/SignUpPage';
 import { ShopPage } from '../components/pages/ShopPage';
 import { SiteLayout } from '../components/layout/SiteLayout';
-import { ROUTES, ROUTE_SEGMENTS } from './routes';
+import { ROUTES, ROUTE_SEGMENTS } from '@src/app/routes';
 
 export function App() {
   return (

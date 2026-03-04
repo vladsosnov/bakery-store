@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 
-import { ROUTES } from '../../app/routes';
+import { ROUTES } from '@src/app/routes';
 import { ChatWidget } from './ChatWidget';
 import * as S from './SiteLayout.styles';
 

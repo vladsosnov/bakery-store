@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-import { ROUTES } from '../../../app/routes';
+import { ROUTES } from '@src/app/routes';
 import { SiteLayout } from '../SiteLayout';
 
 describe('SiteLayout chat', () => {
