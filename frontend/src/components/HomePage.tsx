@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+import * as S from './HomePage.styles';
 
 type Slide = {
   id: number;
@@ -56,80 +58,6 @@ const BENEFITS: BenefitCard[] = [
   }
 ];
 
-const pageStyles: Record<string, CSSProperties> = {
-  section: {
-    width: 'min(1120px, 92vw)',
-    margin: '0 auto'
-  },
-  slider: {
-    marginTop: '24px',
-    borderRadius: '24px',
-    overflow: 'hidden',
-    position: 'relative',
-    minHeight: '360px',
-    display: 'flex',
-    alignItems: 'flex-end',
-    boxShadow: '0 16px 30px rgba(117, 79, 52, 0.18)'
-  },
-  slideImage: {
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  slideOverlay: {
-    position: 'absolute',
-    inset: 0,
-    background: 'linear-gradient(90deg, rgba(34, 19, 13, 0.78), rgba(34, 19, 13, 0.22))'
-  },
-  slideContent: {
-    position: 'relative',
-    padding: '36px',
-    color: '#fff',
-    maxWidth: '540px'
-  },
-  buttonSolid: {
-    border: '1px solid #513333',
-    background: '#513333',
-    color: '#fff',
-    borderRadius: '999px',
-    padding: '10px 16px',
-    cursor: 'pointer',
-    fontWeight: 600
-  },
-  sliderDots: {
-    position: 'absolute',
-    right: '20px',
-    bottom: '18px',
-    display: 'flex',
-    gap: '8px',
-    zIndex: 3
-  },
-  dot: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-    border: 0,
-    cursor: 'pointer'
-  },
-  cardsSection: {
-    padding: '50px 0 72px'
-  },
-  cardsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '16px'
-  },
-  card: {
-    background: '#fff',
-    borderRadius: '16px',
-    border: '1px solid #f0d8c9',
-    padding: '20px',
-    boxShadow: '0 8px 18px rgba(118, 77, 48, 0.08)'
-  }
-};
-
 export function HomePage() {
   const [slideIndex, setSlideIndex] = useState(0);
   const currentSlide = useMemo(() => SLIDES[slideIndex], [slideIndex]);
@@ -143,56 +71,49 @@ export function HomePage() {
   }, []);
 
   return (
-    <main>
-      <section style={pageStyles.section}>
-        <article style={pageStyles.slider} aria-label="New bakery products banner">
-          <img src={currentSlide.image} alt={currentSlide.title} style={pageStyles.slideImage} />
-          <div style={pageStyles.slideOverlay} />
+    <S.Main>
+      <S.Section>
+        <S.Slider aria-label="New bakery products banner">
+          <S.SlideImage src={currentSlide.image} alt={currentSlide.title} />
+          <S.SlideOverlay />
 
-          <div style={pageStyles.slideContent}>
-            <p style={{ margin: 0, opacity: 0.8 }}>Fresh drop</p>
-            <h1 style={{ marginTop: '8px', marginBottom: '8px', fontSize: 'clamp(2rem, 6vw, 3rem)' }}>
-              {currentSlide.title}
-            </h1>
-            <p style={{ marginTop: 0 }}>{currentSlide.subtitle}</p>
-            <button type="button" style={pageStyles.buttonSolid}>
-              {currentSlide.cta}
-            </button>
-          </div>
+          <S.SlideContent>
+            <S.Eyebrow>Fresh drop</S.Eyebrow>
+            <S.HeroTitle>{currentSlide.title}</S.HeroTitle>
+            <S.Subtitle>{currentSlide.subtitle}</S.Subtitle>
+            <S.CTAButton type="button">{currentSlide.cta}</S.CTAButton>
+          </S.SlideContent>
 
-          <div style={pageStyles.sliderDots}>
+          <S.SliderDots>
             {SLIDES.map((slide, index) => (
-              <button
+              <S.SliderDot
                 key={slide.id}
                 type="button"
                 onClick={() => setSlideIndex(index)}
-                style={{
-                  ...pageStyles.dot,
-                  background: index === slideIndex ? '#fff' : 'rgba(255, 255, 255, 0.5)'
-                }}
+                $active={index === slideIndex}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
-          </div>
-        </article>
-      </section>
+          </S.SliderDots>
+        </S.Slider>
+      </S.Section>
 
-      <section style={{ ...pageStyles.section, ...pageStyles.cardsSection }}>
-        <h2 style={{ marginTop: 0 }}>Why everyone loves our bakery</h2>
-        <p style={{ maxWidth: '700px', color: '#76554a' }}>
+      <S.CardsSection>
+        <S.CardsHeading>Why everyone loves our bakery</S.CardsHeading>
+        <S.CardsText>
           We combine premium ingredients, old-school baking techniques, and modern design so every
           cake, pastry, and loaf tastes incredible and looks perfect for sharing.
-        </p>
+        </S.CardsText>
 
-        <div style={pageStyles.cardsGrid}>
+        <S.CardsGrid>
           {BENEFITS.map((card) => (
-            <article key={card.id} style={pageStyles.card}>
-              <h3 style={{ marginTop: 0 }}>{card.title}</h3>
-              <p style={{ marginBottom: 0, color: '#6f5045' }}>{card.text}</p>
-            </article>
+            <S.Card key={card.id}>
+              <S.CardTitle>{card.title}</S.CardTitle>
+              <S.CardText>{card.text}</S.CardText>
+            </S.Card>
           ))}
-        </div>
-      </section>
-    </main>
+        </S.CardsGrid>
+      </S.CardsSection>
+    </S.Main>
   );
 }
