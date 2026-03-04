@@ -1,10 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
-import { AboutPage } from '../components/AboutPage';
-import { HomePage } from '../components/HomePage';
-import { SignInPage } from '../components/SignInPage';
-import { SignUpPage } from '../components/SignUpPage';
-import { ShopPage } from '../components/ShopPage';
+import { AboutPage } from '../components/pages/AboutPage';
+import { HomePage } from '../components/pages/HomePage';
+import { SignInPage } from '../components/pages/SignInPage';
+import { SignUpPage } from '../components/pages/SignUpPage';
+import { ShopPage } from '../components/pages/ShopPage';
 import { SiteLayout } from '../components/layout/SiteLayout';
 
 export function App() {
