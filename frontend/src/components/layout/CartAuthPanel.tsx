@@ -19,8 +19,12 @@ export function CartAuthPanel({ onClose }: CartAuthPanelProps) {
       <S.Body>
         <S.Message>Authorize first to access your cart and checkout.</S.Message>
         <S.Actions>
-          <S.GhostLink to={ROUTES.signIn}>Sign in</S.GhostLink>
-          <S.SolidLink to={ROUTES.signUp}>Sign up</S.SolidLink>
+          <S.GhostLink to={ROUTES.signIn} onClick={onClose}>
+            Sign in
+          </S.GhostLink>
+          <S.SolidLink to={ROUTES.signUp} onClick={onClose}>
+            Sign up
+          </S.SolidLink>
         </S.Actions>
       </S.Body>
     </S.Panel>

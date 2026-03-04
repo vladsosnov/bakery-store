@@ -55,12 +55,15 @@ export const HeaderActions = styled.div`
 `;
 
 export const CartButton = styled.button<{ $open: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   border-radius: 999px;
   border: 1px solid ${(props) => (props.$open ? '#2f6f51' : '#d7b9a6')};
   background: ${(props) => (props.$open ? '#2f6f51' : '#fff7f0')};
   color: ${(props) => (props.$open ? '#fff' : '#513333')};
-  padding: 10px 14px;
-  font-weight: 700;
+  padding: 10px 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: transform 170ms ease, box-shadow 170ms ease;
 

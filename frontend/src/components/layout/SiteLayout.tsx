@@ -1,5 +1,6 @@
+import { ShoppingCart } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { useState } from 'react';
 
 import { ROUTES } from '@src/app/routes';
 import { CartAuthPanel } from '@src/components/layout/CartAuthPanel';
@@ -16,6 +17,17 @@ export function SiteLayout() {
   const location = useLocation();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsCartOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <S.Wrapper>
@@ -45,6 +57,7 @@ export function SiteLayout() {
               setIsChatOpen(false);
             }}
           >
+            <ShoppingCart size={16} />
             Cart
           </S.CartButton>
 

@@ -35,6 +35,20 @@ describe('ShopPage', () => {
     expect(screen.queryByText(/butter croissant/i)).not.toBeInTheDocument();
   });
 
+  it('increments item quantity near add to cart button', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getAllByLabelText(/in cart: 0/i).length).toBeGreaterThan(0);
+    await user.click(screen.getAllByRole('button', { name: /add to cart/i })[0]);
+    expect(screen.getByText(/added/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/in cart: 1/i)).toBeInTheDocument();
+  });
+
   it('applies tag filter from url query', () => {
     render(
       <MemoryRouter initialEntries={[shopRoutes.withTag('New')]}>

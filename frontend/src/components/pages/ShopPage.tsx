@@ -102,6 +102,8 @@ export function ShopPage() {
   const [veganOnly, setVeganOnly] = useState(false);
   const [glutenFreeOnly, setGlutenFreeOnly] = useState(false);
   const [underTwenty, setUnderTwenty] = useState(false);
+  const [justAddedProductId, setJustAddedProductId] = useState<number | null>(null);
+  const [cartByProduct, setCartByProduct] = useState<Record<number, number>>({});
 
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
@@ -260,7 +262,23 @@ export function ShopPage() {
                         ))}
                       </S.ProductTags>
                       <S.ProductActions>
-                        <S.AddToCartButton type="button">Add to cart</S.AddToCartButton>
+                        <S.ItemCount aria-label={`In cart: ${cartByProduct[product.id] ?? 0}`}>
+                          In cart: {cartByProduct[product.id] ?? 0}
+                        </S.ItemCount>
+                        <S.AddToCartButton
+                          type="button"
+                          $added={justAddedProductId === product.id}
+                          onClick={() => {
+                            setCartByProduct((prev) => ({
+                              ...prev,
+                              [product.id]: (prev[product.id] ?? 0) + 1
+                            }));
+                            setJustAddedProductId(product.id);
+                            window.setTimeout(() => setJustAddedProductId(null), 360);
+                          }}
+                        >
+                          {justAddedProductId === product.id ? 'Added' : 'Add to cart'}
+                        </S.AddToCartButton>
                       </S.ProductActions>
                     </S.ProductBody>
                   </S.ProductCard>

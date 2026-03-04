@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
 
 export const Main = styled.main`
@@ -225,20 +225,48 @@ export const ProductTags = styled.div`
   flex-wrap: wrap;
 `;
 
-export const ProductActions = styled.div`
-  margin-top: 12px;
+const addPulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.03);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 `;
 
-export const AddToCartButton = styled.button`
-  width: 100%;
+export const ProductActions = styled.div`
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+`;
+
+export const ItemCount = styled.span`
+  border-radius: 999px;
+  background: #f5ece5;
+  color: #5e4339;
+  padding: 7px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+`;
+
+export const AddToCartButton = styled.button<{ $added: boolean }>`
   border-radius: 10px;
   border: 1px solid #2f6f51;
-  background: #2f6f51;
+  background: ${(props) => (props.$added ? '#256045' : '#2f6f51')};
   color: #fff;
   padding: 9px 12px;
   font-weight: 700;
   cursor: pointer;
   transition: transform 170ms ease, box-shadow 170ms ease;
+  animation: ${(props) => (props.$added ? addPulse : 'none')} 320ms ease;
 
   &:hover {
     transform: translateY(-1px);
