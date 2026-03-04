@@ -6,6 +6,7 @@ import { SignInPage } from '../components/pages/SignInPage';
 import { SignUpPage } from '../components/pages/SignUpPage';
 import { ShopPage } from '../components/pages/ShopPage';
 import { SiteLayout } from '../components/layout/SiteLayout';
+import { ROUTES, ROUTE_SEGMENTS } from './routes';
 
 export function App() {
   return (
@@ -13,12 +14,12 @@ export function App() {
       <Routes>
         <Route element={<SiteLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="shop" element={<ShopPage />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route path="sign-in" element={<SignInPage />} />
-          <Route path="sign-up" element={<SignUpPage />} />
+          <Route path={ROUTE_SEGMENTS.shop} element={<ShopPage />} />
+          <Route path={ROUTE_SEGMENTS.about} element={<AboutPage />} />
+          <Route path={ROUTE_SEGMENTS.signIn} element={<SignInPage />} />
+          <Route path={ROUTE_SEGMENTS.signUp} element={<SignUpPage />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
       </Routes>
     </BrowserRouter>
   );

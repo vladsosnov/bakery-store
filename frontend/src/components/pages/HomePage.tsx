@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { shopRoutes } from '../../app/routes';
 import * as S from './HomePage.styles';
 
 type Slide = {
@@ -25,7 +26,7 @@ const SLIDES: Slide[] = [
     subtitle: 'Flaky layers, fresh berries, and silky vanilla cream.',
     cta: 'Shop new collection',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1600&q=80',
-    to: '/shop?tag=New'
+    to: shopRoutes.withTag('New')
   },
   {
     id: 2,
@@ -33,7 +34,7 @@ const SLIDES: Slide[] = [
     subtitle: 'Limited small-batch cakes baked fresh every morning.',
     cta: 'Order today',
     image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1600&q=80',
-    to: '/shop'
+    to: shopRoutes.base
   },
   {
     id: 3,
@@ -41,7 +42,7 @@ const SLIDES: Slide[] = [
     subtitle: 'Stone-baked bread with deep aroma and crispy crust.',
     cta: 'Explore breads',
     image: 'https://images.unsplash.com/photo-1608198093002-ad4e005484ec?auto=format&fit=crop&w=1600&q=80',
-    to: '/shop?tag=Bread'
+    to: shopRoutes.withTag('Bread')
   }
 ];
 

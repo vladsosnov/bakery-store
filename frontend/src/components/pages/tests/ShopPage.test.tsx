@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
+import { shopRoutes } from '../../../app/routes';
 import { ShopPage } from '../ShopPage';
 
 describe('ShopPage', () => {
@@ -35,7 +36,7 @@ describe('ShopPage', () => {
 
   it('applies tag filter from url query', () => {
     render(
-      <MemoryRouter initialEntries={['/shop?tag=New']}>
+      <MemoryRouter initialEntries={[shopRoutes.withTag('New')]}>
         <ShopPage />
       </MemoryRouter>
     );
@@ -46,7 +47,7 @@ describe('ShopPage', () => {
 
   it('applies bread tag filter from url query', () => {
     render(
-      <MemoryRouter initialEntries={['/shop?tag=Bread']}>
+      <MemoryRouter initialEntries={[shopRoutes.withTag('Bread')]}>
         <ShopPage />
       </MemoryRouter>
     );

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { ROUTES } from '../../app/routes';
 import * as S from './SignInPage.styles';
 
 export function SignInPage() {
@@ -25,7 +26,7 @@ export function SignInPage() {
         </S.Form>
 
         <S.FooterText>
-          New here? <Link to="/sign-up">Create an account</Link>
+          New here? <Link to={ROUTES.signUp}>Create an account</Link>
         </S.FooterText>
       </S.Panel>
 

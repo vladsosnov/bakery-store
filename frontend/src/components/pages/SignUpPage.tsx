@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { ROUTES } from '../../app/routes';
 import * as S from './SignUpPage.styles';
 
 export function SignUpPage() {
@@ -42,7 +43,7 @@ export function SignUpPage() {
         </S.Form>
 
         <S.FooterText>
-          Already have an account? <Link to="/sign-in">Sign in</Link>
+          Already have an account? <Link to={ROUTES.signIn}>Sign in</Link>
         </S.FooterText>
       </S.Panel>
     </S.Section>

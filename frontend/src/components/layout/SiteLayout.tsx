@@ -1,13 +1,14 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 
+import { ROUTES } from '../../app/routes';
 import { ChatWidget } from './ChatWidget';
 import * as S from './SiteLayout.styles';
 
 const navItems = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/shop', label: 'Shop' },
-  { to: '/about', label: 'About' }
+  { to: ROUTES.home, label: 'Home', end: true },
+  { to: ROUTES.shop, label: 'Shop' },
+  { to: ROUTES.about, label: 'About' }
 ];
 
 export function SiteLayout() {
@@ -34,14 +35,14 @@ export function SiteLayout() {
 
         <S.Auth>
           <S.AuthLink
-            to="/sign-in"
+            to={ROUTES.signIn}
             $variant="ghost"
             className={({ isActive }) => (isActive ? 'active' : undefined)}
           >
             Sign in
           </S.AuthLink>
           <S.AuthLink
-            to="/sign-up"
+            to={ROUTES.signUp}
             $variant="solid"
             className={({ isActive }) => (isActive ? 'active' : undefined)}
           >
