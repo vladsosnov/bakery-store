@@ -5,7 +5,7 @@ export function AboutPage() {
     <S.Main>
       <S.Section>
         <S.Hero>
-          <S.HeroTitle>About Bakery Store</S.HeroTitle>
+          <S.HeroTitle>About bakery store</S.HeroTitle>
           <p>
             Hi, I am <strong>Vlad Sosnov</strong>. I am a baker who cooks cakes, pastries, and
             artisan bread with a focus on clean ingredients and consistent quality.
@@ -18,19 +18,19 @@ export function AboutPage() {
 
         <S.Grid>
           <S.Card>
-            <S.CardTitle>Our Mission</S.CardTitle>
+            <S.CardTitle>Our mission</S.CardTitle>
             <S.CardText>
               To make every customer feel special with fresh bakery products made with care.
             </S.CardText>
           </S.Card>
 
           <S.Card>
-            <S.CardTitle>What We Value</S.CardTitle>
+            <S.CardTitle>What we value</S.CardTitle>
             <S.CardText>Quality ingredients, honest recipes, and warm service for every order.</S.CardText>
           </S.Card>
 
           <S.Card>
-            <S.CardTitle>Why Customers Choose Us</S.CardTitle>
+            <S.CardTitle>Why we</S.CardTitle>
             <S.CardText>
               Reliable taste, custom cake options, and beautiful presentation for events.
             </S.CardText>

@@ -35,14 +35,14 @@ export function SiteLayout() {
             $variant="ghost"
             className={({ isActive }) => (isActive ? 'active' : undefined)}
           >
-            Sign In
+            Sign in
           </S.AuthLink>
           <S.AuthLink
             to="/sign-up"
             $variant="solid"
             className={({ isActive }) => (isActive ? 'active' : undefined)}
           >
-            Sign Up
+            Sign up
           </S.AuthLink>
         </S.Auth>
       </S.Header>

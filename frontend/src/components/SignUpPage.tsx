@@ -6,7 +6,7 @@ export function SignUpPage() {
   return (
     <S.Section>
       <S.AccentPanel>
-        <S.AccentTitle>Create Your Account</S.AccentTitle>
+        <S.AccentTitle>Create your account</S.AccentTitle>
         <S.AccentText>
           Join Bakery Store to get personalized offers, easy reorders, and seasonal cake alerts.
         </S.AccentText>
@@ -18,8 +18,8 @@ export function SignUpPage() {
       </S.AccentPanel>
 
       <S.Panel>
-        <S.Eyebrow>START HERE</S.Eyebrow>
-        <S.Title>Sign Up</S.Title>
+        <S.Eyebrow>Start here</S.Eyebrow>
+        <S.Title>Sign up</S.Title>
         <S.Subtitle>It takes less than a minute.</S.Subtitle>
 
         <S.Form>
@@ -38,7 +38,7 @@ export function SignUpPage() {
             <S.Input type="password" placeholder="Create a password" />
           </S.Label>
 
-          <S.SubmitButton type="submit">Create Account</S.SubmitButton>
+          <S.SubmitButton type="submit">Create account</S.SubmitButton>
         </S.Form>
 
         <S.FooterText>

@@ -6,8 +6,8 @@ export function SignInPage() {
   return (
     <S.Section>
       <S.Panel>
-        <S.Eyebrow>WELCOME BACK</S.Eyebrow>
-        <S.Title>Sign In</S.Title>
+        <S.Eyebrow>Welcome back</S.Eyebrow>
+        <S.Title>Sign in</S.Title>
         <S.Subtitle>Continue to your bakery account and manage your orders.</S.Subtitle>
 
         <S.Form>
@@ -21,7 +21,7 @@ export function SignInPage() {
             <S.Input type="password" placeholder="Enter your password" />
           </S.Label>
 
-          <S.SubmitButton type="submit">Sign In</S.SubmitButton>
+          <S.SubmitButton type="submit">Sign in</S.SubmitButton>
         </S.Form>
 
         <S.FooterText>
