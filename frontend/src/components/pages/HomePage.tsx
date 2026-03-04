@@ -74,15 +74,17 @@ export function HomePage() {
     <S.Main>
       <S.Section>
         <S.Slider aria-label="New bakery products banner">
-          <S.SlideImage src={currentSlide.image} alt={currentSlide.title} />
-          <S.SlideOverlay />
+          <S.SlideStage key={currentSlide.id}>
+            <S.SlideImage src={currentSlide.image} alt={currentSlide.title} />
+            <S.SlideOverlay />
 
-          <S.SlideContent>
-            <S.Eyebrow>Fresh drop</S.Eyebrow>
-            <S.HeroTitle>{currentSlide.title}</S.HeroTitle>
-            <S.Subtitle>{currentSlide.subtitle}</S.Subtitle>
-            <S.CTAButton type="button">{currentSlide.cta}</S.CTAButton>
-          </S.SlideContent>
+            <S.SlideContent>
+              <S.Eyebrow>Fresh drop</S.Eyebrow>
+              <S.HeroTitle>{currentSlide.title}</S.HeroTitle>
+              <S.Subtitle>{currentSlide.subtitle}</S.Subtitle>
+              <S.CTAButton type="button">{currentSlide.cta}</S.CTAButton>
+            </S.SlideContent>
+          </S.SlideStage>
 
           <S.SliderDots>
             {SLIDES.map((slide, index) => (

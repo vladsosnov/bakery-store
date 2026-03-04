@@ -1,4 +1,16 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const slideEnter = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(18px) scale(1.015);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+`;
 
 export const Main = styled.main``;
 
@@ -16,6 +28,16 @@ export const Slider = styled.article`
   display: flex;
   align-items: flex-end;
   box-shadow: 0 16px 30px rgba(117, 79, 52, 0.18);
+`;
+
+export const SlideStage = styled.div`
+  position: absolute;
+  inset: 0;
+  animation: ${slideEnter} 520ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 `;
 
 export const SlideImage = styled.img`
@@ -37,6 +59,7 @@ export const SlideContent = styled.div`
   padding: 36px;
   color: #fff;
   max-width: 540px;
+  z-index: 2;
 `;
 
 export const Eyebrow = styled.p`
