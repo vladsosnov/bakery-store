@@ -1,16 +1,5 @@
-import styled, { keyframes } from 'styled-components';
-
-const revealList = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.985);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-`;
+import styled from 'styled-components';
+import { fadeInLift } from '../../styles/animations';
 
 export const Main = styled.main`
   width: min(1200px, 94vw);
@@ -186,7 +175,7 @@ export const ProductsGrid = styled.div`
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  animation: ${revealList} 260ms ease;
+  animation: ${fadeInLift} 260ms ease;
 `;
 
 export const ProductCard = styled.article`
@@ -252,7 +241,7 @@ export const EmptyState = styled.div`
   border-radius: 14px;
   padding: 18px;
   color: #705247;
-  animation: ${revealList} 220ms ease;
+  animation: ${fadeInLift} 220ms ease;
 `;
 
 export const ResultTransition = styled.div`

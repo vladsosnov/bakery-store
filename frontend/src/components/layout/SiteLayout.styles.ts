@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { fadeInLift } from '../../styles/animations';
 
 type AuthVariant = 'ghost' | 'solid';
 
@@ -92,9 +93,10 @@ export const ContentInner = styled.div`
 
 export const RouteTransition = styled.div`
   flex: 1;
+  animation: ${fadeInLift} 260ms ease-out;
 
-  &.route-transition {
-    animation: page-enter 260ms ease-out;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 `;
 

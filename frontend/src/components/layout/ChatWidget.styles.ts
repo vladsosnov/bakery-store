@@ -1,16 +1,5 @@
-import styled, { keyframes } from 'styled-components';
-
-const slideIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-`;
+import styled from 'styled-components';
+import { fadeInLift } from '../../styles/animations';
 
 export const Panel = styled.section`
   position: fixed;
@@ -26,7 +15,7 @@ export const Panel = styled.section`
   box-shadow: 0 20px 48px rgba(65, 43, 33, 0.28);
   overflow: hidden;
   z-index: 45;
-  animation: ${slideIn} 240ms ease;
+  animation: ${fadeInLift} 240ms ease;
 `;
 
 export const Header = styled.header`

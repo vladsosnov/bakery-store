@@ -52,7 +52,7 @@ export function SiteLayout() {
 
       <S.Content>
         <S.ContentInner>
-          <S.RouteTransition key={location.pathname} className="route-transition">
+          <S.RouteTransition key={location.pathname}>
             <Outlet />
           </S.RouteTransition>
 
