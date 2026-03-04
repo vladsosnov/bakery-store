@@ -1,4 +1,16 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const revealList = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+`;
 
 export const Main = styled.main`
   width: min(1200px, 94vw);
@@ -42,6 +54,8 @@ export const Sidebar = styled.aside`
   @media (max-width: 900px) {
     position: static;
   }
+
+  transition: box-shadow 180ms ease, transform 180ms ease;
 `;
 
 export const SideTitle = styled.h2`
@@ -64,6 +78,19 @@ export const CheckboxLabel = styled.label`
   align-items: center;
   margin-bottom: 8px;
   color: #5d4137;
+  transition: color 160ms ease, transform 160ms ease;
+  cursor: pointer;
+
+  &:hover {
+    color: #452f28;
+    transform: translateX(1px);
+  }
+
+  input {
+    accent-color: #2f6f51;
+    width: 16px;
+    height: 16px;
+  }
 `;
 
 export const ResetButton = styled.button`
@@ -76,6 +103,17 @@ export const ResetButton = styled.button`
   padding: 10px 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+
+  &:hover {
+    background: #f4e8de;
+    box-shadow: 0 8px 16px rgba(83, 51, 51, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 export const Content = styled.div`
@@ -88,6 +126,7 @@ export const Toolbar = styled.div`
   border-radius: 20px;
   padding: 14px;
   box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  transition: box-shadow 200ms ease;
 `;
 
 export const SearchInput = styled.input`
@@ -96,6 +135,14 @@ export const SearchInput = styled.input`
   border: 1px solid #e3cbbb;
   padding: 12px 13px;
   font-size: 0.98rem;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+
+  &:focus {
+    outline: none;
+    border-color: #2f6f51;
+    box-shadow: 0 0 0 4px rgba(47, 111, 81, 0.13);
+    background: #fff;
+  }
 `;
 
 export const Categories = styled.div`
@@ -113,6 +160,20 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
   padding: 8px 12px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: ${(props) =>
+    props.$active ? '0 8px 16px rgba(47, 111, 81, 0.25)' : '0 2px 6px rgba(93, 65, 55, 0.08)'};
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease,
+    border-color 180ms ease, color 180ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: ${(props) =>
+    props.$active ? '0 10px 18px rgba(47, 111, 81, 0.32)' : '0 7px 14px rgba(93, 65, 55, 0.14)'};
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 export const Summary = styled.p`
@@ -125,6 +186,7 @@ export const ProductsGrid = styled.div`
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  animation: ${revealList} 260ms ease;
 `;
 
 export const ProductCard = styled.article`
@@ -133,6 +195,12 @@ export const ProductCard = styled.article`
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(118, 77, 48, 0.16);
+  }
 `;
 
 export const ProductImage = styled.img`
@@ -184,4 +252,16 @@ export const EmptyState = styled.div`
   border-radius: 14px;
   padding: 18px;
   color: #705247;
+  animation: ${revealList} 220ms ease;
+`;
+
+export const ResultTransition = styled.div`
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 `;

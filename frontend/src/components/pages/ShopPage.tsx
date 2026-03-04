@@ -104,6 +104,14 @@ export function ShopPage() {
     });
   }, [activeCategory, search, veganOnly, glutenFreeOnly, underTwenty]);
 
+  const filterAnimationKey = [
+    activeCategory,
+    search.trim().toLowerCase(),
+    veganOnly ? 'v' : 'nv',
+    glutenFreeOnly ? 'gf' : 'ngf',
+    underTwenty ? 'u20' : 'allp'
+  ].join('|');
+
   return (
     <S.Main>
       <S.Header>
@@ -189,28 +197,30 @@ export function ShopPage() {
             <S.Summary>{filteredProducts.length} products found</S.Summary>
           </S.Toolbar>
 
-          {filteredProducts.length > 0 ? (
-            <S.ProductsGrid>
-              {filteredProducts.map((product) => (
-                <S.ProductCard key={product.id}>
-                  <S.ProductImage src={product.image} alt={product.name} />
-                  <S.ProductBody>
-                    <S.ProductTitle>{product.name}</S.ProductTitle>
-                    <S.ProductMeta>{product.description}</S.ProductMeta>
-                    <S.ProductPrice>${product.price.toFixed(2)}</S.ProductPrice>
-                    <S.ProductTags>
-                      <S.ProductTag>{product.category}</S.ProductTag>
-                      {product.tags.map((tag) => (
-                        <S.ProductTag key={tag}>{tag}</S.ProductTag>
-                      ))}
-                    </S.ProductTags>
-                  </S.ProductBody>
-                </S.ProductCard>
-              ))}
-            </S.ProductsGrid>
-          ) : (
-            <S.EmptyState>No results. Try changing filters or search query.</S.EmptyState>
-          )}
+          <S.ResultTransition key={filterAnimationKey}>
+            {filteredProducts.length > 0 ? (
+              <S.ProductsGrid>
+                {filteredProducts.map((product) => (
+                  <S.ProductCard key={product.id}>
+                    <S.ProductImage src={product.image} alt={product.name} />
+                    <S.ProductBody>
+                      <S.ProductTitle>{product.name}</S.ProductTitle>
+                      <S.ProductMeta>{product.description}</S.ProductMeta>
+                      <S.ProductPrice>${product.price.toFixed(2)}</S.ProductPrice>
+                      <S.ProductTags>
+                        <S.ProductTag>{product.category}</S.ProductTag>
+                        {product.tags.map((tag) => (
+                          <S.ProductTag key={tag}>{tag}</S.ProductTag>
+                        ))}
+                      </S.ProductTags>
+                    </S.ProductBody>
+                  </S.ProductCard>
+                ))}
+              </S.ProductsGrid>
+            ) : (
+              <S.EmptyState>No results. Try changing filters or search query.</S.EmptyState>
+            )}
+          </S.ResultTransition>
         </S.Content>
       </S.Layout>
     </S.Main>
