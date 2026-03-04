@@ -26,6 +26,7 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      indent: ['error', 2, { SwitchCase: 1 }],
       'react-refresh/only-export-components': 'warn'
     }
   }
