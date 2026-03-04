@@ -1,8 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import * as S from './ShopPage.styles';
 
 type Category = 'All' | 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';
+type ProductTag =
+  | 'All'
+  | 'New'
+  | 'Bread'
+  | 'Best seller'
+  | 'Party'
+  | 'Artisan'
+  | 'Seasonal'
+  | 'Gift';
 
 type Product = {
   id: number;
@@ -19,6 +29,7 @@ type Product = {
 };
 
 const CATEGORIES: Category[] = ['All', 'Bread', 'Cakes', 'Pastries', 'Cookies'];
+const TAGS: ProductTag[] = ['All', 'New', 'Bread', 'Best seller', 'Party', 'Artisan', 'Seasonal', 'Gift'];
 
 const PRODUCTS: Product[] = [
   {
@@ -48,7 +59,7 @@ const PRODUCTS: Product[] = [
     price: 8,
     image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=900&q=80',
     description: 'Naturally fermented bread with deep flavor.',
-    tags: ['Artisan'],
+    tags: ['Bread', 'Artisan'],
     dietary: { vegan: true, glutenFree: false }
   },
   {
@@ -84,11 +95,30 @@ const PRODUCTS: Product[] = [
 ];
 
 export function ShopPage() {
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<Category>('All');
+  const [activeTag, setActiveTag] = useState<ProductTag>('All');
   const [veganOnly, setVeganOnly] = useState(false);
   const [glutenFreeOnly, setGlutenFreeOnly] = useState(false);
   const [underTwenty, setUnderTwenty] = useState(false);
+
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category');
+    const tagFromUrl = searchParams.get('tag');
+
+    if (categoryFromUrl && CATEGORIES.includes(categoryFromUrl as Category)) {
+      setActiveCategory(categoryFromUrl as Category);
+    } else {
+      setActiveCategory('All');
+    }
+
+    if (tagFromUrl && TAGS.includes(tagFromUrl as ProductTag)) {
+      setActiveTag(tagFromUrl as ProductTag);
+    } else {
+      setActiveTag('All');
+    }
+  }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter((product) => {
@@ -99,13 +129,15 @@ export function ShopPage() {
       const byVegan = !veganOnly || product.dietary.vegan;
       const byGlutenFree = !glutenFreeOnly || product.dietary.glutenFree;
       const byPrice = !underTwenty || product.price < 20;
+      const byTag = activeTag === 'All' || product.tags.includes(activeTag);
 
-      return byCategory && bySearch && byVegan && byGlutenFree && byPrice;
+      return byCategory && bySearch && byVegan && byGlutenFree && byPrice && byTag;
     });
-  }, [activeCategory, search, veganOnly, glutenFreeOnly, underTwenty]);
+  }, [activeCategory, activeTag, search, veganOnly, glutenFreeOnly, underTwenty]);
 
   const filterAnimationKey = [
     activeCategory,
+    activeTag,
     search.trim().toLowerCase(),
     veganOnly ? 'v' : 'nv',
     glutenFreeOnly ? 'gf' : 'ngf',
@@ -162,6 +194,7 @@ export function ShopPage() {
             onClick={() => {
               setSearch('');
               setActiveCategory('All');
+              setActiveTag('All');
               setVeganOnly(false);
               setGlutenFreeOnly(false);
               setUnderTwenty(false);
@@ -190,6 +223,19 @@ export function ShopPage() {
                   onClick={() => setActiveCategory(category)}
                 >
                   {category}
+                </S.CategoryButton>
+              ))}
+            </S.Categories>
+
+            <S.Categories aria-label="Tag filters">
+              {TAGS.map((tag) => (
+                <S.CategoryButton
+                  key={tag}
+                  type="button"
+                  $active={activeTag === tag}
+                  onClick={() => setActiveTag(tag)}
+                >
+                  #{tag}
                 </S.CategoryButton>
               ))}
             </S.Categories>
