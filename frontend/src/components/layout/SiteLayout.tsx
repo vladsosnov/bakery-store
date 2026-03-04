@@ -51,12 +51,14 @@ export function SiteLayout() {
       </S.Header>
 
       <S.Content>
-        <S.RouteTransition key={location.pathname} className="route-transition">
-          <Outlet />
-        </S.RouteTransition>
-      </S.Content>
+        <S.ContentInner>
+          <S.RouteTransition key={location.pathname} className="route-transition">
+            <Outlet />
+          </S.RouteTransition>
 
-      <S.Footer>Bakery Store - Freshly baked with care, every single day.</S.Footer>
+          <S.Footer>Bakery Store - Freshly baked with care, every single day.</S.Footer>
+        </S.ContentInner>
+      </S.Content>
 
       {isChatOpen ? <ChatWidget onClose={() => setIsChatOpen(false)} /> : null}
 

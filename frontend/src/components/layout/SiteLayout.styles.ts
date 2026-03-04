@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 type AuthVariant = 'ghost' | 'solid';
 
 export const Wrapper = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #fff7f0 0%, #fff 40%, #fff7f0 100%);
@@ -80,9 +80,19 @@ export const AuthLink = styled(NavLink)<{ $variant: AuthVariant }>`
 
 export const Content = styled.div`
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
+export const ContentInner = styled.div`
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const RouteTransition = styled.div`
+  flex: 1;
+
   &.route-transition {
     animation: page-enter 260ms ease-out;
   }
