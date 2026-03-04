@@ -48,6 +48,9 @@ const styles: Record<string, CSSProperties> = {
     cursor: 'pointer',
     fontWeight: 600
   },
+  buttonGhostActive: {
+    background: '#f3e4d9'
+  },
   buttonSolid: {
     border: '1px solid #513333',
     background: '#513333',
@@ -56,6 +59,10 @@ const styles: Record<string, CSSProperties> = {
     padding: '10px 16px',
     cursor: 'pointer',
     fontWeight: 600
+  },
+  buttonSolidActive: {
+    background: '#3e2424',
+    borderColor: '#3e2424'
   },
   footer: {
     marginTop: '20px',
@@ -80,9 +87,9 @@ const styles: Record<string, CSSProperties> = {
 };
 
 const navItems = [
-  { to: '/', label: 'Home Page', end: true },
-  { to: '/shop', label: 'Shop Page' },
-  { to: '/about', label: 'About Page' }
+  { to: '/', label: 'Home', end: true },
+  { to: '/shop', label: 'Shop' },
+  { to: '/about', label: 'About' }
 ];
 
 export function SiteLayout() {
@@ -110,20 +117,34 @@ export function SiteLayout() {
         </nav>
 
         <div style={styles.auth}>
-          <button type="button" style={styles.buttonGhost}>
+          <NavLink
+            to="/sign-in"
+            style={({ isActive }) => ({
+              ...styles.buttonGhost,
+              ...(isActive ? styles.buttonGhostActive : {}),
+              textDecoration: 'none'
+            })}
+          >
             Sign In
-          </button>
-          <button type="button" style={styles.buttonSolid}>
+          </NavLink>
+          <NavLink
+            to="/sign-up"
+            style={({ isActive }) => ({
+              ...styles.buttonSolid,
+              ...(isActive ? styles.buttonSolidActive : {}),
+              textDecoration: 'none'
+            })}
+          >
             Sign Up
-          </button>
+          </NavLink>
         </div>
       </header>
 
-      <main style={styles.content}>
+      <div style={styles.content}>
         <div key={location.pathname} className="route-transition">
           <Outlet />
         </div>
-      </main>
+      </div>
 
       <footer style={styles.footer}>
         Bakery Store - Freshly baked with care, every single day.
