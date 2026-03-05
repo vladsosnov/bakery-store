@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FC } from 'react';
+import { useEffect, useMemo, useState, type FC, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { shopRoutes } from '@src/app/routes';
@@ -69,6 +69,21 @@ export const HomePage: FC = () => {
   const [slideIndex, setSlideIndex] = useState(0);
   const currentSlide = useMemo(() => SLIDES[slideIndex], [slideIndex]);
 
+  const handleSlideCtaClick = () => {
+    navigate(currentSlide.to);
+  };
+
+  const handleSliderDotClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const indexValue = event.currentTarget.dataset.index;
+    const nextSlideIndex = indexValue ? Number(indexValue) : Number.NaN;
+
+    if (Number.isNaN(nextSlideIndex)) {
+      return;
+    }
+
+    setSlideIndex(nextSlideIndex);
+  };
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setSlideIndex((prev) => (prev + 1) % SLIDES.length);
@@ -89,7 +104,7 @@ export const HomePage: FC = () => {
               <S.Eyebrow>Fresh drop</S.Eyebrow>
               <S.HeroTitle>{currentSlide.title}</S.HeroTitle>
               <S.Subtitle>{currentSlide.subtitle}</S.Subtitle>
-              <S.CTAButton type="button" onClick={() => navigate(currentSlide.to)}>
+              <S.CTAButton type="button" onClick={handleSlideCtaClick}>
                 {currentSlide.cta}
               </S.CTAButton>
             </S.SlideContent>
@@ -100,7 +115,8 @@ export const HomePage: FC = () => {
               <S.SliderDot
                 key={slide.id}
                 type="button"
-                onClick={() => setSlideIndex(index)}
+                data-index={index}
+                onClick={handleSliderDotClick}
                 $active={index === slideIndex}
                 aria-label={`Go to slide ${index + 1}`}
               />

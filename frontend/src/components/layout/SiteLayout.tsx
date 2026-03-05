@@ -39,6 +39,36 @@ export const SiteLayout: FC = () => {
     };
   }, []);
 
+  const handleCartButtonClick = () => {
+    if (session) {
+      setIsCartOpen(false);
+      setIsChatOpen(false);
+      navigate(ROUTES.cart);
+      return;
+    }
+
+    setIsCartOpen((prev) => !prev);
+    setIsChatOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    clearAuthSession();
+    navigate(ROUTES.home);
+  };
+
+  const handleCartPanelClose = () => {
+    setIsCartOpen(false);
+  };
+
+  const handleChatPanelClose = () => {
+    setIsChatOpen(false);
+  };
+
+  const handleChatButtonClick = () => {
+    setIsChatOpen((prev) => !prev);
+    setIsCartOpen(false);
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -75,17 +105,7 @@ export const SiteLayout: FC = () => {
             aria-label={
               session ? 'Go to cart page' : isCartOpen ? 'Close cart' : 'Open cart'
             }
-            onClick={() => {
-              if (session) {
-                setIsCartOpen(false);
-                setIsChatOpen(false);
-                navigate(ROUTES.cart);
-                return;
-              }
-
-              setIsCartOpen((prev) => !prev);
-              setIsChatOpen(false);
-            }}
+            onClick={handleCartButtonClick}
           >
             <ShoppingCart size={16} />
             Cart
@@ -103,10 +123,7 @@ export const SiteLayout: FC = () => {
                 </S.AuthLink>
                 <S.LogoutButton
                   type="button"
-                  onClick={() => {
-                    clearAuthSession();
-                    navigate(ROUTES.home);
-                  }}
+                  onClick={handleLogoutClick}
                 >
                   Logout
                 </S.LogoutButton>
@@ -145,21 +162,18 @@ export const SiteLayout: FC = () => {
 
       {isCartOpen ? (
         <CartAuthPanel
-          onClose={() => setIsCartOpen(false)}
+          onClose={handleCartPanelClose}
           isAuthenticated={Boolean(session)}
           firstName={session?.user.firstName}
         />
       ) : null}
-      {isChatOpen ? <ChatWidget onClose={() => setIsChatOpen(false)} /> : null}
+      {isChatOpen ? <ChatWidget onClose={handleChatPanelClose} /> : null}
 
       <S.ChatButton
         type="button"
         $open={isChatOpen}
         aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
-        onClick={() => {
-          setIsChatOpen((prev) => !prev);
-          setIsCartOpen(false);
-        }}
+        onClick={handleChatButtonClick}
       >
         {isChatOpen ? 'Hide chat' : 'Chat'}
       </S.ChatButton>

@@ -1,4 +1,4 @@
-import { useState, type FC, type SyntheticEvent } from 'react';
+import { useState, type ChangeEvent, type FC, type MouseEvent, type SyntheticEvent } from 'react';
 
 import * as S from './ChatWidget.styles';
 
@@ -48,6 +48,21 @@ export const ChatWidget: FC<ChatWidgetProps> = ({ onClose }) => {
     setMessages((prev) => [...prev, { id: prev.length + 1, role, text }]);
   };
 
+  const handleQuickActionClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const action = event.currentTarget.dataset.action;
+
+    if (!action) {
+      return;
+    }
+
+    pushMessage(action, 'user');
+    pushMessage(generateReply(action), 'assistant');
+  };
+
+  const handleDraftChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setDraft(event.target.value);
+  };
+
   const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     const next = draft.trim();
@@ -84,14 +99,7 @@ export const ChatWidget: FC<ChatWidgetProps> = ({ onClose }) => {
       <S.Footer>
         <S.QuickActions>
           {QUICK_ACTIONS.map((action) => (
-            <S.QuickButton
-              key={action}
-              type="button"
-              onClick={() => {
-                pushMessage(action, 'user');
-                pushMessage(generateReply(action), 'assistant');
-              }}
-            >
+            <S.QuickButton key={action} type="button" data-action={action} onClick={handleQuickActionClick}>
               {action}
             </S.QuickButton>
           ))}
@@ -100,7 +108,7 @@ export const ChatWidget: FC<ChatWidgetProps> = ({ onClose }) => {
         <S.Composer onSubmit={handleSubmit}>
           <S.Input
             value={draft}
-            onChange={(event) => setDraft(event.target.value)}
+            onChange={handleDraftChange}
             placeholder="Write a message..."
             aria-label="Chat message"
           />

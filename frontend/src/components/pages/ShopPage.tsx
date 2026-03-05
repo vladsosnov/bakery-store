@@ -1,21 +1,14 @@
-import { useEffect, useMemo, useState, type FC } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { listProducts, type ApiProduct } from '@src/services/product-api';
 import * as S from './ShopPage.styles';
 
 type Category = 'All' | 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';
-type ProductTag =
-  | 'All'
-  | 'New'
-  | 'Bread'
-  | 'Best seller'
-  | 'Party'
-  | 'Artisan'
-  | 'Seasonal'
-  | 'Gift';
+type ProductTag = 'All' | string;
 
 type Product = {
-  id: number;
+  id: string;
   name: string;
   category: Exclude<Category, 'All'>;
   price: number;
@@ -29,81 +22,141 @@ type Product = {
 };
 
 const CATEGORIES: Category[] = ['All', 'Bread', 'Cakes', 'Pastries', 'Cookies'];
-const TAGS: ProductTag[] = ['All', 'New', 'Bread', 'Best seller', 'Party', 'Artisan', 'Seasonal', 'Gift'];
 
-const PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: 'Butter croissant',
-    category: 'Pastries',
-    price: 4.5,
-    image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=900&q=80',
-    description: 'Flaky laminated pastry with cultured butter.',
-    tags: ['Best seller'],
-    dietary: { vegan: false, glutenFree: false }
-  },
-  {
-    id: 2,
-    name: 'Chocolate celebration cake',
-    category: 'Cakes',
-    price: 42,
-    image: 'https://images.unsplash.com/photo-1602351447937-745cb720612f?auto=format&fit=crop&w=900&q=80',
-    description: 'Rich cocoa sponge with silky ganache layers.',
-    tags: ['Party'],
-    dietary: { vegan: false, glutenFree: false }
-  },
-  {
-    id: 3,
-    name: 'Sourdough loaf',
-    category: 'Bread',
-    price: 8,
-    image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=900&q=80',
-    description: 'Naturally fermented bread with deep flavor.',
-    tags: ['Bread', 'Artisan'],
-    dietary: { vegan: true, glutenFree: false }
-  },
-  {
-    id: 4,
-    name: 'Strawberry shortcake',
-    category: 'Cakes',
-    price: 36,
-    image: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=900&q=80',
-    description: 'Fresh cream cake layered with seasonal strawberries.',
-    tags: ['Seasonal'],
-    dietary: { vegan: false, glutenFree: false }
-  },
-  {
-    id: 5,
-    name: 'Almond flour cookie box',
-    category: 'Cookies',
-    price: 14,
-    image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=900&q=80',
-    description: 'Crunchy almond cookies with vanilla notes.',
-    tags: ['Gift'],
-    dietary: { vegan: false, glutenFree: true }
-  },
-  {
-    id: 6,
-    name: 'Vegan cinnamon roll',
-    category: 'Pastries',
-    price: 5.5,
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80',
-    description: 'Soft swirl pastry with cinnamon glaze.',
-    tags: ['New'],
-    dietary: { vegan: true, glutenFree: false }
+const inferDietary = (product: ApiProduct) => {
+  if (product.dietary) {
+    return product.dietary;
   }
-];
+
+  const combinedText = `${product.name} ${product.tags.join(' ')}`.toLowerCase();
+
+  return {
+    vegan: combinedText.includes('vegan'),
+    glutenFree: combinedText.includes('gluten') || combinedText.includes('almond flour')
+  };
+};
+
+const toCategory = (category: string): Exclude<Category, 'All'> => {
+  const isKnownCategory = CATEGORIES.includes(category as Category) && category !== 'All';
+
+  return isKnownCategory ? (category as Exclude<Category, 'All'>) : 'Pastries';
+};
+
+const mapApiProduct = (product: ApiProduct): Product => {
+  return {
+    id: product._id,
+    name: product.name,
+    category: toCategory(product.category),
+    price: product.price,
+    image: product.imageUrl,
+    description: product.description,
+    tags: product.tags,
+    dietary: inferDietary(product)
+  };
+};
 
 export const ShopPage: FC = () => {
   const [searchParams] = useSearchParams();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<Category>('All');
   const [activeTag, setActiveTag] = useState<ProductTag>('All');
   const [veganOnly, setVeganOnly] = useState(false);
   const [glutenFreeOnly, setGlutenFreeOnly] = useState(false);
   const [underTwenty, setUnderTwenty] = useState(false);
-  const [justAddedProductId, setJustAddedProductId] = useState<number | null>(null);
-  const [cartByProduct, setCartByProduct] = useState<Record<number, number>>({});
+  const [justAddedProductId, setJustAddedProductId] = useState<string | null>(null);
+  const [cartByProduct, setCartByProduct] = useState<Record<string, number>>({});
+  const availableTags = useMemo<ProductTag[]>(() => {
+    const uniqueTags = new Set<string>();
+
+    products.forEach((product) => {
+      product.tags.forEach((tag) => uniqueTags.add(tag));
+    });
+
+    return ['All', ...Array.from(uniqueTags).slice(0, 10)];
+  }, [products]);
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  };
+
+  const handleFiltersReset = () => {
+    setSearch('');
+    setActiveCategory('All');
+    setActiveTag('All');
+    setVeganOnly(false);
+    setGlutenFreeOnly(false);
+    setUnderTwenty(false);
+  };
+
+  const handleFilterToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+
+    if (name === 'veganOnly') {
+      setVeganOnly(checked);
+      return;
+    }
+
+    if (name === 'glutenFreeOnly') {
+      setGlutenFreeOnly(checked);
+      return;
+    }
+
+    if (name === 'underTwenty') {
+      setUnderTwenty(checked);
+    }
+  };
+
+  const handleCategoryClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const category = event.currentTarget.dataset.category;
+
+    if (category && CATEGORIES.includes(category as Category)) {
+      setActiveCategory(category as Category);
+    }
+  };
+
+  const handleTagClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const tag = event.currentTarget.dataset.tag;
+
+    if (tag && availableTags.includes(tag)) {
+      setActiveTag(tag);
+    }
+  };
+
+  const handleAddToCartClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const productId = event.currentTarget.dataset.productId;
+
+    if (!productId) {
+      return;
+    }
+
+    setCartByProduct((prev) => ({
+      ...prev,
+      [productId]: (prev[productId] ?? 0) + 1
+    }));
+    setJustAddedProductId(productId);
+    window.setTimeout(() => setJustAddedProductId(null), 360);
+  };
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const response = await listProducts();
+        setProducts(response.map(mapApiProduct));
+      } catch {
+        setLoadError('Failed to load products. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadProducts();
+  }, []);
 
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
@@ -115,15 +168,15 @@ export const ShopPage: FC = () => {
       setActiveCategory('All');
     }
 
-    if (tagFromUrl && TAGS.includes(tagFromUrl as ProductTag)) {
-      setActiveTag(tagFromUrl as ProductTag);
+    if (tagFromUrl && availableTags.includes(tagFromUrl)) {
+      setActiveTag(tagFromUrl);
     } else {
       setActiveTag('All');
     }
-  }, [searchParams]);
+  }, [availableTags, searchParams]);
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       const byCategory = activeCategory === 'All' || product.category === activeCategory;
       const bySearch =
         product.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -135,7 +188,7 @@ export const ShopPage: FC = () => {
 
       return byCategory && bySearch && byVegan && byGlutenFree && byPrice && byTag;
     });
-  }, [activeCategory, activeTag, search, veganOnly, glutenFreeOnly, underTwenty]);
+  }, [activeCategory, activeTag, products, search, veganOnly, glutenFreeOnly, underTwenty]);
 
   const filterAnimationKey = [
     activeCategory,
@@ -143,7 +196,8 @@ export const ShopPage: FC = () => {
     search.trim().toLowerCase(),
     veganOnly ? 'v' : 'nv',
     glutenFreeOnly ? 'gf' : 'ngf',
-    underTwenty ? 'u20' : 'allp'
+    underTwenty ? 'u20' : 'allp',
+    products.length
   ].join('|');
 
   return (
@@ -164,16 +218,18 @@ export const ShopPage: FC = () => {
             <S.CheckboxLabel>
               <input
                 type="checkbox"
+                name="veganOnly"
                 checked={veganOnly}
-                onChange={(event) => setVeganOnly(event.target.checked)}
+                onChange={handleFilterToggle}
               />
               Vegan only
             </S.CheckboxLabel>
             <S.CheckboxLabel>
               <input
                 type="checkbox"
+                name="glutenFreeOnly"
                 checked={glutenFreeOnly}
-                onChange={(event) => setGlutenFreeOnly(event.target.checked)}
+                onChange={handleFilterToggle}
               />
               Gluten-free only
             </S.CheckboxLabel>
@@ -184,24 +240,15 @@ export const ShopPage: FC = () => {
             <S.CheckboxLabel>
               <input
                 type="checkbox"
+                name="underTwenty"
                 checked={underTwenty}
-                onChange={(event) => setUnderTwenty(event.target.checked)}
+                onChange={handleFilterToggle}
               />
               Under $20
             </S.CheckboxLabel>
           </S.SideGroup>
 
-          <S.ResetButton
-            type="button"
-            onClick={() => {
-              setSearch('');
-              setActiveCategory('All');
-              setActiveTag('All');
-              setVeganOnly(false);
-              setGlutenFreeOnly(false);
-              setUnderTwenty(false);
-            }}
-          >
+          <S.ResetButton type="button" onClick={handleFiltersReset}>
             Reset filters
           </S.ResetButton>
         </S.Sidebar>
@@ -212,7 +259,7 @@ export const ShopPage: FC = () => {
               type="search"
               value={search}
               placeholder="Search cakes, bread, pastries..."
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={handleSearchChange}
               aria-label="Search products"
             />
 
@@ -221,8 +268,9 @@ export const ShopPage: FC = () => {
                 <S.CategoryButton
                   key={category}
                   type="button"
+                  data-category={category}
                   $active={activeCategory === category}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={handleCategoryClick}
                 >
                   {category}
                 </S.CategoryButton>
@@ -230,12 +278,13 @@ export const ShopPage: FC = () => {
             </S.Categories>
 
             <S.Categories aria-label="Tag filters">
-              {TAGS.map((tag) => (
+              {availableTags.map((tag) => (
                 <S.CategoryButton
                   key={tag}
                   type="button"
+                  data-tag={tag}
                   $active={activeTag === tag}
-                  onClick={() => setActiveTag(tag)}
+                  onClick={handleTagClick}
                 >
                   #{tag}
                 </S.CategoryButton>
@@ -245,49 +294,49 @@ export const ShopPage: FC = () => {
             <S.Summary>{filteredProducts.length} products found</S.Summary>
           </S.Toolbar>
 
-          <S.ResultTransition key={filterAnimationKey}>
-            {filteredProducts.length > 0 ? (
-              <S.ProductsGrid>
-                {filteredProducts.map((product) => (
-                  <S.ProductCard key={product.id}>
-                    <S.ProductImage src={product.image} alt={product.name} />
-                    <S.ProductBody>
-                      <S.ProductTitle>{product.name}</S.ProductTitle>
-                      <S.ProductMeta>{product.description}</S.ProductMeta>
-                      <S.ProductPrice>${product.price.toFixed(2)}</S.ProductPrice>
-                      <S.ProductTags>
-                        <S.ProductTag>{product.category}</S.ProductTag>
-                        {product.tags.map((tag) => (
-                          <S.ProductTag key={tag}>{tag}</S.ProductTag>
-                        ))}
-                      </S.ProductTags>
-                      <S.ProductActions>
-                        <S.ItemCount aria-label={`In cart: ${cartByProduct[product.id] ?? 0}`}>
-                          In cart: {cartByProduct[product.id] ?? 0}
-                        </S.ItemCount>
-                        <S.AddToCartButton
-                          type="button"
-                          $added={justAddedProductId === product.id}
-                          onClick={() => {
-                            setCartByProduct((prev) => ({
-                              ...prev,
-                              [product.id]: (prev[product.id] ?? 0) + 1
-                            }));
-                            setJustAddedProductId(product.id);
-                            window.setTimeout(() => setJustAddedProductId(null), 360);
-                          }}
-                        >
-                          {justAddedProductId === product.id ? 'Added' : 'Add to cart'}
-                        </S.AddToCartButton>
-                      </S.ProductActions>
-                    </S.ProductBody>
-                  </S.ProductCard>
-                ))}
-              </S.ProductsGrid>
-            ) : (
-              <S.EmptyState>No results. Try changing filters or search query.</S.EmptyState>
-            )}
-          </S.ResultTransition>
+          {isLoading ? (
+            <S.EmptyState>Loading products...</S.EmptyState>
+          ) : loadError ? (
+            <S.EmptyState>{loadError}</S.EmptyState>
+          ) : (
+            <S.ResultTransition key={filterAnimationKey}>
+              {filteredProducts.length > 0 ? (
+                <S.ProductsGrid>
+                  {filteredProducts.map((product) => (
+                    <S.ProductCard key={product.id}>
+                      <S.ProductImage src={product.image} alt={product.name} />
+                      <S.ProductBody>
+                        <S.ProductTitle>{product.name}</S.ProductTitle>
+                        <S.ProductMeta>{product.description}</S.ProductMeta>
+                        <S.ProductPrice>${product.price.toFixed(2)}</S.ProductPrice>
+                        <S.ProductTags>
+                          <S.ProductTag>{product.category}</S.ProductTag>
+                          {product.tags.map((tag) => (
+                            <S.ProductTag key={tag}>{tag}</S.ProductTag>
+                          ))}
+                        </S.ProductTags>
+                        <S.ProductActions>
+                          <S.ItemCount aria-label={`In cart: ${cartByProduct[product.id] ?? 0}`}>
+                            In cart: {cartByProduct[product.id] ?? 0}
+                          </S.ItemCount>
+                          <S.AddToCartButton
+                            type="button"
+                            data-product-id={product.id}
+                            $added={justAddedProductId === product.id}
+                            onClick={handleAddToCartClick}
+                          >
+                            {justAddedProductId === product.id ? 'Added' : 'Add to cart'}
+                          </S.AddToCartButton>
+                        </S.ProductActions>
+                      </S.ProductBody>
+                    </S.ProductCard>
+                  ))}
+                </S.ProductsGrid>
+              ) : (
+                <S.EmptyState>No results. Try changing filters or search query.</S.EmptyState>
+              )}
+            </S.ResultTransition>
+          )}
         </S.Content>
       </S.Layout>
     </S.Main>
