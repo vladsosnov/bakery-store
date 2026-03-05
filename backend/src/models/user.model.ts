@@ -1,0 +1,56 @@
+import { Schema, model, type InferSchemaType } from 'mongoose';
+
+import { USER_ROLES } from '../types/user-role.js';
+
+const userSchema = new Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    lastName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true
+    },
+    passwordHash: {
+      type: String,
+      required: true
+    },
+    role: {
+      type: String,
+      enum: Object.values(USER_ROLES),
+      default: USER_ROLES.customer,
+      required: true
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      required: true
+    }
+  },
+  {
+    timestamps: true,
+    versionKey: false
+  }
+);
+
+userSchema.index(
+  { role: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { role: USER_ROLES.admin }
+  }
+);
+
+export type UserDocument = InferSchemaType<typeof userSchema> & { id: string };
+
+export const UserModel = model('User', userSchema);

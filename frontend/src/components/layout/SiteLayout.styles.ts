@@ -60,7 +60,7 @@ export const CartButton = styled.button<{ $open: boolean }>`
   align-items: center;
   gap: 8px;
   border-radius: 999px;
-  border: 1px solid ${(props) => (props.$open ? colors.accentGreen : colors.cinnamonTea)};
+  border: none;
   background: ${(props) => (props.$open ? colors.accentGreen : colors.provincialPink)};
   color: ${(props) => (props.$open ? colors.white : colors.brandBrown)};
   padding: 10px 16px;

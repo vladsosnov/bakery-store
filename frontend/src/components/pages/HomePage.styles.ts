@@ -98,7 +98,7 @@ export const SliderDots = styled.div`
 
 export const SliderDot = styled.button<{ $active: boolean }>`
   width: 10px;
-  height: 10px;
+  height: 11px;
   border-radius: 50%;
   border: 0;
   cursor: pointer;

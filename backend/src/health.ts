@@ -1,3 +1,3 @@
-export function getHealthStatus(): { status: string } {
+export const getHealthStatus = (): { status: string } => {
   return { status: 'ok' };
-}
+};

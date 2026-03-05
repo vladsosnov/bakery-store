@@ -1,4 +1,4 @@
-import { getHealthStatus } from '../src/health';
+import { getHealthStatus } from '../src/health.js';
 
 describe('getHealthStatus', () => {
   it('returns status ok', () => {
