@@ -1,18 +1,22 @@
-export const ROUTES = {
-  home: '/',
-  shop: '/shop',
-  about: '/about',
-  profile: '/profile',
-  signIn: '/sign-in',
-  signUp: '/sign-up'
-} as const;
-
 export const ROUTE_SEGMENTS = {
   shop: 'shop',
   about: 'about',
+  cart: 'cart',
   profile: 'profile',
   signIn: 'sign-in',
   signUp: 'sign-up'
+} as const;
+
+const toRoute = (segment: string) => `/${segment}` as const;
+
+export const ROUTES = {
+  home: '/',
+  shop: toRoute(ROUTE_SEGMENTS.shop),
+  about: toRoute(ROUTE_SEGMENTS.about),
+  cart: toRoute(ROUTE_SEGMENTS.cart),
+  profile: toRoute(ROUTE_SEGMENTS.profile),
+  signIn: toRoute(ROUTE_SEGMENTS.signIn),
+  signUp: toRoute(ROUTE_SEGMENTS.signUp)
 } as const;
 
 type ShopCategory = 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';

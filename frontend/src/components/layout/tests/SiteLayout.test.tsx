@@ -105,13 +105,14 @@ describe('SiteLayout chat', () => {
         <Routes>
           <Route path={ROUTES.home} element={<SiteLayout />}>
             <Route index element={<div>Home content</div>} />
+            <Route path="cart" element={<div>Cart content</div>} />
           </Route>
         </Routes>
       </MemoryRouter>
     );
 
-    await user.click(screen.getByRole('button', { name: /open cart/i }));
+    await user.click(screen.getByRole('button', { name: /go to cart page/i }));
+    expect(screen.getByText(/cart content/i)).toBeInTheDocument();
     expect(screen.queryByText(/authorize first/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/your cart is empty right now/i)).toBeInTheDocument();
   });
 });

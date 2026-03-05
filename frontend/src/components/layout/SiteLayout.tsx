@@ -72,8 +72,17 @@ export const SiteLayout: FC = () => {
           <S.CartButton
             type="button"
             $open={isCartOpen}
-            aria-label={isCartOpen ? 'Close cart' : 'Open cart'}
+            aria-label={
+              session ? 'Go to cart page' : isCartOpen ? 'Close cart' : 'Open cart'
+            }
             onClick={() => {
+              if (session) {
+                setIsCartOpen(false);
+                setIsChatOpen(false);
+                navigate(ROUTES.cart);
+                return;
+              }
+
               setIsCartOpen((prev) => !prev);
               setIsChatOpen(false);
             }}

@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { AboutPage } from '../components/pages/AboutPage';
+import { CartPage } from '../components/pages/CartPage';
 import { HomePage } from '../components/pages/HomePage';
 import { ProfilePage } from '../components/pages/ProfilePage';
 import { SignInPage } from '../components/pages/SignInPage';
@@ -18,6 +19,7 @@ export const App: FC = () => {
           <Route index element={<HomePage />} />
           <Route path={ROUTE_SEGMENTS.shop} element={<ShopPage />} />
           <Route path={ROUTE_SEGMENTS.about} element={<AboutPage />} />
+          <Route path={ROUTE_SEGMENTS.cart} element={<CartPage />} />
           <Route path={ROUTE_SEGMENTS.profile} element={<ProfilePage />} />
           <Route path={ROUTE_SEGMENTS.signIn} element={<SignInPage />} />
           <Route path={ROUTE_SEGMENTS.signUp} element={<SignUpPage />} />
