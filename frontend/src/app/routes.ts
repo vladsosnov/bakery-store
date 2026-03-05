@@ -2,6 +2,7 @@ export const ROUTES = {
   home: '/',
   shop: '/shop',
   about: '/about',
+  profile: '/profile',
   signIn: '/sign-in',
   signUp: '/sign-up'
 } as const;
@@ -9,6 +10,7 @@ export const ROUTES = {
 export const ROUTE_SEGMENTS = {
   shop: 'shop',
   about: 'about',
+  profile: 'profile',
   signIn: 'sign-in',
   signUp: 'sign-up'
 } as const;

@@ -1,10 +1,15 @@
 import { ShoppingCart } from 'lucide-react';
 import { useEffect, useState, type FC } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@src/app/routes';
 import { CartAuthPanel } from '@src/components/layout/CartAuthPanel';
 import { ChatWidget } from '@src/components/layout/ChatWidget';
+import {
+  AUTH_CHANGED_EVENT,
+  clearAuthSession,
+  getAuthSession
+} from '@src/services/auth-session';
 import * as S from '@src/components/layout/SiteLayout.styles';
 
 const navItems = [
@@ -15,8 +20,24 @@ const navItems = [
 
 export const SiteLayout: FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [session, setSession] = useState(() => getAuthSession());
+
+  useEffect(() => {
+    const syncSession = () => {
+      setSession(getAuthSession());
+    };
+
+    window.addEventListener(AUTH_CHANGED_EVENT, syncSession);
+    window.addEventListener('storage', syncSession);
+
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, syncSession);
+      window.removeEventListener('storage', syncSession);
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -62,20 +83,43 @@ export const SiteLayout: FC = () => {
           </S.CartButton>
 
           <S.Auth>
-            <S.AuthLink
-              to={ROUTES.signIn}
-              $variant="ghost"
-              className={({ isActive }) => (isActive ? 'active' : undefined)}
-            >
-              Sign in
-            </S.AuthLink>
-            <S.AuthLink
-              to={ROUTES.signUp}
-              $variant="solid"
-              className={({ isActive }) => (isActive ? 'active' : undefined)}
-            >
-              Sign up
-            </S.AuthLink>
+            {session ? (
+              <>
+                <S.AuthLink
+                  to={ROUTES.profile}
+                  $variant="ghost"
+                  className={({ isActive }) => (isActive ? 'active' : undefined)}
+                >
+                  Profile
+                </S.AuthLink>
+                <S.LogoutButton
+                  type="button"
+                  onClick={() => {
+                    clearAuthSession();
+                    navigate(ROUTES.home);
+                  }}
+                >
+                  Logout
+                </S.LogoutButton>
+              </>
+            ) : (
+              <>
+                <S.AuthLink
+                  to={ROUTES.signIn}
+                  $variant="ghost"
+                  className={({ isActive }) => (isActive ? 'active' : undefined)}
+                >
+                  Sign in
+                </S.AuthLink>
+                <S.AuthLink
+                  to={ROUTES.signUp}
+                  $variant="solid"
+                  className={({ isActive }) => (isActive ? 'active' : undefined)}
+                >
+                  Sign up
+                </S.AuthLink>
+              </>
+            )}
           </S.Auth>
         </S.HeaderActions>
       </S.Header>

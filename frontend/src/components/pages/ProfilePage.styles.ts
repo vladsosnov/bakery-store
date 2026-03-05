@@ -1,0 +1,43 @@
+import styled from 'styled-components';
+
+import { colors } from '@src/styles/colors';
+
+export const Section = styled.section`
+  width: min(960px, 92vw);
+  margin: 0 auto;
+  padding: 34px 0 14px;
+`;
+
+export const Card = styled.article`
+  border-radius: 20px;
+  border: 1px solid ${colors.softBorder};
+  background: ${colors.white};
+  box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
+  padding: 28px;
+`;
+
+export const Title = styled.h1`
+  margin-top: 0;
+  margin-bottom: 8px;
+`;
+
+export const Subtitle = styled.p`
+  color: ${colors.romanCoffee};
+`;
+
+export const InfoGrid = styled.dl`
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 12px;
+  margin-top: 18px;
+`;
+
+export const Label = styled.dt`
+  font-weight: 700;
+  color: ${colors.brandBrown};
+`;
+
+export const Value = styled.dd`
+  margin: 0;
+  color: ${colors.vintageBrown};
+`;

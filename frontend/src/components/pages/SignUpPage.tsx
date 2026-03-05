@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@src/app/routes';
 import { registerUser } from '@src/services/auth-api';
+import { setAuthSession } from '@src/services/auth-session';
 import * as S from './SignUpPage.styles';
 
 export const SignUpPage: FC = () => {
@@ -30,13 +31,10 @@ export const SignUpPage: FC = () => {
         password
       });
 
-      localStorage.setItem(
-        'bakery_auth',
-        JSON.stringify({
-          accessToken: response.data.accessToken,
-          user: response.data.user
-        })
-      );
+      setAuthSession({
+        accessToken: response.data.accessToken,
+        user: response.data.user
+      });
 
       setStatusMessage(
         `Welcome, ${response.data.user.firstName}! Your account is ready.`

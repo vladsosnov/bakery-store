@@ -47,6 +47,7 @@ export const NavItem = styled(NavLink)`
 export const Auth = styled.div`
   display: flex;
   gap: 10px;
+  align-items: center;
 `;
 
 export const HeaderActions = styled.div`
@@ -101,8 +102,20 @@ export const AuthLink = styled(NavLink)<{ $variant: AuthVariant }>`
   padding: 10px 16px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 14px;
+  line-height: 15px;
   text-decoration: none;
   ${(props) => authLinkVariants[props.$variant]}
+`;
+
+export const LogoutButton = styled.button`
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  border: 1px solid ${colors.cinnamonTea};
+  background: ${colors.provincialPink};
+  color: ${colors.brandBrown};
 `;
 
 export const Content = styled.div`
