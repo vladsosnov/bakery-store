@@ -5,9 +5,11 @@ import * as S from './CartAuthPanel.styles';
 
 type CartAuthPanelProps = {
   onClose: () => void;
+  isAuthenticated: boolean;
+  firstName?: string;
 };
 
-export const CartAuthPanel: FC<CartAuthPanelProps> = ({ onClose }) => {
+export const CartAuthPanel: FC<CartAuthPanelProps> = ({ onClose, isAuthenticated, firstName }) => {
   return (
     <S.Panel aria-label="Cart panel">
       <S.Header>
@@ -18,15 +20,26 @@ export const CartAuthPanel: FC<CartAuthPanelProps> = ({ onClose }) => {
       </S.Header>
 
       <S.Body>
-        <S.Message>Authorize first to access your cart and checkout.</S.Message>
-        <S.Actions>
-          <S.GhostLink to={ROUTES.signIn} onClick={onClose}>
-            Sign in
-          </S.GhostLink>
-          <S.SolidLink to={ROUTES.signUp} onClick={onClose}>
-            Sign up
-          </S.SolidLink>
-        </S.Actions>
+        {isAuthenticated ? (
+          <>
+            <S.Message>
+              {firstName ? `${firstName}, your cart is empty right now.` : 'Your cart is empty right now.'}
+            </S.Message>
+            <S.SecondaryMessage>Add products from Shop to start checkout.</S.SecondaryMessage>
+          </>
+        ) : (
+          <>
+            <S.Message>Authorize first to access your cart and checkout.</S.Message>
+            <S.Actions>
+              <S.GhostLink to={ROUTES.signIn} onClick={onClose}>
+                Sign in
+              </S.GhostLink>
+              <S.SolidLink to={ROUTES.signUp} onClick={onClose}>
+                Sign up
+              </S.SolidLink>
+            </S.Actions>
+          </>
+        )}
       </S.Body>
     </S.Panel>
   );

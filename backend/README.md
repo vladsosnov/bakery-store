@@ -38,6 +38,13 @@ Backend starts on `http://localhost:4000` by default.
   - response:
     - `data.user`
     - `data.accessToken` (JWT)
+- `POST /api/auth/login`
+  - body:
+    - `email: string`
+    - `password: string`
+  - response:
+    - `data.user`
+    - `data.accessToken` (JWT)
 
 ## Admin Seeding (Code-only)
 

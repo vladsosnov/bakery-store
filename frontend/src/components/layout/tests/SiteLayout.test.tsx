@@ -80,6 +80,38 @@ describe('SiteLayout chat', () => {
     expect(screen.queryByRole('link', { name: /sign in/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /sign up/i })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /profile/i })).toBeInTheDocument();
-    expect(screen.getByText('Vlad')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
+  });
+
+  it('shows regular cart content for authenticated users', async () => {
+    const user = userEvent.setup();
+
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token',
+        user: {
+          id: 'u1',
+          firstName: 'Vlad',
+          lastName: 'Sosnov',
+          email: 'vlad@bakery.local',
+          role: 'customer'
+        }
+      })
+    );
+
+    render(
+      <MemoryRouter initialEntries={[ROUTES.home]}>
+        <Routes>
+          <Route path={ROUTES.home} element={<SiteLayout />}>
+            <Route index element={<div>Home content</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole('button', { name: /open cart/i }));
+    expect(screen.queryByText(/authorize first/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/your cart is empty right now/i)).toBeInTheDocument();
   });
 });

@@ -46,6 +46,11 @@ export const Message = styled.p`
   color: ${colors.textMuted};
 `;
 
+export const SecondaryMessage = styled.p`
+  margin-top: 8px;
+  color: ${colors.vintageBrown};
+`;
+
 export const Actions = styled.div`
   margin-top: 12px;
   display: flex;

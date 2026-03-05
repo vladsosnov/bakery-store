@@ -13,7 +13,7 @@ type RegisterRequest = {
   password: string;
 };
 
-type RegisterResponse = {
+type AuthResponse = {
   data: {
     user: {
       id: string;
@@ -27,7 +27,18 @@ type RegisterResponse = {
 };
 
 export const registerUser = async (payload: RegisterRequest) => {
-  const response = await apiClient.post<RegisterResponse>('/api/auth/register', payload);
+  const response = await apiClient.post<AuthResponse>('/api/auth/register', payload);
+
+  return response.data;
+};
+
+type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export const loginUser = async (payload: LoginRequest) => {
+  const response = await apiClient.post<AuthResponse>('/api/auth/login', payload);
 
   return response.data;
 };

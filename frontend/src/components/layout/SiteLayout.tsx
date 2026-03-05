@@ -134,7 +134,13 @@ export const SiteLayout: FC = () => {
         </S.ContentInner>
       </S.Content>
 
-      {isCartOpen ? <CartAuthPanel onClose={() => setIsCartOpen(false)} /> : null}
+      {isCartOpen ? (
+        <CartAuthPanel
+          onClose={() => setIsCartOpen(false)}
+          isAuthenticated={Boolean(session)}
+          firstName={session?.user.firstName}
+        />
+      ) : null}
       {isChatOpen ? <ChatWidget onClose={() => setIsChatOpen(false)} /> : null}
 
       <S.ChatButton

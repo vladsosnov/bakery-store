@@ -4,7 +4,7 @@ import { env } from '../config/env.js';
 import { UserModel } from '../models/user.model.js';
 import { USER_ROLES } from '../types/user-role.js';
 import { signAccessToken } from '../utils/jwt.js';
-import { hashPassword } from '../utils/password.js';
+import { comparePassword, hashPassword } from '../utils/password.js';
 
 const registerSchema = z.object({
   firstName: z.string().trim().min(1, 'firstName is required'),
@@ -16,7 +16,13 @@ const registerSchema = z.object({
     .max(128, 'password must be at most 128 characters')
 });
 
+const loginSchema = z.object({
+  email: z.string().trim().email('email must be valid'),
+  password: z.string().min(1, 'password is required')
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
 
 export class AuthError extends Error {
   statusCode: number;
@@ -40,6 +46,37 @@ export const parseRegisterInput = (payload: unknown): RegisterInput => {
 
     throw error;
   }
+};
+
+export const parseLoginInput = (payload: unknown): LoginInput => {
+  try {
+    return loginSchema.parse(payload);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new AuthError(error.issues[0]?.message ?? 'Invalid request body', 400, 'VALIDATION_ERROR');
+    }
+
+    throw error;
+  }
+};
+
+const buildAuthPayload = (user: {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'customer' | 'moderator' | 'admin';
+}) => {
+  const accessToken = signAccessToken({
+    sub: user.id,
+    email: user.email,
+    role: user.role
+  });
+
+  return {
+    user,
+    accessToken
+  };
 };
 
 export const registerCustomer = async (payload: unknown) => {
@@ -69,16 +106,30 @@ export const registerCustomer = async (payload: unknown) => {
     role: user.role
   };
 
-  const accessToken = signAccessToken({
-    sub: user.id,
+  return buildAuthPayload(userPublic);
+};
+
+export const loginUser = async (payload: unknown) => {
+  const data = parseLoginInput(payload);
+  const normalizedEmail = data.email.toLowerCase();
+
+  const user = await UserModel.findOne({ email: normalizedEmail });
+  if (!user) {
+    throw new AuthError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+  }
+
+  const isPasswordValid = await comparePassword(data.password, user.passwordHash);
+  if (!isPasswordValid) {
+    throw new AuthError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+  }
+
+  return buildAuthPayload({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     email: user.email,
     role: user.role
   });
-
-  return {
-    user: userPublic,
-    accessToken
-  };
 };
 
 export const seedAdminUser = async () => {

@@ -39,6 +39,14 @@ const openApiDefinition = {
         },
         required: ['firstName', 'lastName', 'email', 'password']
       },
+      LoginRequest: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', format: 'email', example: 'vlad@bakery-store.local' },
+          password: { type: 'string', example: 'mySecret123' }
+        },
+        required: ['email', 'password']
+      },
       UserPublic: {
         type: 'object',
         properties: {
@@ -126,6 +134,60 @@ const openApiDefinition = {
           },
           409: {
             description: 'Email already registered',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          500: {
+            description: 'Internal server error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/auth/login': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Sign in with email and password',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/LoginRequest' }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Signed in',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/RegisterResponse' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          401: {
+            description: 'Invalid credentials',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }
