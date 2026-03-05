@@ -190,16 +190,6 @@ export const ShopPage: FC = () => {
     });
   }, [activeCategory, activeTag, products, search, veganOnly, glutenFreeOnly, underTwenty]);
 
-  const filterAnimationKey = [
-    activeCategory,
-    activeTag,
-    search.trim().toLowerCase(),
-    veganOnly ? 'v' : 'nv',
-    glutenFreeOnly ? 'gf' : 'ngf',
-    underTwenty ? 'u20' : 'allp',
-    products.length
-  ].join('|');
-
   return (
     <S.Main>
       <S.Header>
@@ -299,7 +289,7 @@ export const ShopPage: FC = () => {
           ) : loadError ? (
             <S.EmptyState>{loadError}</S.EmptyState>
           ) : (
-            <S.ResultTransition key={filterAnimationKey}>
+            <S.ResultTransition>
               {filteredProducts.length > 0 ? (
                 <S.ProductsGrid>
                   {filteredProducts.map((product) => (

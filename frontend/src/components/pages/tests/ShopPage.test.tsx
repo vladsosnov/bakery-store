@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -126,7 +126,9 @@ describe('ShopPage', () => {
     );
 
     expect(await screen.findByText(/vegan cinnamon roll/i)).toBeInTheDocument();
-    expect(screen.queryByText(/butter croissant/i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText(/butter croissant/i)).not.toBeInTheDocument();
+    });
   });
 
   it('applies bread tag filter from url query', async () => {
@@ -137,6 +139,8 @@ describe('ShopPage', () => {
     );
 
     expect(await screen.findByText(/sourdough loaf/i)).toBeInTheDocument();
-    expect(screen.queryByText(/chocolate celebration cake/i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText(/chocolate celebration cake/i)).not.toBeInTheDocument();
+    });
   });
 });
