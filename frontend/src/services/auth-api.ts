@@ -59,3 +59,21 @@ export const changePasswordByEmail = async (payload: ChangePasswordRequest) => {
 
   return response.data;
 };
+
+type SetPasswordRequest = {
+  email: string;
+  currentPassword: string;
+  newPassword: string;
+};
+
+type SetPasswordResponse = {
+  data: {
+    message: string;
+  };
+};
+
+export const setOwnPassword = async (payload: SetPasswordRequest) => {
+  const response = await apiClient.post<SetPasswordResponse>('/api/auth/set-password', payload);
+
+  return response.data;
+};

@@ -55,6 +55,15 @@ const openApiDefinition = {
         },
         required: ['email']
       },
+      SetPasswordRequest: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', format: 'email', example: 'vlad@bakery-store.local' },
+          currentPassword: { type: 'string', example: 'Bakery-u8q2ke-2026' },
+          newPassword: { type: 'string', minLength: 8, example: 'myNewStrongPassword123' }
+        },
+        required: ['email', 'currentPassword', 'newPassword']
+      },
       UserPublic: {
         type: 'object',
         properties: {
@@ -85,6 +94,13 @@ const openApiDefinition = {
           temporaryPassword: { type: 'string', example: 'Bakery-u8q2ke-2026' }
         },
         required: ['message', 'temporaryPassword']
+      },
+      SetPasswordResponse: {
+        type: 'object',
+        properties: {
+          message: { type: 'string', example: 'Password updated successfully.' }
+        },
+        required: ['message']
       },
       Product: {
         type: 'object',
@@ -285,6 +301,60 @@ const openApiDefinition = {
           },
           400: {
             description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          500: {
+            description: 'Internal server error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/auth/set-password': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Set own password using current password',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/SetPasswordRequest' }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Password updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/SetPasswordResponse' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          401: {
+            description: 'Invalid credentials',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }

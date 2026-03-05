@@ -25,9 +25,19 @@ const changePasswordSchema = z.object({
   email: z.string().trim().email('email must be valid')
 });
 
+const setPasswordSchema = z.object({
+  email: z.string().trim().email('email must be valid'),
+  currentPassword: z.string().min(1, 'currentPassword is required'),
+  newPassword: z
+    .string()
+    .min(8, 'newPassword must be at least 8 characters')
+    .max(128, 'newPassword must be at most 128 characters')
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type SetPasswordInput = z.infer<typeof setPasswordSchema>;
 
 export class AuthError extends Error {
   statusCode: number;
@@ -68,6 +78,18 @@ export const parseLoginInput = (payload: unknown): LoginInput => {
 export const parseChangePasswordInput = (payload: unknown): ChangePasswordInput => {
   try {
     return changePasswordSchema.parse(payload);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new AuthError(error.issues[0]?.message ?? 'Invalid request body', 400, 'VALIDATION_ERROR');
+    }
+
+    throw error;
+  }
+};
+
+export const parseSetPasswordInput = (payload: unknown): SetPasswordInput => {
+  try {
+    return setPasswordSchema.parse(payload);
   } catch (error) {
     if (error instanceof ZodError) {
       throw new AuthError(error.issues[0]?.message ?? 'Invalid request body', 400, 'VALIDATION_ERROR');
@@ -169,6 +191,28 @@ export const changePasswordByEmail = async (payload: unknown) => {
   return {
     message: 'Temporary password generated. Use it to sign in and update password later.',
     temporaryPassword
+  };
+};
+
+export const setOwnPassword = async (payload: unknown) => {
+  const data = parseSetPasswordInput(payload);
+  const normalizedEmail = data.email.toLowerCase();
+
+  const user = await UserModel.findOne({ email: normalizedEmail });
+  if (!user) {
+    throw new AuthError('Invalid current password', 401, 'INVALID_CREDENTIALS');
+  }
+
+  const isCurrentPasswordValid = await comparePassword(data.currentPassword, user.passwordHash);
+  if (!isCurrentPasswordValid) {
+    throw new AuthError('Invalid current password', 401, 'INVALID_CREDENTIALS');
+  }
+
+  user.passwordHash = await hashPassword(data.newPassword);
+  await user.save();
+
+  return {
+    message: 'Password updated successfully.'
   };
 };
 

@@ -10,6 +10,7 @@ describe('API docs', () => {
     expect(response.body.openapi).toBe('3.0.3');
     expect(response.body.paths['/api/auth/register']).toBeDefined();
     expect(response.body.paths['/api/auth/change-password']).toBeDefined();
+    expect(response.body.paths['/api/auth/set-password']).toBeDefined();
     expect(response.body.paths['/api/products']).toBeDefined();
   });
 
