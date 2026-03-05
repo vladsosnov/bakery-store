@@ -1,10 +1,4 @@
-import axios from 'axios';
-
-const apiClient = axios.create({
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+import { apiClient } from './api-client';
 
 export type ApiProduct = {
   _id: string;

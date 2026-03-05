@@ -1,3 +1,5 @@
+import type { ShopTag } from '../../../backend/src/types/shop-tag';
+
 export const ROUTE_SEGMENTS = {
   shop: 'shop',
   about: 'about',
@@ -22,7 +24,6 @@ export const ROUTES = {
 } as const;
 
 type ShopCategory = 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';
-export type ShopTag = 'New' | 'Bread' | 'Best seller' | 'Party' | 'Artisan' | 'Seasonal' | 'Gift';
 
 export const shopRoutes = {
   base: ROUTES.shop,

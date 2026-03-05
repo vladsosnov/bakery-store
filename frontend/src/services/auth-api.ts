@@ -1,21 +1,5 @@
-import axios from 'axios';
-
 import type { UserRole } from '@src/types/user-role';
-import { getAuthSession } from './auth-session';
-
-const apiClient = axios.create({
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-const getAuthHeaders = () => {
-  const session = getAuthSession();
-
-  return {
-    Authorization: `Bearer ${session?.accessToken ?? ''}`
-  };
-};
+import { apiAuthClient, apiClient } from './api-client';
 
 type RegisterRequest = {
   firstName: string;
@@ -119,17 +103,13 @@ type UpdateProfileRequest = {
 };
 
 export const getMyProfile = async () => {
-  const response = await apiClient.get<UserProfileResponse>('/api/auth/me', {
-    headers: getAuthHeaders()
-  });
+  const response = await apiAuthClient.get<UserProfileResponse>('/api/auth/me');
 
   return response.data;
 };
 
 export const updateMyProfile = async (payload: UpdateProfileRequest) => {
-  const response = await apiClient.patch<UserProfileResponse>('/api/auth/profile', payload, {
-    headers: getAuthHeaders()
-  });
+  const response = await apiAuthClient.patch<UserProfileResponse>('/api/auth/profile', payload);
 
   return response.data;
 };

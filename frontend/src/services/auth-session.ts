@@ -53,10 +53,7 @@ export const updateAuthSessionUser = (patch: Partial<AuthUser>) => {
 
   const nextSession: AuthSession = {
     ...session,
-    user: {
-      ...session.user,
-      ...patch
-    }
+    user: { ...session.user, ...patch }
   };
 
   setAuthSession(nextSession);

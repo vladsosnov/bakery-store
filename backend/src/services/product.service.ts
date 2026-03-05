@@ -1,6 +1,7 @@
 import { ZodError, z } from 'zod';
 
 import { ProductModel } from '../models/product.model.js';
+import { SHOP_TAGS, type ShopTag } from '../types/shop-tag.js';
 
 type ProductSeed = {
   name: string;
@@ -9,14 +10,14 @@ type ProductSeed = {
   category: string;
   price: number;
   imageUrl: string;
-  tags: string[];
+  tags: ShopTag[];
   isAvailable: boolean;
   stock: number;
 };
 
 const productListQuerySchema = z.object({
   category: z.string().trim().min(1).optional(),
-  tag: z.string().trim().min(1).optional(),
+  tag: z.enum(SHOP_TAGS).optional(),
   search: z.string().trim().min(1).optional()
 });
 
