@@ -1,3 +1,4 @@
+import type { FC } from 'react';
 import { ROUTES } from '@src/app/routes';
 
 import * as S from './CartAuthPanel.styles';
@@ -6,7 +7,7 @@ type CartAuthPanelProps = {
   onClose: () => void;
 };
 
-export function CartAuthPanel({ onClose }: CartAuthPanelProps) {
+export const CartAuthPanel: FC<CartAuthPanelProps> = ({ onClose }) => {
   return (
     <S.Panel aria-label="Cart panel">
       <S.Header>
@@ -29,4 +30,4 @@ export function CartAuthPanel({ onClose }: CartAuthPanelProps) {
       </S.Body>
     </S.Panel>
   );
-}
+};

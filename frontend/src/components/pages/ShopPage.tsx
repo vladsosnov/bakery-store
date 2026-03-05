@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import * as S from './ShopPage.styles';
@@ -94,7 +94,7 @@ const PRODUCTS: Product[] = [
   }
 ];
 
-export function ShopPage() {
+export const ShopPage: FC = () => {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<Category>('All');
@@ -292,4 +292,4 @@ export function ShopPage() {
       </S.Layout>
     </S.Main>
   );
-}
+};

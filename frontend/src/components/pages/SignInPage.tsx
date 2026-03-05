@@ -1,9 +1,10 @@
+import type { FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ROUTES } from '@src/app/routes';
 import * as S from './SignInPage.styles';
 
-export function SignInPage() {
+export const SignInPage: FC = () => {
   return (
     <S.Section>
       <S.Panel>
@@ -43,4 +44,4 @@ export function SignInPage() {
       </S.AccentPanel>
     </S.Section>
   );
-}
+};

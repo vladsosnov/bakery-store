@@ -42,7 +42,6 @@ export const Body = styled.div`
 `;
 
 export const Message = styled.p`
-  margin: 0;
   color: #6f5045;
 `;
 

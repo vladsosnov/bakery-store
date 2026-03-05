@@ -1,5 +1,5 @@
 import { ShoppingCart } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { ROUTES } from '@src/app/routes';
@@ -13,7 +13,7 @@ const navItems = [
   { to: ROUTES.about, label: 'About' }
 ];
 
-export function SiteLayout() {
+export const SiteLayout: FC = () => {
   const location = useLocation();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -106,4 +106,4 @@ export function SiteLayout() {
       </S.ChatButton>
     </S.Wrapper>
   );
-}
+};

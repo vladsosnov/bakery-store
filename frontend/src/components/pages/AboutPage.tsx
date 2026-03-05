@@ -1,6 +1,7 @@
+import type { FC } from 'react';
 import * as S from './AboutPage.styles';
 
-export function AboutPage() {
+export const AboutPage: FC = () => {
   return (
     <S.Main>
       <S.Section>
@@ -45,4 +46,4 @@ export function AboutPage() {
       </S.Section>
     </S.Main>
   );
-}
+};

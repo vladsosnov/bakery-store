@@ -63,7 +63,6 @@ export const SlideContent = styled.div`
 `;
 
 export const Eyebrow = styled.p`
-  margin: 0;
   opacity: 0.8;
 `;
 

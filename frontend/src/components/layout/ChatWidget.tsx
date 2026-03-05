@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FC, type SyntheticEvent } from 'react';
 
 import * as S from './ChatWidget.styles';
 
@@ -18,7 +18,7 @@ const INITIAL_MESSAGES: Message[] = [
 
 const QUICK_ACTIONS = ['Delivery info', 'Custom cake', 'Today specials'];
 
-function generateReply(text: string): string {
+const generateReply = (text: string) => {
   const input = text.toLowerCase();
 
   if (input.includes('delivery')) {
@@ -40,7 +40,7 @@ type ChatWidgetProps = {
   onClose: () => void;
 };
 
-export function ChatWidget({ onClose }: ChatWidgetProps) {
+export const ChatWidget: FC<ChatWidgetProps> = ({ onClose }) => {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [draft, setDraft] = useState('');
 
@@ -48,7 +48,7 @@ export function ChatWidget({ onClose }: ChatWidgetProps) {
     setMessages((prev) => [...prev, { id: prev.length + 1, role, text }]);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     const next = draft.trim();
 
@@ -109,4 +109,4 @@ export function ChatWidget({ onClose }: ChatWidgetProps) {
       </S.Footer>
     </S.Panel>
   );
-}
+};

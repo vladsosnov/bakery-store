@@ -26,7 +26,6 @@ export const AccentPanel = styled.aside`
 `;
 
 export const Eyebrow = styled.p`
-  margin: 0;
   color: #856459;
   font-weight: 700;
 `;

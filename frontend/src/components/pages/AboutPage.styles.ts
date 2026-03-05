@@ -44,7 +44,6 @@ export const CardText = styled.p`
 `;
 
 export const ContactLine = styled.p`
-  margin: 0;
 `;
 
 export const ContactLineLast = styled.p`

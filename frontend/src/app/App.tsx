@@ -1,3 +1,4 @@
+import type { FC } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { AboutPage } from '../components/pages/AboutPage';
@@ -8,7 +9,7 @@ import { ShopPage } from '../components/pages/ShopPage';
 import { SiteLayout } from '../components/layout/SiteLayout';
 import { ROUTES, ROUTE_SEGMENTS } from '@src/app/routes';
 
-export function App() {
+export const App: FC = () => {
   return (
     <BrowserRouter>
       <Routes>
@@ -23,4 +24,4 @@ export function App() {
       </Routes>
     </BrowserRouter>
   );
-}
+};

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { shopRoutes } from '@src/app/routes';
@@ -64,7 +64,7 @@ const BENEFITS: BenefitCard[] = [
   }
 ];
 
-export function HomePage() {
+export const HomePage: FC = () => {
   const navigate = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
   const currentSlide = useMemo(() => SLIDES[slideIndex], [slideIndex]);
@@ -127,4 +127,4 @@ export function HomePage() {
       </S.CardsSection>
     </S.Main>
   );
-}
+};
