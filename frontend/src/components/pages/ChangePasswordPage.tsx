@@ -1,35 +1,25 @@
 import axios from 'axios';
 import { useState, type ChangeEvent, type FC, type FormEventHandler } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 
+import { ROUTES } from '@src/app/routes';
 import { changePasswordByEmail } from '@src/services/auth-api';
 import { getAuthSession } from '@src/services/auth-session';
+import * as S from './ChangePasswordPage.styles';
 
-import * as S from './ProfilePage.styles';
-
-export const ProfilePage: FC = () => {
+export const ChangePasswordPage: FC = () => {
   const session = getAuthSession();
-  const [email, setEmail] = useState(session?.user.email ?? '');
+  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
 
-  if (!session) {
-    return (
-      <S.Section>
-        <S.Card>
-          <S.Title>Profile</S.Title>
-          <S.Subtitle>Please sign in to view your profile.</S.Subtitle>
-        </S.Card>
-      </S.Section>
-    );
-  }
-
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
   };
 
-  const handlePasswordResetSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
     setStatusMessage(null);
@@ -53,42 +43,30 @@ export const ProfilePage: FC = () => {
     }
   };
 
+  if (session) {
+    return <Navigate to={ROUTES.profile} replace />;
+  }
+
   return (
     <S.Section>
-      <S.Card>
-        <S.Title>Profile</S.Title>
-        <S.Subtitle>Your account details.</S.Subtitle>
+      <S.Panel>
+        <S.Eyebrow>Account recovery</S.Eyebrow>
+        <S.Title>Change password</S.Title>
+        <S.Subtitle>
+          Enter your account email and we will generate a temporary password for immediate sign in.
+        </S.Subtitle>
 
-        <S.InfoGrid>
-          <S.Label>First name</S.Label>
-          <S.Value>{session.user.firstName}</S.Value>
-
-          <S.Label>Last name</S.Label>
-          <S.Value>{session.user.lastName}</S.Value>
-
-          <S.Label>Email</S.Label>
-          <S.Value>{session.user.email}</S.Value>
-
-          <S.Label>Role</S.Label>
-          <S.Value>{session.user.role}</S.Value>
-        </S.InfoGrid>
-      </S.Card>
-
-      <S.Card>
-        <S.BlockTitle>Reset password</S.BlockTitle>
-        <S.Subtitle>Generate a temporary password for your account.</S.Subtitle>
-
-        <S.Form onSubmit={handlePasswordResetSubmit}>
-          <S.FieldLabel>
+        <S.Form onSubmit={handleSubmit}>
+          <S.Label>
             Email
             <S.Input
               type="email"
+              placeholder="vlad@bakerystore.com"
               value={email}
               onChange={handleEmailChange}
-              placeholder="vlad@bakerystore.com"
               required
             />
-          </S.FieldLabel>
+          </S.Label>
 
           <S.SubmitButton type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Generating...' : 'Generate temporary password'}
@@ -99,11 +77,15 @@ export const ProfilePage: FC = () => {
 
         {temporaryPassword ? (
           <>
-            <S.Subtitle>Your temporary password:</S.Subtitle>
+            <S.FooterText>Your temporary password:</S.FooterText>
             <S.TempPassword>{temporaryPassword}</S.TempPassword>
           </>
         ) : null}
-      </S.Card>
+
+        <S.FooterText>
+          Back to <Link to={ROUTES.signIn}>Sign in</Link>
+        </S.FooterText>
+      </S.Panel>
     </S.Section>
   );
 };

@@ -21,8 +21,13 @@ const loginSchema = z.object({
   password: z.string().min(1, 'password is required')
 });
 
+const changePasswordSchema = z.object({
+  email: z.string().trim().email('email must be valid')
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
 export class AuthError extends Error {
   statusCode: number;
@@ -58,6 +63,23 @@ export const parseLoginInput = (payload: unknown): LoginInput => {
 
     throw error;
   }
+};
+
+export const parseChangePasswordInput = (payload: unknown): ChangePasswordInput => {
+  try {
+    return changePasswordSchema.parse(payload);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new AuthError(error.issues[0]?.message ?? 'Invalid request body', 400, 'VALIDATION_ERROR');
+    }
+
+    throw error;
+  }
+};
+
+const generateTemporaryPassword = () => {
+  const randomChunk = Math.random().toString(36).slice(2, 8);
+  return `Bakery-${randomChunk}-2026`;
 };
 
 const buildAuthPayload = (user: {
@@ -130,6 +152,24 @@ export const loginUser = async (payload: unknown) => {
     email: user.email,
     role: user.role
   });
+};
+
+export const changePasswordByEmail = async (payload: unknown) => {
+  const data = parseChangePasswordInput(payload);
+  const normalizedEmail = data.email.toLowerCase();
+  const temporaryPassword = generateTemporaryPassword();
+
+  const user = await UserModel.findOne({ email: normalizedEmail });
+
+  if (user) {
+    user.passwordHash = await hashPassword(temporaryPassword);
+    await user.save();
+  }
+
+  return {
+    message: 'Temporary password generated. Use it to sign in and update password later.',
+    temporaryPassword
+  };
 };
 
 export const seedAdminUser = async () => {

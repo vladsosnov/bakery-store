@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { loginUser, registerCustomer } from '../services/auth.service.js';
+import { changePasswordByEmail, loginUser, registerCustomer } from '../services/auth.service.js';
 
 export const registerController = async (req: Request, res: Response) => {
   const auth = await registerCustomer(req.body);
@@ -15,5 +15,13 @@ export const loginController = async (req: Request, res: Response) => {
 
   return res.status(200).json({
     data: auth
+  });
+};
+
+export const changePasswordController = async (req: Request, res: Response) => {
+  const result = await changePasswordByEmail(req.body);
+
+  return res.status(200).json({
+    data: result
   });
 };

@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { AboutPage } from '../components/pages/AboutPage';
 import { CartPage } from '../components/pages/CartPage';
+import { ChangePasswordPage } from '../components/pages/ChangePasswordPage';
 import { HomePage } from '../components/pages/HomePage';
 import { ProfilePage } from '../components/pages/ProfilePage';
 import { SignInPage } from '../components/pages/SignInPage';
@@ -23,6 +24,7 @@ export const App: FC = () => {
           <Route path={ROUTE_SEGMENTS.profile} element={<ProfilePage />} />
           <Route path={ROUTE_SEGMENTS.signIn} element={<SignInPage />} />
           <Route path={ROUTE_SEGMENTS.signUp} element={<SignUpPage />} />
+          <Route path={ROUTE_SEGMENTS.changePassword} element={<ChangePasswordPage />} />
         </Route>
         <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
       </Routes>

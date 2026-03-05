@@ -4,7 +4,8 @@ export const ROUTE_SEGMENTS = {
   cart: 'cart',
   profile: 'profile',
   signIn: 'sign-in',
-  signUp: 'sign-up'
+  signUp: 'sign-up',
+  changePassword: 'change-password'
 } as const;
 
 const toRoute = (segment: string) => `/${segment}` as const;
@@ -16,7 +17,8 @@ export const ROUTES = {
   cart: toRoute(ROUTE_SEGMENTS.cart),
   profile: toRoute(ROUTE_SEGMENTS.profile),
   signIn: toRoute(ROUTE_SEGMENTS.signIn),
-  signUp: toRoute(ROUTE_SEGMENTS.signUp)
+  signUp: toRoute(ROUTE_SEGMENTS.signUp),
+  changePassword: toRoute(ROUTE_SEGMENTS.changePassword)
 } as const;
 
 type ShopCategory = 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';

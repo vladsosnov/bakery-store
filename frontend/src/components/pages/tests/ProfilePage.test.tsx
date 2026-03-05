@@ -29,5 +29,7 @@ describe('ProfilePage', () => {
     expect(screen.getByText('Vlad')).toBeInTheDocument();
     expect(screen.getByText('Sosnov')).toBeInTheDocument();
     expect(screen.getByText('vlad@bakery.local')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /reset password/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /generate temporary password/i })).toBeInTheDocument();
   });
 });

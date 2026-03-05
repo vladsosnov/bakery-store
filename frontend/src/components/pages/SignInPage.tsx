@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useState, type FC, type SyntheticEvent } from 'react';
+import { useState, type ChangeEvent, type FC, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@src/app/routes';
@@ -14,6 +14,14 @@ export const SignInPage: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+  };
 
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,7 +68,7 @@ export const SignInPage: FC = () => {
               type="email"
               placeholder="vlad@bakerystore.com"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={handleEmailChange}
               required
             />
           </S.Label>
@@ -71,7 +79,7 @@ export const SignInPage: FC = () => {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={handlePasswordChange}
               required
             />
           </S.Label>
@@ -86,6 +94,10 @@ export const SignInPage: FC = () => {
             {statusMessage}
           </S.FooterText>
         ) : null}
+
+        <S.FooterText>
+          <Link to={ROUTES.changePassword}>Forgot password?</Link>
+        </S.FooterText>
 
         <S.FooterText>
           New here? <Link to={ROUTES.signUp}>Create an account</Link>

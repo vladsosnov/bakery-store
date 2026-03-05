@@ -42,3 +42,20 @@ export const loginUser = async (payload: LoginRequest) => {
 
   return response.data;
 };
+
+type ChangePasswordRequest = {
+  email: string;
+};
+
+type ChangePasswordResponse = {
+  data: {
+    message: string;
+    temporaryPassword: string;
+  };
+};
+
+export const changePasswordByEmail = async (payload: ChangePasswordRequest) => {
+  const response = await apiClient.post<ChangePasswordResponse>('/api/auth/change-password', payload);
+
+  return response.data;
+};

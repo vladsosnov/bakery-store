@@ -48,6 +48,13 @@ const openApiDefinition = {
         },
         required: ['email', 'password']
       },
+      ChangePasswordRequest: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', format: 'email', example: 'vlad@bakery-store.local' }
+        },
+        required: ['email']
+      },
       UserPublic: {
         type: 'object',
         properties: {
@@ -70,6 +77,14 @@ const openApiDefinition = {
           accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }
         },
         required: ['user', 'accessToken']
+      },
+      ChangePasswordResponse: {
+        type: 'object',
+        properties: {
+          message: { type: 'string', example: 'Temporary password generated. Use it to sign in and update password later.' },
+          temporaryPassword: { type: 'string', example: 'Bakery-u8q2ke-2026' }
+        },
+        required: ['message', 'temporaryPassword']
       },
       Product: {
         type: 'object',
@@ -224,6 +239,52 @@ const openApiDefinition = {
           },
           401: {
             description: 'Invalid credentials',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          500: {
+            description: 'Internal server error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/auth/change-password': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Change password with email only (temporary password flow)',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ChangePasswordRequest' }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Temporary password generated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/ChangePasswordResponse' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          400: {
+            description: 'Validation error',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }

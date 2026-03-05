@@ -1,4 +1,8 @@
-import { parseLoginInput, parseRegisterInput } from '../src/services/auth.service.js';
+import {
+  parseChangePasswordInput,
+  parseLoginInput,
+  parseRegisterInput
+} from '../src/services/auth.service.js';
 
 describe('parseRegisterInput', () => {
   it('accepts valid registration payload', () => {
@@ -47,6 +51,26 @@ describe('parseLoginInput', () => {
       parseLoginInput({
         email: 'bad-email',
         password: ''
+      })
+    ).toThrow();
+  });
+});
+
+describe('parseChangePasswordInput', () => {
+  it('accepts valid email payload', () => {
+    const parsed = parseChangePasswordInput({
+      email: 'vlad@bakery.com'
+    });
+
+    expect(parsed).toEqual({
+      email: 'vlad@bakery.com'
+    });
+  });
+
+  it('throws for invalid payload', () => {
+    expect(() =>
+      parseChangePasswordInput({
+        email: 'wrong-email'
       })
     ).toThrow();
   });
