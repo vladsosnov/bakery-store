@@ -168,7 +168,7 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
 
 export const Summary = styled.p<{ $error?: boolean }>`
   margin: 14px 0 0;
-  color: ${(props) => (props.$error ? '#b42318' : colors.vintageBrown)};
+  color: ${(props) => (props.$error ? colors.errorRed : colors.vintageBrown)};
 `;
 
 export const ProductsGrid = styled.div`
@@ -282,7 +282,7 @@ export const EmptyState = styled.div<{ $error?: boolean }>`
   border: 1px dashed #d8b8a5;
   border-radius: 14px;
   padding: 18px;
-  color: ${(props) => (props.$error ? '#b42318' : colors.vintageBrown)};
+  color: ${(props) => (props.$error ? colors.errorRed : colors.vintageBrown)};
   animation: ${fadeInLift} 220ms ease;
 `;
 

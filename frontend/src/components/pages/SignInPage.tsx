@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState, type ChangeEvent, type FC, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
 import { loginUser } from '@src/services/auth-api';
@@ -13,7 +14,6 @@ export const SignInPage: FC = () => {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [hasError, setHasError] = useState(false);
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -27,7 +27,6 @@ export const SignInPage: FC = () => {
     event.preventDefault();
     setIsSubmitting(true);
     setStatusMessage(null);
-    setHasError(false);
 
     try {
       const response = await loginUser({
@@ -42,13 +41,12 @@ export const SignInPage: FC = () => {
       setStatusMessage(`Welcome back, ${response.data.user.firstName}!`);
       navigate(ROUTES.home);
     } catch (error) {
-      if (axios.isAxiosError<{ error?: string }>(error)) {
-        setStatusMessage(error.response?.data?.error ?? 'Failed to sign in. Please try again.');
-      } else {
-        setStatusMessage('Failed to sign in. Please try again.');
-      }
+      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error ?? 'Failed to sign in. Please try again.'
+        : 'Failed to sign in. Please try again.';
 
-      setHasError(true);
+      toast.error(errorMessage);
+      setStatusMessage(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -90,7 +88,7 @@ export const SignInPage: FC = () => {
         </S.Form>
 
         {statusMessage ? (
-          <S.FooterText role={hasError ? 'alert' : 'status'} style={{ color: hasError ? '#b42318' : undefined }}>
+          <S.FooterText role="status">
             {statusMessage}
           </S.FooterText>
         ) : null}

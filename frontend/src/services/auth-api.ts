@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import type { UserRole } from '@src/types/user-role';
 import { getAuthSession } from './auth-session';
 
 const apiClient = axios.create({
@@ -30,7 +31,7 @@ type AuthResponse = {
       firstName: string;
       lastName: string;
       email: string;
-      role: 'customer' | 'moderator' | 'admin';
+      role: UserRole;
     };
     accessToken: string;
   };
@@ -93,7 +94,7 @@ export type UserProfile = {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'customer' | 'moderator' | 'admin';
+  role: UserRole;
   phoneNumber: string;
   address: {
     zip: string;

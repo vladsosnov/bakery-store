@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState, type ChangeEvent, type FC, type FormEventHandler } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
 import { changePasswordByEmail } from '@src/services/auth-api';
@@ -13,7 +14,6 @@ export const ChangePasswordPage: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
-  const [hasError, setHasError] = useState(false);
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -24,20 +24,17 @@ export const ChangePasswordPage: FC = () => {
     setIsSubmitting(true);
     setStatusMessage(null);
     setTemporaryPassword(null);
-    setHasError(false);
 
     try {
       const response = await changePasswordByEmail({ email });
       setStatusMessage(response.data.message);
       setTemporaryPassword(response.data.temporaryPassword);
     } catch (error) {
-      if (axios.isAxiosError<{ error?: string }>(error)) {
-        setStatusMessage(error.response?.data?.error ?? 'Failed to change password. Please try again.');
-      } else {
-        setStatusMessage('Failed to change password. Please try again.');
-      }
-
-      setHasError(true);
+      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error ?? 'Failed to change password. Please try again.'
+        : 'Failed to change password. Please try again.';
+      toast.error(errorMessage);
+      setStatusMessage(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -73,7 +70,7 @@ export const ChangePasswordPage: FC = () => {
           </S.SubmitButton>
         </S.Form>
 
-        {statusMessage ? <S.Status $isError={hasError}>{statusMessage}</S.Status> : null}
+        {statusMessage ? <S.Status $isError={false}>{statusMessage}</S.Status> : null}
 
         {temporaryPassword ? (
           <>

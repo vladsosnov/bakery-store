@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 import { AboutPage } from '../components/pages/AboutPage';
 import { CartPage } from '../components/pages/CartPage';
@@ -15,6 +16,7 @@ import { ROUTES, ROUTE_SEGMENTS } from '@src/app/routes';
 export const App: FC = () => {
   return (
     <BrowserRouter>
+      <Toaster richColors position="top-right" />
       <Routes>
         <Route element={<SiteLayout />}>
           <Route index element={<HomePage />} />

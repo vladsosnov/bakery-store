@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useMemo, useState, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { addToCart, fetchCart } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
@@ -73,8 +74,6 @@ export const ShopPage: FC = () => {
   const [underTwenty, setUnderTwenty] = useState(false);
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [cartByProduct, setCartByProduct] = useState<Record<string, number>>({});
-  const [cartStatusMessage, setCartStatusMessage] = useState<string | null>(null);
-  const [cartStatusError, setCartStatusError] = useState(false);
   const availableTags = useMemo<ProductTag[]>(() => {
     const uniqueTags = new Set<string>();
 
@@ -167,15 +166,12 @@ export const ShopPage: FC = () => {
     const session = getAuthSession();
 
     if (!session) {
-      setCartStatusMessage('Sign in first to add products to your cart.');
-      setCartStatusError(true);
+      toast.error('Sign in first to add products to your cart.');
       return;
     }
 
     const updateCart = async () => {
       try {
-        setCartStatusMessage(null);
-        setCartStatusError(false);
         setAddingProductId(productId);
 
         const response = await addToCart({ productId, quantity: 1 });
@@ -186,13 +182,10 @@ export const ShopPage: FC = () => {
 
         setCartByProduct(nextCartByProduct);
       } catch (error) {
-        if (axios.isAxiosError<{ error?: string }>(error)) {
-          setCartStatusMessage(error.response?.data?.error ?? 'Failed to add product to cart.');
-        } else {
-          setCartStatusMessage('Failed to add product to cart.');
-        }
-
-        setCartStatusError(true);
+        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+          ? error.response?.data?.error ?? 'Failed to add product to cart.'
+          : 'Failed to add product to cart.';
+        toast.error(errorMessage);
       } finally {
         setAddingProductId(null);
       }
@@ -210,6 +203,7 @@ export const ShopPage: FC = () => {
         const response = await listProducts();
         setProducts(response.map(mapApiProduct));
       } catch {
+        toast.error('Failed to load products. Please try again.');
         setLoadError('Failed to load products. Please try again.');
       } finally {
         setIsLoading(false);
@@ -366,11 +360,6 @@ export const ShopPage: FC = () => {
               ))}
             </S.Categories>
 
-            {cartStatusMessage ? (
-              <S.Summary role={cartStatusError ? 'alert' : 'status'} $error={cartStatusError}>
-                {cartStatusMessage}
-              </S.Summary>
-            ) : null}
             <S.Summary>{filteredProducts.length} products found</S.Summary>
           </S.Toolbar>
 

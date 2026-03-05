@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 
 import { env } from '../config/env.js';
 import { UserModel } from '../models/user.model.js';
-import { USER_ROLES } from '../types/user-role.js';
+import { USER_ROLES, type UserRole } from '../types/user-role.js';
 import { signAccessToken } from '../utils/jwt.js';
 import { comparePassword, hashPassword } from '../utils/password.js';
 
@@ -57,7 +57,7 @@ type UserProfile = {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'customer' | 'moderator' | 'admin';
+  role: UserRole;
   phoneNumber: string;
   address: {
     zip: string;
@@ -149,7 +149,7 @@ const toUserProfile = (user: {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'customer' | 'moderator' | 'admin';
+  role: UserRole;
   phoneNumber?: string | null;
   address?: {
     zip?: string | null;
@@ -177,7 +177,7 @@ const buildAuthPayload = (user: {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'customer' | 'moderator' | 'admin';
+  role: UserRole;
 }) => {
   const accessToken = signAccessToken({
     sub: user.id,

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState, type FC, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
 import { registerUser } from '@src/services/auth-api';
@@ -15,13 +16,11 @@ export const SignUpPage: FC = () => {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [hasError, setHasError] = useState(false);
 
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
     setStatusMessage(null);
-    setHasError(false);
 
     try {
       const response = await registerUser({
@@ -42,13 +41,11 @@ export const SignUpPage: FC = () => {
       setPassword('');
       navigate(ROUTES.home);
     } catch (error) {
-      if (axios.isAxiosError<{ error?: string }>(error)) {
-        setStatusMessage(error.response?.data?.error ?? 'Failed to create account. Please try again.');
-      } else {
-        setStatusMessage('Failed to create account. Please try again.');
-      }
-
-      setHasError(true);
+      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error ?? 'Failed to create account. Please try again.'
+        : 'Failed to create account. Please try again.';
+      toast.error(errorMessage);
+      setStatusMessage(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -125,7 +122,7 @@ export const SignUpPage: FC = () => {
         </S.Form>
 
         {statusMessage ? (
-          <S.FooterText role={hasError ? 'alert' : 'status'} style={{ color: hasError ? '#b42318' : undefined }}>
+          <S.FooterText role="status">
             {statusMessage}
           </S.FooterText>
         ) : null}

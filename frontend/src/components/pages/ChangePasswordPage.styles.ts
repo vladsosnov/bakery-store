@@ -66,7 +66,7 @@ export const SubmitButton = styled.button`
 export const Status = styled.p<{ $isError: boolean }>`
   margin-bottom: 0;
   margin-top: 14px;
-  color: ${(props) => (props.$isError ? '#b42318' : colors.textMuted)};
+  color: ${(props) => (props.$isError ? colors.errorRed : colors.textMuted)};
 `;
 
 export const TempPassword = styled.code`

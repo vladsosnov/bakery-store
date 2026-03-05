@@ -12,5 +12,7 @@ export const colors = {
   treehouse: '#3e2424',
   cinnamonTea: '#d7b9a6',
   vintageBrown: '#705247',
-  inputBorder: '#e3cbbb'
+  inputBorder: '#e3cbbb',
+  errorRed: '#b42318',
+  errorMuted: '#8f3426'
 } as const;

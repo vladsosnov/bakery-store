@@ -86,7 +86,7 @@ export const RemoveButton = styled.button`
   border-radius: 10px;
   border: 1px solid #e5beb8;
   background: #fff3f0;
-  color: #8f3426;
+  color: ${colors.errorMuted};
   padding: 8px 10px;
   font-weight: 600;
   cursor: pointer;
@@ -99,7 +99,7 @@ export const RemoveButton = styled.button`
 
 export const Status = styled.p<{ $isError?: boolean }>`
   margin: 10px 0 0;
-  color: ${(props) => (props.$isError ? '#b42318' : colors.romanCoffee)};
+  color: ${(props) => (props.$isError ? colors.errorRed : colors.romanCoffee)};
 `;
 
 export const Total = styled.p`

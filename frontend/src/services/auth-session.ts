@@ -1,3 +1,5 @@
+import type { UserRole } from '@src/types/user-role';
+
 export const AUTH_STORAGE_KEY = 'bakery_auth';
 export const AUTH_CHANGED_EVENT = 'bakery-auth-changed';
 
@@ -6,7 +8,7 @@ type AuthUser = {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'customer' | 'moderator' | 'admin';
+  role: UserRole;
 };
 
 type AuthSession = {

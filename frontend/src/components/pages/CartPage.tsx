@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useMemo, useState, type FC, type MouseEvent } from 'react';
+import { toast } from 'sonner';
 
 import { fetchCart, removeCartItem, updateCartItemQuantity } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
@@ -41,6 +42,7 @@ export const CartPage: FC = () => {
         setItems(response.data.items);
         setTotalPrice(response.data.totalPrice);
       } catch {
+        toast.error('Failed to load cart.');
         setErrorMessage('Failed to load cart.');
       } finally {
         setIsLoading(false);
@@ -119,12 +121,11 @@ export const CartPage: FC = () => {
 
         applyCartResponse(response);
       } catch (error) {
-        if (axios.isAxiosError<{ error?: string }>(error)) {
-          setStatusMessage(error.response?.data?.error ?? 'Failed to update quantity.');
-        } else {
-          setStatusMessage('Failed to update quantity.');
-        }
-
+        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+          ? error.response?.data?.error ?? 'Failed to update quantity.'
+          : 'Failed to update quantity.';
+        toast.error(errorMessage);
+        setStatusMessage(errorMessage);
         setHasError(true);
       } finally {
         setProductPending(productId, false);
@@ -162,12 +163,11 @@ export const CartPage: FC = () => {
 
         applyCartResponse(response);
       } catch (error) {
-        if (axios.isAxiosError<{ error?: string }>(error)) {
-          setStatusMessage(error.response?.data?.error ?? 'Failed to update quantity.');
-        } else {
-          setStatusMessage('Failed to update quantity.');
-        }
-
+        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+          ? error.response?.data?.error ?? 'Failed to update quantity.'
+          : 'Failed to update quantity.';
+        toast.error(errorMessage);
+        setStatusMessage(errorMessage);
         setHasError(true);
       } finally {
         setProductPending(productId, false);
@@ -192,12 +192,11 @@ export const CartPage: FC = () => {
         const response = await removeCartItem({ productId });
         applyCartResponse(response);
       } catch (error) {
-        if (axios.isAxiosError<{ error?: string }>(error)) {
-          setStatusMessage(error.response?.data?.error ?? 'Failed to remove item.');
-        } else {
-          setStatusMessage('Failed to remove item.');
-        }
-
+        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+          ? error.response?.data?.error ?? 'Failed to remove item.'
+          : 'Failed to remove item.';
+        toast.error(errorMessage);
+        setStatusMessage(errorMessage);
         setHasError(true);
       } finally {
         setProductPending(productId, false);

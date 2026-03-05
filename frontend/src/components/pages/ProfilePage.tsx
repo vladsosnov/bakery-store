@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useMemo, useState, type ChangeEvent, type FC, type FormEventHandler } from 'react';
+import { toast } from 'sonner';
 
 import {
   changePasswordByEmail,
@@ -26,19 +27,16 @@ export const ProfilePage: FC = () => {
   const [city, setCity] = useState('');
   const [isProfileSaving, setIsProfileSaving] = useState(false);
   const [profileStatus, setProfileStatus] = useState<string | null>(null);
-  const [profileHasError, setProfileHasError] = useState(false);
 
   const [email, setEmail] = useState(session?.user.email ?? '');
   const [isResetSubmitting, setIsResetSubmitting] = useState(false);
   const [resetStatusMessage, setResetStatusMessage] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
-  const [hasResetError, setHasResetError] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [isSetSubmitting, setIsSetSubmitting] = useState(false);
   const [setStatusMessage, setSetStatusMessage] = useState<string | null>(null);
-  const [hasSetError, setHasSetError] = useState(false);
 
   useEffect(() => {
     if (!session) {
@@ -63,6 +61,7 @@ export const ProfilePage: FC = () => {
         setCity(nextProfile.address.city);
         setEmail(nextProfile.email);
       } catch {
+        toast.error('Failed to load profile data.');
         setProfileLoadError('Failed to load profile data.');
       } finally {
         setIsProfileLoading(false);
@@ -135,7 +134,6 @@ export const ProfilePage: FC = () => {
     event.preventDefault();
     setIsProfileSaving(true);
     setProfileStatus(null);
-    setProfileHasError(false);
 
     try {
       const response = await updateMyProfile({
@@ -156,13 +154,11 @@ export const ProfilePage: FC = () => {
       });
       setProfileStatus('Profile updated successfully.');
     } catch (error) {
-      if (axios.isAxiosError<{ error?: string }>(error)) {
-        setProfileStatus(error.response?.data?.error ?? 'Failed to update profile. Please try again.');
-      } else {
-        setProfileStatus('Failed to update profile. Please try again.');
-      }
-
-      setProfileHasError(true);
+      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error ?? 'Failed to update profile. Please try again.'
+        : 'Failed to update profile. Please try again.';
+      toast.error(errorMessage);
+      setProfileStatus(null);
     } finally {
       setIsProfileSaving(false);
     }
@@ -177,20 +173,17 @@ export const ProfilePage: FC = () => {
     setIsResetSubmitting(true);
     setResetStatusMessage(null);
     setTemporaryPassword(null);
-    setHasResetError(false);
 
     try {
       const response = await changePasswordByEmail({ email });
       setResetStatusMessage(response.data.message);
       setTemporaryPassword(response.data.temporaryPassword);
     } catch (error) {
-      if (axios.isAxiosError<{ error?: string }>(error)) {
-        setResetStatusMessage(error.response?.data?.error ?? 'Failed to change password. Please try again.');
-      } else {
-        setResetStatusMessage('Failed to change password. Please try again.');
-      }
-
-      setHasResetError(true);
+      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error ?? 'Failed to change password. Please try again.'
+        : 'Failed to change password. Please try again.';
+      toast.error(errorMessage);
+      setResetStatusMessage(null);
     } finally {
       setIsResetSubmitting(false);
     }
@@ -212,11 +205,9 @@ export const ProfilePage: FC = () => {
     event.preventDefault();
     setIsSetSubmitting(true);
     setSetStatusMessage(null);
-    setHasSetError(false);
 
     if (newPassword !== confirmNewPassword) {
-      setSetStatusMessage('New password and confirmation must match.');
-      setHasSetError(true);
+      toast.error('New password and confirmation must match.');
       setIsSetSubmitting(false);
       return;
     }
@@ -233,13 +224,11 @@ export const ProfilePage: FC = () => {
       setNewPassword('');
       setConfirmNewPassword('');
     } catch (error) {
-      if (axios.isAxiosError<{ error?: string }>(error)) {
-        setSetStatusMessage(error.response?.data?.error ?? 'Failed to set password. Please try again.');
-      } else {
-        setSetStatusMessage('Failed to set password. Please try again.');
-      }
-
-      setHasSetError(true);
+      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error ?? 'Failed to set password. Please try again.'
+        : 'Failed to set password. Please try again.';
+      toast.error(errorMessage);
+      setSetStatusMessage(null);
     } finally {
       setIsSetSubmitting(false);
     }
@@ -304,7 +293,7 @@ export const ProfilePage: FC = () => {
           </S.SubmitButton>
         </S.Form>
 
-        {profileStatus ? <S.Status $isError={profileHasError}>{profileStatus}</S.Status> : null}
+        {profileStatus ? <S.Status $isError={false}>{profileStatus}</S.Status> : null}
       </S.Card>
 
       <S.Card>
@@ -328,7 +317,7 @@ export const ProfilePage: FC = () => {
           </S.SubmitButton>
         </S.Form>
 
-        {resetStatusMessage ? <S.Status $isError={hasResetError}>{resetStatusMessage}</S.Status> : null}
+        {resetStatusMessage ? <S.Status $isError={false}>{resetStatusMessage}</S.Status> : null}
 
         {temporaryPassword ? (
           <>
@@ -383,7 +372,7 @@ export const ProfilePage: FC = () => {
           </S.SubmitButton>
         </S.Form>
 
-        {setStatusMessage ? <S.Status $isError={hasSetError}>{setStatusMessage}</S.Status> : null}
+        {setStatusMessage ? <S.Status $isError={false}>{setStatusMessage}</S.Status> : null}
       </S.Card>
     </S.Section>
   );
