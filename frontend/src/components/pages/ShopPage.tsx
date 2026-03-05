@@ -1,6 +1,9 @@
+import axios from 'axios';
 import { useEffect, useMemo, useState, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { addToCart, fetchCart } from '@src/services/cart-api';
+import { getAuthSession } from '@src/services/auth-session';
 import { listProducts, type ApiProduct } from '@src/services/product-api';
 import * as S from './ShopPage.styles';
 
@@ -66,8 +69,10 @@ export const ShopPage: FC = () => {
   const [veganOnly, setVeganOnly] = useState(false);
   const [glutenFreeOnly, setGlutenFreeOnly] = useState(false);
   const [underTwenty, setUnderTwenty] = useState(false);
-  const [justAddedProductId, setJustAddedProductId] = useState<string | null>(null);
+  const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [cartByProduct, setCartByProduct] = useState<Record<string, number>>({});
+  const [cartStatusMessage, setCartStatusMessage] = useState<string | null>(null);
+  const [cartStatusError, setCartStatusError] = useState(false);
   const availableTags = useMemo<ProductTag[]>(() => {
     const uniqueTags = new Set<string>();
 
@@ -132,12 +137,44 @@ export const ShopPage: FC = () => {
       return;
     }
 
-    setCartByProduct((prev) => ({
-      ...prev,
-      [productId]: (prev[productId] ?? 0) + 1
-    }));
-    setJustAddedProductId(productId);
-    window.setTimeout(() => setJustAddedProductId(null), 360);
+    if (addingProductId === productId) {
+      return;
+    }
+    const session = getAuthSession();
+
+    if (!session) {
+      setCartStatusMessage('Sign in first to add products to your cart.');
+      setCartStatusError(true);
+      return;
+    }
+
+    const updateCart = async () => {
+      try {
+        setCartStatusMessage(null);
+        setCartStatusError(false);
+        setAddingProductId(productId);
+
+        const response = await addToCart({ productId, quantity: 1 });
+        const nextCartByProduct = response.data.items.reduce<Record<string, number>>((acc, item) => {
+          acc[item.productId] = item.quantity;
+          return acc;
+        }, {});
+
+        setCartByProduct(nextCartByProduct);
+      } catch (error) {
+        if (axios.isAxiosError<{ error?: string }>(error)) {
+          setCartStatusMessage(error.response?.data?.error ?? 'Failed to add product to cart.');
+        } else {
+          setCartStatusMessage('Failed to add product to cart.');
+        }
+
+        setCartStatusError(true);
+      } finally {
+        setAddingProductId(null);
+      }
+    };
+
+    void updateCart();
   };
 
   useEffect(() => {
@@ -156,6 +193,30 @@ export const ShopPage: FC = () => {
     };
 
     void loadProducts();
+  }, []);
+
+  useEffect(() => {
+    const session = getAuthSession();
+    if (!session) {
+      setCartByProduct({});
+      return;
+    }
+
+    const loadCart = async () => {
+      try {
+        const response = await fetchCart();
+        const nextCartByProduct = response.data.items.reduce<Record<string, number>>((acc, item) => {
+          acc[item.productId] = item.quantity;
+          return acc;
+        }, {});
+
+        setCartByProduct(nextCartByProduct);
+      } catch {
+        setCartByProduct({});
+      }
+    };
+
+    void loadCart();
   }, []);
 
   useEffect(() => {
@@ -281,6 +342,9 @@ export const ShopPage: FC = () => {
               ))}
             </S.Categories>
 
+            {cartStatusMessage ? (
+              <S.Summary role={cartStatusError ? 'alert' : 'status'}>{cartStatusMessage}</S.Summary>
+            ) : null}
             <S.Summary>{filteredProducts.length} products found</S.Summary>
           </S.Toolbar>
 
@@ -312,10 +376,10 @@ export const ShopPage: FC = () => {
                           <S.AddToCartButton
                             type="button"
                             data-product-id={product.id}
-                            $added={justAddedProductId === product.id}
+                            disabled={addingProductId === product.id}
                             onClick={handleAddToCartClick}
                           >
-                            {justAddedProductId === product.id ? 'Added' : 'Add to cart'}
+                            {addingProductId === product.id ? 'Adding...' : 'Add to cart'}
                           </S.AddToCartButton>
                         </S.ProductActions>
                       </S.ProductBody>

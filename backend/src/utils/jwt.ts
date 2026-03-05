@@ -9,8 +9,14 @@ type AccessTokenPayload = {
   role: UserRole;
 };
 
+export type VerifiedAccessTokenPayload = AccessTokenPayload & jwt.JwtPayload;
+
 export const signAccessToken = (payload: AccessTokenPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: '7d'
   });
+};
+
+export const verifyAccessToken = (token: string): VerifiedAccessTokenPayload => {
+  return jwt.verify(token, env.JWT_SECRET) as VerifiedAccessTokenPayload;
 };

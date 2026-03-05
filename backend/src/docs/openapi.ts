@@ -16,9 +16,17 @@ const openApiDefinition = {
   tags: [
     { name: 'Health', description: 'Service health endpoints' },
     { name: 'Auth', description: 'Authentication endpoints' },
-    { name: 'Products', description: 'Product catalog endpoints' }
+    { name: 'Products', description: 'Product catalog endpoints' },
+    { name: 'Cart', description: 'Cart endpoints' }
   ],
   components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT'
+      }
+    },
     schemas: {
       HealthResponse: {
         type: 'object',
@@ -101,6 +109,46 @@ const openApiDefinition = {
           message: { type: 'string', example: 'Password updated successfully.' }
         },
         required: ['message']
+      },
+      CartItem: {
+        type: 'object',
+        properties: {
+          productId: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
+          name: { type: 'string', example: 'Sourdough loaf' },
+          imageUrl: { type: 'string', example: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73' },
+          price: { type: 'number', example: 8 },
+          quantity: { type: 'number', example: 2 },
+          availableStock: { type: 'number', example: 6 },
+          lineTotal: { type: 'number', example: 16 }
+        },
+        required: ['productId', 'name', 'imageUrl', 'price', 'quantity', 'availableStock', 'lineTotal']
+      },
+      CartResponse: {
+        type: 'object',
+        properties: {
+          items: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/CartItem' }
+          },
+          totalItems: { type: 'number', example: 2 },
+          totalPrice: { type: 'number', example: 16 }
+        },
+        required: ['items', 'totalItems', 'totalPrice']
+      },
+      AddCartItemRequest: {
+        type: 'object',
+        properties: {
+          productId: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
+          quantity: { type: 'number', example: 1 }
+        },
+        required: ['productId']
+      },
+      UpdateCartItemQuantityRequest: {
+        type: 'object',
+        properties: {
+          quantity: { type: 'number', example: 2 }
+        },
+        required: ['quantity']
       },
       Product: {
         type: 'object',
@@ -427,6 +475,176 @@ const openApiDefinition = {
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/cart': {
+      get: {
+        tags: ['Cart'],
+        summary: 'Get current user cart',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'User cart',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/CartResponse' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/cart/items': {
+      post: {
+        tags: ['Cart'],
+        summary: 'Add product to current user cart',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AddCartItemRequest' }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Updated cart',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/CartResponse' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          404: {
+            description: 'Product not found',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          409: {
+            description: 'Not enough stock',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/cart/items/{productId}': {
+      patch: {
+        tags: ['Cart'],
+        summary: 'Update quantity for item in current user cart',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'productId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/UpdateCartItemQuantityRequest' }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Updated cart',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/CartResponse' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Product/cart item not found',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          409: {
+            description: 'Not enough stock',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      },
+      delete: {
+        tags: ['Cart'],
+        summary: 'Remove item from current user cart',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'productId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        responses: {
+          200: {
+            description: 'Updated cart',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/CartResponse' }
+                  },
+                  required: ['data']
+                }
               }
             }
           }

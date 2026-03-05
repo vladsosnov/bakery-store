@@ -3,14 +3,26 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
 import { shopRoutes } from '@src/app/routes';
+import { addToCart, fetchCart } from '@src/services/cart-api';
+import { getAuthSession } from '@src/services/auth-session';
 import { listProducts } from '@src/services/product-api';
 import { ShopPage } from '../ShopPage';
 
 jest.mock('@src/services/product-api', () => ({
   listProducts: jest.fn()
 }));
+jest.mock('@src/services/cart-api', () => ({
+  fetchCart: jest.fn(),
+  addToCart: jest.fn()
+}));
+jest.mock('@src/services/auth-session', () => ({
+  getAuthSession: jest.fn()
+}));
 
 const mockedListProducts = jest.mocked(listProducts);
+const mockedFetchCart = jest.mocked(fetchCart);
+const mockedAddToCart = jest.mocked(addToCart);
+const mockedGetAuthSession = jest.mocked(getAuthSession);
 
 const PRODUCTS_FIXTURE = [
   {
@@ -66,10 +78,47 @@ const PRODUCTS_FIXTURE = [
 describe('ShopPage', () => {
   beforeEach(() => {
     mockedListProducts.mockResolvedValue(PRODUCTS_FIXTURE);
+    mockedGetAuthSession.mockReturnValue({
+      accessToken: 'token',
+      user: {
+        id: 'u1',
+        firstName: 'Vlad',
+        lastName: 'Sosnov',
+        email: 'vlad@bakery.local',
+        role: 'customer'
+      }
+    });
+    mockedFetchCart.mockResolvedValue({
+      data: {
+        items: [],
+        totalItems: 0,
+        totalPrice: 0
+      }
+    });
+    mockedAddToCart.mockResolvedValue({
+      data: {
+        items: [
+          {
+            productId: '1',
+            name: 'Butter croissant',
+            imageUrl: 'https://example.com/butter-croissant.jpg',
+            price: 4.5,
+            quantity: 1,
+            availableStock: 10,
+            lineTotal: 4.5
+          }
+        ],
+        totalItems: 1,
+        totalPrice: 4.5
+      }
+    });
   });
 
   afterEach(() => {
     mockedListProducts.mockReset();
+    mockedFetchCart.mockReset();
+    mockedAddToCart.mockReset();
+    mockedGetAuthSession.mockReset();
   });
 
   it('renders filters, categories, and search', async () => {
@@ -114,7 +163,6 @@ describe('ShopPage', () => {
     await screen.findByText(/butter croissant/i);
     expect(screen.getAllByLabelText(/in cart: 0/i).length).toBeGreaterThan(0);
     await user.click(screen.getAllByRole('button', { name: /add to cart/i })[0]);
-    expect(screen.getByText(/added/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/in cart: 1/i)).toBeInTheDocument();
   });
 

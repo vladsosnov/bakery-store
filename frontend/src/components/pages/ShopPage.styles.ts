@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
 import { colors } from '@src/styles/colors';
 
@@ -226,20 +226,6 @@ export const ProductTags = styled.div`
   flex-wrap: wrap;
 `;
 
-const addPulse = keyframes`
-  0% {
-    transform: scale(1);
-  }
-
-  45% {
-    transform: scale(1.03);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-`;
-
 export const ProductActions = styled.div`
   margin-top: 12px;
   display: grid;
@@ -258,20 +244,26 @@ export const ItemCount = styled.span`
   white-space: nowrap;
 `;
 
-export const AddToCartButton = styled.button<{ $added: boolean }>`
+export const AddToCartButton = styled.button`
   border-radius: 10px;
   border: 1px solid ${colors.accentGreen};
-  background: ${(props) => (props.$added ? '#256045' : colors.accentGreen)};
+  background: ${colors.accentGreen};
   color: ${colors.white};
   padding: 9px 12px;
   font-weight: 700;
   cursor: pointer;
   transition: transform 170ms ease, box-shadow 170ms ease;
-  animation: ${(props) => (props.$added ? addPulse : 'none')} 320ms ease;
 
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 9px 16px rgba(47, 111, 81, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.75;
+    cursor: progress;
+    transform: none;
+    box-shadow: none;
   }
 `;
 

@@ -12,6 +12,9 @@ describe('API docs', () => {
     expect(response.body.paths['/api/auth/change-password']).toBeDefined();
     expect(response.body.paths['/api/auth/set-password']).toBeDefined();
     expect(response.body.paths['/api/products']).toBeDefined();
+    expect(response.body.paths['/api/cart']).toBeDefined();
+    expect(response.body.paths['/api/cart/items']).toBeDefined();
+    expect(response.body.paths['/api/cart/items/{productId}']).toBeDefined();
   });
 
   it('serves Swagger UI page', async () => {
