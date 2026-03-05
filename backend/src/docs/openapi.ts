@@ -72,6 +72,24 @@ const openApiDefinition = {
         },
         required: ['email', 'currentPassword', 'newPassword']
       },
+      UpdateProfileRequest: {
+        type: 'object',
+        properties: {
+          firstName: { type: 'string', example: 'Vlad' },
+          lastName: { type: 'string', example: 'Sosnov' },
+          phoneNumber: { type: 'string', example: '+15550001122' },
+          address: {
+            type: 'object',
+            properties: {
+              zip: { type: 'string', example: '10001' },
+              street: { type: 'string', example: '5th Avenue 10' },
+              city: { type: 'string', example: 'New York' }
+            },
+            required: ['zip', 'street', 'city']
+          }
+        },
+        required: ['firstName', 'lastName', 'phoneNumber', 'address']
+      },
       UserPublic: {
         type: 'object',
         properties: {
@@ -109,6 +127,27 @@ const openApiDefinition = {
           message: { type: 'string', example: 'Password updated successfully.' }
         },
         required: ['message']
+      },
+      UserProfile: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
+          firstName: { type: 'string', example: 'Vlad' },
+          lastName: { type: 'string', example: 'Sosnov' },
+          email: { type: 'string', format: 'email', example: 'vlad@bakery-store.local' },
+          role: { type: 'string', enum: ['customer', 'moderator', 'admin'], example: 'customer' },
+          phoneNumber: { type: 'string', example: '+15550001122' },
+          address: {
+            type: 'object',
+            properties: {
+              zip: { type: 'string', example: '10001' },
+              street: { type: 'string', example: '5th Avenue 10' },
+              city: { type: 'string', example: 'New York' }
+            },
+            required: ['zip', 'street', 'city']
+          }
+        },
+        required: ['id', 'firstName', 'lastName', 'email', 'role', 'phoneNumber', 'address']
       },
       CartItem: {
         type: 'object',
@@ -411,6 +450,84 @@ const openApiDefinition = {
           },
           500: {
             description: 'Internal server error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/auth/me': {
+      get: {
+        tags: ['Auth'],
+        summary: 'Get current user profile',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Current user profile',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/UserProfile' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/auth/profile': {
+      patch: {
+        tags: ['Auth'],
+        summary: 'Update current user profile',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/UpdateProfileRequest' }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Updated user profile',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/UserProfile' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }

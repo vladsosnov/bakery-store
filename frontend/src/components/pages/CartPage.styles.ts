@@ -97,9 +97,9 @@ export const RemoveButton = styled.button`
   }
 `;
 
-export const Status = styled.p`
+export const Status = styled.p<{ $isError?: boolean }>`
   margin: 10px 0 0;
-  color: ${colors.romanCoffee};
+  color: ${(props) => (props.$isError ? '#b42318' : colors.romanCoffee)};
 `;
 
 export const Total = styled.p`

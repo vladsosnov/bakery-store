@@ -41,3 +41,21 @@ export const clearAuthSession = () => {
   localStorage.removeItem(AUTH_STORAGE_KEY);
   dispatchAuthChanged();
 };
+
+export const updateAuthSessionUser = (patch: Partial<AuthUser>) => {
+  const session = getAuthSession();
+
+  if (!session) {
+    return;
+  }
+
+  const nextSession: AuthSession = {
+    ...session,
+    user: {
+      ...session.user,
+      ...patch
+    }
+  };
+
+  setAuthSession(nextSession);
+};

@@ -77,7 +77,7 @@ export const CartPage: FC = () => {
       <S.Section>
         <S.Card>
           <S.Title>Cart</S.Title>
-          <S.Subtitle>{errorMessage}</S.Subtitle>
+          <S.Status $isError>{errorMessage}</S.Status>
         </S.Card>
       </S.Section>
     );
@@ -218,7 +218,11 @@ export const CartPage: FC = () => {
         ) : (
           <>
             <S.Subtitle>Items in your cart:</S.Subtitle>
-            {statusMessage ? <S.Status role={hasError ? 'alert' : 'status'}>{statusMessage}</S.Status> : null}
+            {statusMessage ? (
+              <S.Status role={hasError ? 'alert' : 'status'} $isError={hasError}>
+                {statusMessage}
+              </S.Status>
+            ) : null}
             <S.ItemList>
               {items.map((item) => (
                 <S.Item key={item.productId}>

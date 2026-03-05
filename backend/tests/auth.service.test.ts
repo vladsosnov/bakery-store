@@ -2,7 +2,8 @@ import {
   parseChangePasswordInput,
   parseLoginInput,
   parseRegisterInput,
-  parseSetPasswordInput
+  parseSetPasswordInput,
+  parseUpdateProfileInput
 } from '../src/services/auth.service.js';
 
 describe('parseRegisterInput', () => {
@@ -98,6 +99,47 @@ describe('parseSetPasswordInput', () => {
         email: 'wrong-email',
         currentPassword: '',
         newPassword: '123'
+      })
+    ).toThrow();
+  });
+});
+
+describe('parseUpdateProfileInput', () => {
+  it('accepts valid profile payload', () => {
+    const parsed = parseUpdateProfileInput({
+      firstName: 'Vlad',
+      lastName: 'Sosnov',
+      phoneNumber: '+15550001122',
+      address: {
+        zip: '10001',
+        street: '5th Avenue 10',
+        city: 'New York'
+      }
+    });
+
+    expect(parsed).toEqual({
+      firstName: 'Vlad',
+      lastName: 'Sosnov',
+      phoneNumber: '+15550001122',
+      address: {
+        zip: '10001',
+        street: '5th Avenue 10',
+        city: 'New York'
+      }
+    });
+  });
+
+  it('throws for invalid payload', () => {
+    expect(() =>
+      parseUpdateProfileInput({
+        firstName: '',
+        lastName: 'Sosnov',
+        phoneNumber: '',
+        address: {
+          zip: '',
+          street: '',
+          city: ''
+        }
       })
     ).toThrow();
   });

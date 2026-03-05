@@ -2,9 +2,11 @@ import type { Request, Response } from 'express';
 
 import {
   changePasswordByEmail,
+  getMyProfile,
   loginUser,
   registerCustomer,
-  setOwnPassword
+  setOwnPassword,
+  updateMyProfile
 } from '../services/auth.service.js';
 
 export const registerController = async (req: Request, res: Response) => {
@@ -36,5 +38,21 @@ export const setPasswordController = async (req: Request, res: Response) => {
 
   return res.status(200).json({
     data: result
+  });
+};
+
+export const getMyProfileController = async (req: Request, res: Response) => {
+  const profile = await getMyProfile(req.auth!.userId);
+
+  return res.status(200).json({
+    data: profile
+  });
+};
+
+export const updateMyProfileController = async (req: Request, res: Response) => {
+  const profile = await updateMyProfile(req.auth!.userId, req.body);
+
+  return res.status(200).json({
+    data: profile
   });
 };

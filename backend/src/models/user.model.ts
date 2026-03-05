@@ -35,6 +35,24 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
       required: true
+    },
+    phoneNumber: {
+      type: String,
+      trim: true
+    },
+    address: {
+      zip: {
+        type: String,
+        trim: true
+      },
+      street: {
+        type: String,
+        trim: true
+      },
+      city: {
+        type: String,
+        trim: true
+      }
     }
   },
   {

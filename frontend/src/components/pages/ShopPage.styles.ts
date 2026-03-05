@@ -166,9 +166,9 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
   }
 `;
 
-export const Summary = styled.p`
+export const Summary = styled.p<{ $error?: boolean }>`
   margin: 14px 0 0;
-  color: ${colors.vintageBrown};
+  color: ${(props) => (props.$error ? '#b42318' : colors.vintageBrown)};
 `;
 
 export const ProductsGrid = styled.div`
@@ -261,7 +261,7 @@ export const AddToCartButton = styled.button`
 
   &:disabled {
     opacity: 0.75;
-    cursor: progress;
+    cursor: not-allowed;
     transform: none;
     box-shadow: none;
   }
@@ -276,13 +276,13 @@ export const ProductTag = styled.span`
   font-weight: 700;
 `;
 
-export const EmptyState = styled.div`
+export const EmptyState = styled.div<{ $error?: boolean }>`
   margin-top: 16px;
   background: ${colors.white};
   border: 1px dashed #d8b8a5;
   border-radius: 14px;
   padding: 18px;
-  color: ${colors.vintageBrown};
+  color: ${(props) => (props.$error ? '#b42318' : colors.vintageBrown)};
   animation: ${fadeInLift} 220ms ease;
 `;
 

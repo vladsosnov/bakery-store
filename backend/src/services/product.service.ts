@@ -30,7 +30,7 @@ const PRODUCTS_SEED: ProductSeed[] = [
     imageUrl: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=900&q=80',
     tags: ['Best seller'],
     isAvailable: true,
-    stock: 30
+    stock: 3
   },
   {
     name: 'Chocolate celebration cake',

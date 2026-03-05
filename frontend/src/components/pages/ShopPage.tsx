@@ -15,6 +15,7 @@ type Product = {
   name: string;
   category: Exclude<Category, 'All'>;
   price: number;
+  stock: number;
   image: string;
   description: string;
   tags: string[];
@@ -51,6 +52,7 @@ const mapApiProduct = (product: ApiProduct): Product => {
     name: product.name,
     category: toCategory(product.category),
     price: product.price,
+    stock: product.stock,
     image: product.imageUrl,
     description: product.description,
     tags: product.tags,
@@ -59,7 +61,7 @@ const mapApiProduct = (product: ApiProduct): Product => {
 };
 
 export const ShopPage: FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -83,6 +85,24 @@ export const ShopPage: FC = () => {
     return ['All', ...Array.from(uniqueTags).slice(0, 10)];
   }, [products]);
 
+  const syncUrlFilters = (category: Category, tag: ProductTag) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (category === 'All') {
+      params.delete('category');
+    } else {
+      params.set('category', category);
+    }
+
+    if (tag === 'All') {
+      params.delete('tag');
+    } else {
+      params.set('tag', tag);
+    }
+
+    setSearchParams(params);
+  };
+
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
@@ -94,6 +114,7 @@ export const ShopPage: FC = () => {
     setVeganOnly(false);
     setGlutenFreeOnly(false);
     setUnderTwenty(false);
+    setSearchParams(new URLSearchParams());
   };
 
   const handleFilterToggle = (event: ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +139,9 @@ export const ShopPage: FC = () => {
     const category = event.currentTarget.dataset.category;
 
     if (category && CATEGORIES.includes(category as Category)) {
-      setActiveCategory(category as Category);
+      const nextCategory = category as Category;
+      setActiveCategory(nextCategory);
+      syncUrlFilters(nextCategory, activeTag);
     }
   };
 
@@ -127,6 +150,7 @@ export const ShopPage: FC = () => {
 
     if (tag && availableTags.includes(tag)) {
       setActiveTag(tag);
+      syncUrlFilters(activeCategory, tag);
     }
   };
 
@@ -343,7 +367,9 @@ export const ShopPage: FC = () => {
             </S.Categories>
 
             {cartStatusMessage ? (
-              <S.Summary role={cartStatusError ? 'alert' : 'status'}>{cartStatusMessage}</S.Summary>
+              <S.Summary role={cartStatusError ? 'alert' : 'status'} $error={cartStatusError}>
+                {cartStatusMessage}
+              </S.Summary>
             ) : null}
             <S.Summary>{filteredProducts.length} products found</S.Summary>
           </S.Toolbar>
@@ -351,7 +377,7 @@ export const ShopPage: FC = () => {
           {isLoading ? (
             <S.EmptyState>Loading products...</S.EmptyState>
           ) : loadError ? (
-            <S.EmptyState>{loadError}</S.EmptyState>
+            <S.EmptyState $error>{loadError}</S.EmptyState>
           ) : (
             <S.ResultTransition>
               {filteredProducts.length > 0 ? (
@@ -376,10 +402,17 @@ export const ShopPage: FC = () => {
                           <S.AddToCartButton
                             type="button"
                             data-product-id={product.id}
-                            disabled={addingProductId === product.id}
+                            disabled={
+                              addingProductId === product.id ||
+                              (cartByProduct[product.id] ?? 0) >= product.stock
+                            }
                             onClick={handleAddToCartClick}
                           >
-                            {addingProductId === product.id ? 'Adding...' : 'Add to cart'}
+                            {addingProductId === product.id
+                              ? 'Adding...'
+                              : (cartByProduct[product.id] ?? 0) >= product.stock
+                                ? 'Max in cart'
+                                : 'Add to cart'}
                           </S.AddToCartButton>
                         </S.ProductActions>
                       </S.ProductBody>

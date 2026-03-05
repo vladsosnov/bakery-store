@@ -1,13 +1,33 @@
 import axios from 'axios';
-import { useState, type ChangeEvent, type FC, type FormEventHandler } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent, type FC, type FormEventHandler } from 'react';
 
-import { changePasswordByEmail, setOwnPassword } from '@src/services/auth-api';
-import { getAuthSession } from '@src/services/auth-session';
+import {
+  changePasswordByEmail,
+  getMyProfile,
+  setOwnPassword,
+  updateMyProfile,
+  type UserProfile
+} from '@src/services/auth-api';
+import { getAuthSession, updateAuthSessionUser } from '@src/services/auth-session';
 
 import * as S from './ProfilePage.styles';
 
 export const ProfilePage: FC = () => {
-  const session = getAuthSession();
+  const session = useMemo(() => getAuthSession(), []);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const [profileLoadError, setProfileLoadError] = useState<string | null>(null);
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [zip, setZip] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [isProfileSaving, setIsProfileSaving] = useState(false);
+  const [profileStatus, setProfileStatus] = useState<string | null>(null);
+  const [profileHasError, setProfileHasError] = useState(false);
+
   const [email, setEmail] = useState(session?.user.email ?? '');
   const [isResetSubmitting, setIsResetSubmitting] = useState(false);
   const [resetStatusMessage, setResetStatusMessage] = useState<string | null>(null);
@@ -20,6 +40,38 @@ export const ProfilePage: FC = () => {
   const [setStatusMessage, setSetStatusMessage] = useState<string | null>(null);
   const [hasSetError, setHasSetError] = useState(false);
 
+  useEffect(() => {
+    if (!session) {
+      setIsProfileLoading(false);
+      return;
+    }
+
+    const loadProfile = async () => {
+      setIsProfileLoading(true);
+      setProfileLoadError(null);
+
+      try {
+        const response = await getMyProfile();
+        const nextProfile = response.data;
+
+        setProfile(nextProfile);
+        setFirstName(nextProfile.firstName);
+        setLastName(nextProfile.lastName);
+        setPhoneNumber(nextProfile.phoneNumber);
+        setZip(nextProfile.address.zip);
+        setStreet(nextProfile.address.street);
+        setCity(nextProfile.address.city);
+        setEmail(nextProfile.email);
+      } catch {
+        setProfileLoadError('Failed to load profile data.');
+      } finally {
+        setIsProfileLoading(false);
+      }
+    };
+
+    void loadProfile();
+  }, [session]);
+
   if (!session) {
     return (
       <S.Section>
@@ -30,6 +82,91 @@ export const ProfilePage: FC = () => {
       </S.Section>
     );
   }
+
+  if (isProfileLoading) {
+    return (
+      <S.Section>
+        <S.Card>
+          <S.Title>Profile</S.Title>
+          <S.Subtitle>Loading profile...</S.Subtitle>
+        </S.Card>
+      </S.Section>
+    );
+  }
+
+  if (profileLoadError || !profile) {
+    return (
+      <S.Section>
+        <S.Card>
+          <S.Title>Profile</S.Title>
+          <S.Subtitle>{profileLoadError ?? 'Profile is not available.'}</S.Subtitle>
+        </S.Card>
+      </S.Section>
+    );
+  }
+
+  const isCustomer = profile.role === 'customer';
+
+  const handleFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFirstName(event.target.value);
+  };
+
+  const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setLastName(event.target.value);
+  };
+
+  const handlePhoneNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPhoneNumber(event.target.value);
+  };
+
+  const handleZipChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setZip(event.target.value);
+  };
+
+  const handleStreetChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setStreet(event.target.value);
+  };
+
+  const handleCityChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCity(event.target.value);
+  };
+
+  const handleProfileSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+    setIsProfileSaving(true);
+    setProfileStatus(null);
+    setProfileHasError(false);
+
+    try {
+      const response = await updateMyProfile({
+        firstName,
+        lastName,
+        phoneNumber,
+        address: {
+          zip,
+          street,
+          city
+        }
+      });
+
+      setProfile(response.data);
+      updateAuthSessionUser({
+        firstName: response.data.firstName,
+        lastName: response.data.lastName
+      });
+      setProfileStatus('Profile updated successfully.');
+    } catch (error) {
+      if (axios.isAxiosError<{ error?: string }>(error)) {
+        setProfileStatus(error.response?.data?.error ?? 'Failed to update profile. Please try again.');
+      } else {
+        setProfileStatus('Failed to update profile. Please try again.');
+      }
+
+      setProfileHasError(true);
+    } finally {
+      setIsProfileSaving(false);
+    }
+  };
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -86,7 +223,7 @@ export const ProfilePage: FC = () => {
 
     try {
       const response = await setOwnPassword({
-        email: session.user.email,
+        email: profile.email,
         currentPassword,
         newPassword
       });
@@ -115,18 +252,59 @@ export const ProfilePage: FC = () => {
         <S.Subtitle>Your account details.</S.Subtitle>
 
         <S.InfoGrid>
-          <S.Label>First name</S.Label>
-          <S.Value>{session.user.firstName}</S.Value>
-
-          <S.Label>Last name</S.Label>
-          <S.Value>{session.user.lastName}</S.Value>
-
           <S.Label>Email</S.Label>
-          <S.Value>{session.user.email}</S.Value>
+          <S.Value>{profile.email}</S.Value>
 
-          <S.Label>Role</S.Label>
-          <S.Value>{session.user.role}</S.Value>
+          {!isCustomer ? (
+            <>
+              <S.Label>Role</S.Label>
+              <S.Value>{profile.role}</S.Value>
+            </>
+          ) : null}
         </S.InfoGrid>
+      </S.Card>
+
+      <S.Card>
+        <S.BlockTitle>Personal info</S.BlockTitle>
+        <S.Subtitle>Update your name, phone, and delivery address.</S.Subtitle>
+
+        <S.Form onSubmit={handleProfileSubmit}>
+          <S.FieldLabel>
+            First name
+            <S.Input type="text" value={firstName} onChange={handleFirstNameChange} required />
+          </S.FieldLabel>
+
+          <S.FieldLabel>
+            Last name
+            <S.Input type="text" value={lastName} onChange={handleLastNameChange} required />
+          </S.FieldLabel>
+
+          <S.FieldLabel>
+            Phone number
+            <S.Input type="tel" value={phoneNumber} onChange={handlePhoneNumberChange} required />
+          </S.FieldLabel>
+
+          <S.FieldLabel>
+            ZIP
+            <S.Input type="text" value={zip} onChange={handleZipChange} required />
+          </S.FieldLabel>
+
+          <S.FieldLabel>
+            Address
+            <S.Input type="text" value={street} onChange={handleStreetChange} required />
+          </S.FieldLabel>
+
+          <S.FieldLabel>
+            City
+            <S.Input type="text" value={city} onChange={handleCityChange} required />
+          </S.FieldLabel>
+
+          <S.SubmitButton type="submit" disabled={isProfileSaving}>
+            {isProfileSaving ? 'Saving...' : 'Save profile'}
+          </S.SubmitButton>
+        </S.Form>
+
+        {profileStatus ? <S.Status $isError={profileHasError}>{profileStatus}</S.Status> : null}
       </S.Card>
 
       <S.Card>
