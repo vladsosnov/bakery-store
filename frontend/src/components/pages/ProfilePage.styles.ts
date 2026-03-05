@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 
 import { colors } from '@src/styles/colors';
+import { pageContainer } from '@src/styles/layout';
 
 export const Section = styled.section`
-  width: min(1200px, 94vw);
-  margin: 0 auto;
-  padding: 34px 0 14px;
+  ${pageContainer}
 `;
 
 export const Card = styled.article`
