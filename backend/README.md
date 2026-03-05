@@ -35,11 +35,15 @@ Backend starts on `http://localhost:4000` by default.
     - `lastName: string`
     - `email: string`
     - `password: string` (min 8 chars)
+  - response:
+    - `data.user`
+    - `data.accessToken` (JWT)
 
 ## Admin Seeding (Code-only)
 
 To create the initial admin automatically on startup, set env vars:
 
+- `JWT_SECRET`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 - `ADMIN_FIRST_NAME` (optional, default `Admin`)

@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useState, type FC, type SyntheticEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '@src/app/routes';
 import { registerUser } from '@src/services/auth-api';
 import * as S from './SignUpPage.styles';
 
 export const SignUpPage: FC = () => {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,10 +30,19 @@ export const SignUpPage: FC = () => {
         password
       });
 
+      localStorage.setItem(
+        'bakery_auth',
+        JSON.stringify({
+          accessToken: response.data.accessToken,
+          user: response.data.user
+        })
+      );
+
       setStatusMessage(
-        `Account created for ${response.data.firstName} ${response.data.lastName}. You can sign in now.`
+        `Welcome, ${response.data.user.firstName}! Your account is ready.`
       );
       setPassword('');
+      navigate(ROUTES.home);
     } catch (error) {
       if (axios.isAxiosError<{ error?: string }>(error)) {
         setStatusMessage(error.response?.data?.error ?? 'Failed to create account. Please try again.');

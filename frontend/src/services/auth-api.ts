@@ -15,11 +15,14 @@ type RegisterRequest = {
 
 type RegisterResponse = {
   data: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: 'customer' | 'moderator' | 'admin';
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: 'customer' | 'moderator' | 'admin';
+    };
+    accessToken: string;
   };
 };
 

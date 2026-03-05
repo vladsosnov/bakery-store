@@ -3,6 +3,7 @@ import { ZodError, z } from 'zod';
 import { env } from '../config/env.js';
 import { UserModel } from '../models/user.model.js';
 import { USER_ROLES } from '../types/user-role.js';
+import { signAccessToken } from '../utils/jwt.js';
 import { hashPassword } from '../utils/password.js';
 
 const registerSchema = z.object({
@@ -60,12 +61,23 @@ export const registerCustomer = async (payload: unknown) => {
     role: USER_ROLES.customer
   });
 
-  return {
+  const userPublic = {
     id: user.id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
     role: user.role
+  };
+
+  const accessToken = signAccessToken({
+    sub: user.id,
+    email: user.email,
+    role: user.role
+  });
+
+  return {
+    user: userPublic,
+    accessToken
   };
 };
 

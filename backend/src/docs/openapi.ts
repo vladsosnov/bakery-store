@@ -54,6 +54,14 @@ const openApiDefinition = {
         },
         required: ['id', 'firstName', 'lastName', 'email', 'role']
       },
+      RegisterResponse: {
+        type: 'object',
+        properties: {
+          user: { $ref: '#/components/schemas/UserPublic' },
+          accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }
+        },
+        required: ['user', 'accessToken']
+      },
       ErrorResponse: {
         type: 'object',
         properties: {
@@ -101,7 +109,7 @@ const openApiDefinition = {
                 schema: {
                   type: 'object',
                   properties: {
-                    data: { $ref: '#/components/schemas/UserPublic' }
+                    data: { $ref: '#/components/schemas/RegisterResponse' }
                   },
                   required: ['data']
                 }
