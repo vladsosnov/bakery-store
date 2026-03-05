@@ -16,7 +16,7 @@ const slideEnter = keyframes`
 export const Main = styled.main``;
 
 export const Section = styled.section`
-  width: min(1120px, 92vw);
+  width: min(1200px, 94vw);
   margin: 0 auto;
 `;
 
@@ -106,7 +106,7 @@ export const SliderDot = styled.button<{ $active: boolean }>`
 `;
 
 export const CardsSection = styled.section`
-  width: min(1120px, 92vw);
+  width: min(1200px, 94vw);
   margin: 0 auto;
   padding: 50px 0 72px;
 `;

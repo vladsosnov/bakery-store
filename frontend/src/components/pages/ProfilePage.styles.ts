@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { colors } from '@src/styles/colors';
 
 export const Section = styled.section`
-  width: min(960px, 92vw);
+  width: min(1200px, 94vw);
   margin: 0 auto;
   padding: 34px 0 14px;
 `;
