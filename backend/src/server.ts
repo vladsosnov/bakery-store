@@ -2,10 +2,12 @@ import { app } from './app.js';
 import { env } from './config/env.js';
 import { connectToDatabase, disconnectFromDatabase } from './db/mongodb.js';
 import { seedAdminUser } from './services/auth.service.js';
+import { seedProductsCatalog } from './services/product.service.js';
 
 const startServer = async () => {
   await connectToDatabase();
   await seedAdminUser();
+  await seedProductsCatalog();
 
   const server = app.listen(env.PORT, () => {
     console.log(`Backend is running on port ${env.PORT}`);

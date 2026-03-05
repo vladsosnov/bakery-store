@@ -9,6 +9,7 @@ describe('API docs', () => {
     expect(response.status).toBe(200);
     expect(response.body.openapi).toBe('3.0.3');
     expect(response.body.paths['/api/auth/register']).toBeDefined();
+    expect(response.body.paths['/api/products']).toBeDefined();
   });
 
   it('serves Swagger UI page', async () => {

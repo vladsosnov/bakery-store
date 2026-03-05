@@ -15,7 +15,8 @@ const openApiDefinition = {
   ],
   tags: [
     { name: 'Health', description: 'Service health endpoints' },
-    { name: 'Auth', description: 'Authentication endpoints' }
+    { name: 'Auth', description: 'Authentication endpoints' },
+    { name: 'Products', description: 'Product catalog endpoints' }
   ],
   components: {
     schemas: {
@@ -69,6 +70,41 @@ const openApiDefinition = {
           accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' }
         },
         required: ['user', 'accessToken']
+      },
+      Product: {
+        type: 'object',
+        properties: {
+          _id: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
+          name: { type: 'string', example: 'Butter croissant' },
+          slug: { type: 'string', example: 'butter-croissant' },
+          description: { type: 'string', example: 'Flaky laminated pastry with cultured butter.' },
+          category: { type: 'string', example: 'Pastries' },
+          price: { type: 'number', example: 4.5 },
+          imageUrl: { type: 'string', example: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a' },
+          tags: {
+            type: 'array',
+            items: { type: 'string' },
+            example: ['Best seller']
+          },
+          isAvailable: { type: 'boolean', example: true },
+          stock: { type: 'number', example: 30 },
+          createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time' }
+        },
+        required: [
+          '_id',
+          'name',
+          'slug',
+          'description',
+          'category',
+          'price',
+          'imageUrl',
+          'tags',
+          'isAvailable',
+          'stock',
+          'createdAt',
+          'updatedAt'
+        ]
       },
       ErrorResponse: {
         type: 'object',
@@ -188,6 +224,67 @@ const openApiDefinition = {
           },
           401: {
             description: 'Invalid credentials',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          500: {
+            description: 'Internal server error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/products': {
+      get: {
+        tags: ['Products'],
+        summary: 'List available products',
+        parameters: [
+          {
+            in: 'query',
+            name: 'category',
+            schema: { type: 'string' },
+            description: 'Filter by category (for example: Bread)'
+          },
+          {
+            in: 'query',
+            name: 'tag',
+            schema: { type: 'string' },
+            description: 'Filter by tag (for example: New)'
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Search in product name and description'
+          }
+        ],
+        responses: {
+          200: {
+            description: 'List of currently available products',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Product' }
+                    }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          400: {
+            description: 'Invalid query params',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }
