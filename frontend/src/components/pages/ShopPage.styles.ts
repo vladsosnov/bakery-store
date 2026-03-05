@@ -88,7 +88,7 @@ export const ResetButton = styled.button`
   width: 100%;
   border-radius: 12px;
   border: 1px solid #d8b8a5;
-  background: #fff7f0;
+  background: ${colors.provincialPink};
   color: ${colors.brandBrown};
   padding: 10px 12px;
   font-weight: 600;
@@ -145,7 +145,7 @@ export const Categories = styled.div`
 export const CategoryButton = styled.button<{ $active: boolean }>`
   border-radius: 999px;
   border: 1px solid ${(props) => (props.$active ? colors.accentGreen : '#d8b8a5')};
-  background: ${(props) => (props.$active ? colors.accentGreen : '#fff7f0')};
+  background: ${(props) => (props.$active ? colors.accentGreen : colors.provincialPink)};
   color: ${(props) => (props.$active ? colors.white : '#5b3f36')};
   padding: 8px 12px;
   font-weight: 600;
@@ -168,7 +168,7 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
 
 export const Summary = styled.p`
   margin: 14px 0 0;
-  color: #705247;
+  color: ${colors.vintageBrown};
 `;
 
 export const ProductsGrid = styled.div`
@@ -210,7 +210,7 @@ export const ProductTitle = styled.h3`
 
 export const ProductMeta = styled.p`
   margin: 8px 0 0;
-  color: #705247;
+  color: ${colors.vintageBrown};
   font-size: 0.92rem;
 `;
 
@@ -290,7 +290,7 @@ export const EmptyState = styled.div`
   border: 1px dashed #d8b8a5;
   border-radius: 14px;
   padding: 18px;
-  color: #705247;
+  color: ${colors.vintageBrown};
   animation: ${fadeInLift} 220ms ease;
 `;
 

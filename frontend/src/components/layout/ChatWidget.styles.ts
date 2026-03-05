@@ -90,7 +90,7 @@ export const QuickActions = styled.div`
 export const QuickButton = styled.button`
   border-radius: 999px;
   border: 1px solid #d9bca9;
-  background: #fff7f0;
+  background: ${colors.provincialPink};
   color: #5c3f34;
   padding: 6px 10px;
   font-size: 0.78rem;

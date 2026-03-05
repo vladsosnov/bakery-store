@@ -9,7 +9,7 @@ export const Wrapper = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #fff7f0 0%, ${colors.white} 40%, #fff7f0 100%);
+  background: linear-gradient(180deg, ${colors.provincialPink} 0%, ${colors.white} 40%, ${colors.provincialPink} 100%);
   color: #2d1d1d;
 `;
 
@@ -22,7 +22,7 @@ export const Header = styled.header`
   top: 0;
   backdrop-filter: blur(8px);
   background-color: rgba(255, 247, 240, 0.85);
-  border-bottom: 1px solid #f1ddd0;
+  border-bottom: 1px solid ${colors.ivorySatin};
   z-index: 20;
 `;
 
@@ -60,8 +60,8 @@ export const CartButton = styled.button<{ $open: boolean }>`
   align-items: center;
   gap: 8px;
   border-radius: 999px;
-  border: 1px solid ${(props) => (props.$open ? colors.accentGreen : '#d7b9a6')};
-  background: ${(props) => (props.$open ? colors.accentGreen : '#fff7f0')};
+  border: 1px solid ${(props) => (props.$open ? colors.accentGreen : colors.cinnamonTea)};
+  background: ${(props) => (props.$open ? colors.accentGreen : colors.provincialPink)};
   color: ${(props) => (props.$open ? colors.white : colors.brandBrown)};
   padding: 10px 16px;
   font-weight: 600;
@@ -76,8 +76,8 @@ export const CartButton = styled.button<{ $open: boolean }>`
 
 const authLinkVariants = {
   ghost: css`
-    border: 1px solid #d7b9a6;
-    background: #fff7f0;
+    border: 1px solid ${colors.cinnamonTea};
+    background: ${colors.provincialPink};
     color: ${colors.brandBrown};
 
     &.active {
@@ -90,8 +90,8 @@ const authLinkVariants = {
     color: ${colors.white};
 
     &.active {
-      background: #3e2424;
-      border-color: #3e2424;
+      background: ${colors.treehouse};
+      border-color: ${colors.treehouse};
     }
   `
 } as const;
@@ -129,7 +129,7 @@ export const RouteTransition = styled.div`
 export const Footer = styled.footer`
   margin-top: 20px;
   padding: 24px 28px;
-  border-top: 1px solid #f1ddd0;
+  border-top: 1px solid ${colors.ivorySatin};
   color: ${colors.warmMuted};
 `;
 

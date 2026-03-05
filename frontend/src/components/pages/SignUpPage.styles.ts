@@ -41,7 +41,7 @@ export const AccentList = styled.ul`
 `;
 
 export const Eyebrow = styled.p`
-  color: #856459;
+  color: ${colors.supremeBrown};
   font-weight: 700;
 `;
 
@@ -52,7 +52,7 @@ export const Title = styled.h2`
 
 export const Subtitle = styled.p`
   margin-top: 0;
-  color: #7a5a4f;
+  color: ${colors.romanCoffee};
 `;
 
 export const Form = styled.form`

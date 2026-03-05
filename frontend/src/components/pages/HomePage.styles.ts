@@ -116,6 +116,7 @@ export const CardsHeading = styled.h2`
 `;
 
 export const CardsText = styled.p`
+  margin-bottom: 12px;
   max-width: 700px;
   color: ${colors.warmMuted};
 `;

@@ -54,8 +54,8 @@ export const Actions = styled.div`
 
 export const GhostLink = styled(Link)`
   border-radius: 999px;
-  border: 1px solid #d7b9a6;
-  background: #fff7f0;
+  border: 1px solid ${colors.cinnamonTea};
+  background: ${colors.provincialPink};
   color: ${colors.brandBrown};
   padding: 9px 13px;
   font-weight: 600;
