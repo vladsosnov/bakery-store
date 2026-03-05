@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
+import { colors } from '@src/styles/colors';
 
 type AuthVariant = 'ghost' | 'solid';
 
@@ -8,7 +9,7 @@ export const Wrapper = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #fff7f0 0%, #fff 40%, #fff7f0 100%);
+  background: linear-gradient(180deg, #fff7f0 0%, ${colors.white} 40%, #fff7f0 100%);
   color: #2d1d1d;
 `;
 
@@ -59,9 +60,9 @@ export const CartButton = styled.button<{ $open: boolean }>`
   align-items: center;
   gap: 8px;
   border-radius: 999px;
-  border: 1px solid ${(props) => (props.$open ? '#2f6f51' : '#d7b9a6')};
-  background: ${(props) => (props.$open ? '#2f6f51' : '#fff7f0')};
-  color: ${(props) => (props.$open ? '#fff' : '#513333')};
+  border: 1px solid ${(props) => (props.$open ? colors.accentGreen : '#d7b9a6')};
+  background: ${(props) => (props.$open ? colors.accentGreen : '#fff7f0')};
+  color: ${(props) => (props.$open ? colors.white : colors.brandBrown)};
   padding: 10px 16px;
   font-weight: 600;
   cursor: pointer;
@@ -77,16 +78,16 @@ const authLinkVariants = {
   ghost: css`
     border: 1px solid #d7b9a6;
     background: #fff7f0;
-    color: #513333;
+    color: ${colors.brandBrown};
 
     &.active {
       background: #f3e4d9;
     }
   `,
   solid: css`
-    border: 1px solid #513333;
-    background: #513333;
-    color: #fff;
+    border: 1px solid ${colors.brandBrown};
+    background: ${colors.brandBrown};
+    color: ${colors.white};
 
     &.active {
       background: #3e2424;
@@ -129,7 +130,7 @@ export const Footer = styled.footer`
   margin-top: 20px;
   padding: 24px 28px;
   border-top: 1px solid #f1ddd0;
-  color: #76554a;
+  color: ${colors.warmMuted};
 `;
 
 export const ChatButton = styled.button<{ $open: boolean }>`
@@ -138,8 +139,8 @@ export const ChatButton = styled.button<{ $open: boolean }>`
   bottom: 18px;
   border: none;
   border-radius: 999px;
-  background: ${(props) => (props.$open ? '#513333' : '#2f6f51')};
-  color: #fff;
+  background: ${(props) => (props.$open ? colors.brandBrown : colors.accentGreen)};
+  color: ${colors.white};
   padding: 14px 18px;
   font-weight: 700;
   box-shadow: 0 10px 24px rgba(31, 90, 64, 0.35);

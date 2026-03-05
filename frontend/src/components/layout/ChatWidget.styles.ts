@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
+import { colors } from '@src/styles/colors';
 
 export const Panel = styled.section`
   position: fixed;
@@ -9,7 +10,7 @@ export const Panel = styled.section`
   height: min(520px, calc(100vh - 130px));
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: #fff;
+  background: ${colors.white};
   border: 1px solid #e9d3c5;
   border-radius: 18px;
   box-shadow: 0 20px 48px rgba(65, 43, 33, 0.28);
@@ -25,8 +26,8 @@ export const Header = styled.header`
   gap: 10px;
   align-items: flex-start;
   border-bottom: 1px solid #f2dfd3;
-  background: linear-gradient(135deg, #2f6f51, #22513c);
-  color: #fff;
+  background: linear-gradient(135deg, ${colors.accentGreen}, #22513c);
+  color: ${colors.white};
 `;
 
 export const HeaderText = styled.div``;
@@ -45,7 +46,7 @@ export const HeaderMeta = styled.p`
 export const CloseButton = styled.button`
   border: none;
   background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  color: ${colors.white};
   border-radius: 10px;
   padding: 7px 10px;
   font-weight: 700;
@@ -55,7 +56,7 @@ export const CloseButton = styled.button`
 export const Messages = styled.div`
   padding: 12px;
   overflow-y: auto;
-  background: linear-gradient(180deg, #fff 0%, #fff8f2 100%);
+  background: linear-gradient(180deg, ${colors.white} 0%, #fff8f2 100%);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -68,14 +69,14 @@ export const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
   line-height: 1.35;
   font-size: 0.92rem;
   align-self: ${(props) => (props.$role === 'user' ? 'flex-end' : 'flex-start')};
-  background: ${(props) => (props.$role === 'user' ? '#2f6f51' : '#fff')};
-  color: ${(props) => (props.$role === 'user' ? '#fff' : '#3a2721')};
+  background: ${(props) => (props.$role === 'user' ? colors.accentGreen : colors.white)};
+  color: ${(props) => (props.$role === 'user' ? colors.white : '#3a2721')};
   border: ${(props) => (props.$role === 'user' ? 'none' : '1px solid #ead6c7')};
 `;
 
 export const Footer = styled.footer`
   border-top: 1px solid #f2dfd3;
-  background: #fff;
+  background: ${colors.white};
   padding: 10px;
 `;
 
@@ -105,13 +106,13 @@ export const Composer = styled.form`
 
 export const Input = styled.input`
   border-radius: 10px;
-  border: 1px solid #e3cbbb;
+  border: 1px solid ${colors.inputBorder};
   padding: 10px 11px;
   font-size: 0.92rem;
 
   &:focus {
     outline: none;
-    border-color: #2f6f51;
+    border-color: ${colors.accentGreen};
     box-shadow: 0 0 0 3px rgba(47, 111, 81, 0.14);
   }
 `;
@@ -119,8 +120,8 @@ export const Input = styled.input`
 export const SendButton = styled.button`
   border: none;
   border-radius: 10px;
-  background: #2f6f51;
-  color: #fff;
+  background: ${colors.accentGreen};
+  color: ${colors.white};
   padding: 0 13px;
   font-weight: 700;
   cursor: pointer;

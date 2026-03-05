@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+import { colors } from '@src/styles/colors';
 
 const slideEnter = keyframes`
   from {
@@ -57,7 +58,7 @@ export const SlideOverlay = styled.div`
 export const SlideContent = styled.div`
   position: relative;
   padding: 36px;
-  color: #fff;
+  color: ${colors.white};
   max-width: 540px;
   z-index: 2;
 `;
@@ -73,13 +74,13 @@ export const HeroTitle = styled.h1`
 `;
 
 export const Subtitle = styled.p`
-  margin-top: 0;
+  margin-bottom: 8px;
 `;
 
 export const CTAButton = styled.button`
-  border: 1px solid #513333;
-  background: #513333;
-  color: #fff;
+  border: 1px solid ${colors.brandBrown};
+  background: ${colors.brandBrown};
+  color: ${colors.white};
   border-radius: 999px;
   padding: 10px 16px;
   cursor: pointer;
@@ -101,7 +102,7 @@ export const SliderDot = styled.button<{ $active: boolean }>`
   border-radius: 50%;
   border: 0;
   cursor: pointer;
-  background: ${(props) => (props.$active ? '#fff' : 'rgba(255, 255, 255, 0.5)')};
+  background: ${(props) => (props.$active ? colors.white : 'rgba(255, 255, 255, 0.5)')};
 `;
 
 export const CardsSection = styled.section`
@@ -116,7 +117,7 @@ export const CardsHeading = styled.h2`
 
 export const CardsText = styled.p`
   max-width: 700px;
-  color: #76554a;
+  color: ${colors.warmMuted};
 `;
 
 export const CardsGrid = styled.div`
@@ -126,9 +127,9 @@ export const CardsGrid = styled.div`
 `;
 
 export const Card = styled.article`
-  background: #fff;
+  background: ${colors.white};
   border-radius: 16px;
-  border: 1px solid #f0d8c9;
+  border: 1px solid ${colors.softBorder};
   padding: 20px;
   box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
 `;
@@ -139,5 +140,5 @@ export const CardTitle = styled.h3`
 
 export const CardText = styled.p`
   margin-bottom: 0;
-  color: #6f5045;
+  color: ${colors.textMuted};
 `;

@@ -13,7 +13,7 @@ export const ROUTE_SEGMENTS = {
   signUp: 'sign-up'
 } as const;
 
-export type ShopCategory = 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';
+type ShopCategory = 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';
 export type ShopTag = 'New' | 'Bread' | 'Best seller' | 'Party' | 'Artisan' | 'Seasonal' | 'Gift';
 
 export const shopRoutes = {

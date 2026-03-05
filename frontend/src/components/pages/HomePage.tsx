@@ -70,12 +70,12 @@ export const HomePage: FC = () => {
   const currentSlide = useMemo(() => SLIDES[slideIndex], [slideIndex]);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
+    const timer = window.setTimeout(() => {
       setSlideIndex((prev) => (prev + 1) % SLIDES.length);
     }, 4500);
 
-    return () => window.clearInterval(timer);
-  }, []);
+    return () => window.clearTimeout(timer);
+  }, [slideIndex]);
 
   return (
     <S.Main>

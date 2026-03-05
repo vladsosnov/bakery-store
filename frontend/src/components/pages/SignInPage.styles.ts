@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { colors } from '@src/styles/colors';
 
 export const Section = styled.section`
   width: min(1120px, 92vw);
@@ -11,8 +12,8 @@ export const Section = styled.section`
 
 export const Panel = styled.article`
   border-radius: 20px;
-  border: 1px solid #f0d8c9;
-  background: #fff;
+  border: 1px solid ${colors.softBorder};
+  background: ${colors.white};
   box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
   padding: 28px;
 `;
@@ -20,7 +21,7 @@ export const Panel = styled.article`
 export const AccentPanel = styled.aside`
   border-radius: 20px;
   background: linear-gradient(145deg, #4f2d2d, #7d4738);
-  color: #fff;
+  color: ${colors.white};
   padding: 28px;
   box-shadow: 0 18px 36px rgba(79, 45, 45, 0.3);
 `;
@@ -54,7 +55,7 @@ export const Label = styled.label`
 
 export const Input = styled.input`
   border-radius: 12px;
-  border: 1px solid #e3cbbb;
+  border: 1px solid ${colors.inputBorder};
   padding: 12px 13px;
   font-size: 0.98rem;
 `;
@@ -63,8 +64,8 @@ export const SubmitButton = styled.button`
   margin-top: 8px;
   border-radius: 12px;
   border: none;
-  background: #2f6f51;
-  color: #fff;
+  background: ${colors.accentGreen};
+  color: ${colors.white};
   font-weight: 700;
   padding: 12px 14px;
   cursor: pointer;
@@ -73,7 +74,7 @@ export const SubmitButton = styled.button`
 export const FooterText = styled.p`
   margin-bottom: 0;
   margin-top: 14px;
-  color: #6f5045;
+  color: ${colors.textMuted};
 `;
 
 export const AccentTitle = styled.h2`

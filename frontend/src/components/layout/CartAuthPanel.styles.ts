@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
+import { colors } from '@src/styles/colors';
 
 export const Panel = styled.section`
   position: fixed;
   right: 18px;
   top: 78px;
   width: min(360px, calc(100vw - 24px));
-  background: #fff;
+  background: ${colors.white};
   border: 1px solid #ead4c6;
   border-radius: 16px;
   box-shadow: 0 20px 42px rgba(69, 44, 34, 0.24);
@@ -42,7 +43,7 @@ export const Body = styled.div`
 `;
 
 export const Message = styled.p`
-  color: #6f5045;
+  color: ${colors.textMuted};
 `;
 
 export const Actions = styled.div`
@@ -55,7 +56,7 @@ export const GhostLink = styled(Link)`
   border-radius: 999px;
   border: 1px solid #d7b9a6;
   background: #fff7f0;
-  color: #513333;
+  color: ${colors.brandBrown};
   padding: 9px 13px;
   font-weight: 600;
   text-decoration: none;
@@ -63,9 +64,9 @@ export const GhostLink = styled(Link)`
 
 export const SolidLink = styled(Link)`
   border-radius: 999px;
-  border: 1px solid #513333;
-  background: #513333;
-  color: #fff;
+  border: 1px solid ${colors.brandBrown};
+  background: ${colors.brandBrown};
+  color: ${colors.white};
   padding: 9px 13px;
   font-weight: 600;
   text-decoration: none;
