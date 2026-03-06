@@ -161,6 +161,7 @@ export const RolePill = styled.span<{ $role: 'customer' | 'moderator' | 'admin' 
 export const Actions = styled.div`
   display: flex;
   gap: 8px;
+  align-items: center;
 `;
 
 export const ActionButton = styled.button<{ $danger?: boolean }>`
@@ -238,4 +239,51 @@ export const ModalActions = styled.div`
   display: flex;
   gap: 8px;
   margin-top: 16px;
+`;
+
+export const StatusSelect = styled.select`
+  border-radius: 10px;
+  border: 1px solid ${colors.inputBorder};
+  background: ${colors.white};
+  color: ${colors.brandBrown};
+  font-weight: 600;
+  padding: 7px 10px;
+`;
+
+export const OrdersFilterRow = styled.div`
+  margin-top: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+export const SearchInput = styled.input`
+  min-width: 260px;
+  border-radius: 10px;
+  border: 1px solid ${colors.inputBorder};
+  background: ${colors.white};
+  color: ${colors.brandBrown};
+  padding: 8px 10px;
+`;
+
+export const OrderDetails = styled.div`
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+`;
+
+export const MutedText = styled.p`
+  color: ${colors.romanCoffee};
+  margin: 0;
+`;
+
+export const OrderItemList = styled.ul`
+  margin: 0;
+  padding-left: 18px;
+  color: ${colors.vintageBrown};
+`;
+
+export const OrderItem = styled.li`
+  margin-top: 4px;
 `;

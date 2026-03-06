@@ -18,8 +18,11 @@ import {
   deleteAdminModerator,
   getAdminOrders,
   getAdminUsers,
+  ORDER_STATUS_OPTIONS,
   type AdminOrder,
+  type AdminOrderStatus,
   type AdminUser,
+  updateAdminOrderStatus,
   updateAdminModerator
 } from '@src/services/admin-api';
 import { getAuthSession } from '@src/services/auth-session';
@@ -63,6 +66,9 @@ export const AdminDashboardPage: FC = () => {
   const [editState, setEditState] = useState<EditModeratorState | null>(null);
   const [removeState, setRemoveState] = useState<RemoveModeratorState | null>(null);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | AdminOrderStatus>('all');
+  const [orderSearchTerm, setOrderSearchTerm] = useState('');
 
   const loadDashboardData = useCallback(async () => {
     setIsLoading(true);
@@ -311,6 +317,84 @@ export const AdminDashboardPage: FC = () => {
     setActiveTab('orders');
   };
 
+  const handleOrderStatusChange = async (event: ChangeEvent<HTMLSelectElement>) => {
+    const orderId = event.currentTarget.dataset.orderId;
+    if (!orderId) {
+      return;
+    }
+
+    const nextStatus = event.target.value as AdminOrderStatus;
+
+    setPendingOrderId(orderId);
+    try {
+      const response = await updateAdminOrderStatus(orderId, nextStatus);
+      setOrders((prev) => {
+        return prev.map((order) => {
+          if (order.id !== orderId) {
+            return order;
+          }
+
+          return {
+            ...order,
+            status: response.data.status
+          };
+        });
+      });
+      toast.success('Order status updated.');
+    } catch (error) {
+      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error ?? 'Failed to update order status.'
+        : 'Failed to update order status.';
+      toast.error(errorMessage);
+    } finally {
+      setPendingOrderId(null);
+    }
+  };
+
+  const handleOrderStatusSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    void handleOrderStatusChange(event);
+  };
+
+  const getDeliveryAddressText = (order: AdminOrder) => {
+    const parts = [order.deliveryAddress.street, order.deliveryAddress.city, order.deliveryAddress.zip].filter(
+      (value) => value.trim() !== ''
+    );
+
+    return parts.length > 0 ? parts.join(', ') : 'Address is not set';
+  };
+
+  const filteredOrders = useMemo(() => {
+    const normalizedSearch = orderSearchTerm.trim().toLowerCase();
+
+    return orders.filter((order) => {
+      if (orderStatusFilter !== 'all' && order.status !== orderStatusFilter) {
+        return false;
+      }
+
+      if (normalizedSearch === '') {
+        return true;
+      }
+
+      const orderNumber = order.id.slice(-6).toLowerCase();
+      const fullOrderId = order.id.toLowerCase();
+      const customerName = order.customerName.toLowerCase();
+
+      return (
+        customerName.includes(normalizedSearch) ||
+        orderNumber.includes(normalizedSearch) ||
+        fullOrderId.includes(normalizedSearch)
+      );
+    });
+  }, [orders, orderSearchTerm, orderStatusFilter]);
+
+  const handleOrderStatusFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setOrderStatusFilter(event.target.value as 'all' | AdminOrderStatus);
+  };
+
+  const handleOrderSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setOrderSearchTerm(event.target.value);
+  };
+
   const handleLogsTabClick = () => {
     if (!isAdmin) {
       return;
@@ -434,17 +518,74 @@ export const AdminDashboardPage: FC = () => {
       {activeTab === 'orders' ? (
         <S.Panel>
           <S.BlockTitle>All orders</S.BlockTitle>
-          {orders.length === 0 ? (
-            <S.EmptyText>No orders yet. This tab is ready for backend order integration.</S.EmptyText>
+          <S.OrdersFilterRow>
+            <S.StatusSelect
+              value={orderStatusFilter}
+              onChange={handleOrderStatusFilterChange}
+              aria-label="Filter orders by status"
+            >
+              <option value="all">All statuses</option>
+              {ORDER_STATUS_OPTIONS.map((status) => (
+                <option key={`filter-${status}`} value={status}>
+                  {status}
+                </option>
+              ))}
+            </S.StatusSelect>
+            <S.SearchInput
+              type="search"
+              value={orderSearchTerm}
+              onChange={handleOrderSearchChange}
+              placeholder="Search by customer or order #"
+              aria-label="Search orders"
+            />
+          </S.OrdersFilterRow>
+
+          {filteredOrders.length === 0 ? (
+            <S.EmptyText>
+              {orders.length === 0
+                ? 'No orders yet.'
+                : 'No orders match current filters.'}
+            </S.EmptyText>
           ) : (
             <S.UserList>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <S.UserItem key={order.id}>
                   <S.UserRow>
-                    <S.UserName>{order.customerEmail}</S.UserName>
-                    <S.RolePill $role="moderator">{order.status}</S.RolePill>
+                    <S.UserName>{order.customerName}</S.UserName>
+                    <span>Order #{order.id.slice(-6)}</span>
+                    <span>{order.customerEmail}</span>
+                    {isModerator ? null : <S.RolePill $role="moderator">{order.status}</S.RolePill>}
+                    <span>{order.totalItems} items</span>
                     <span>${order.totalPrice.toFixed(2)}</span>
                   </S.UserRow>
+                  <S.OrderDetails>
+                    <S.MutedText>Delivery: {getDeliveryAddressText(order)}</S.MutedText>
+                    <S.MutedText>
+                      Phone: {order.customerPhone.trim() !== '' ? order.customerPhone : 'Phone is not set'}
+                    </S.MutedText>
+                    <S.OrderItemList>
+                      {order.items.map((item) => (
+                        <S.OrderItem key={`${order.id}-${item.productId}`}>
+                          {item.name} x {item.quantity} - ${item.lineTotal.toFixed(2)}
+                        </S.OrderItem>
+                      ))}
+                    </S.OrderItemList>
+                  </S.OrderDetails>
+                  <S.Actions>
+                    <S.StatusSelect
+                      data-order-id={order.id}
+                      value={order.status}
+                      onChange={handleOrderStatusSelectChange}
+                      disabled={pendingOrderId === order.id}
+                      aria-label={`Order status for ${order.customerEmail}`}
+                    >
+                      {ORDER_STATUS_OPTIONS.map((status) => (
+                        <option key={`${order.id}-${status}`} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </S.StatusSelect>
+                  </S.Actions>
                 </S.UserItem>
               ))}
             </S.UserList>

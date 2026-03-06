@@ -17,10 +17,12 @@ describe('API docs', () => {
     expect(response.body.paths['/api/cart']).toBeDefined();
     expect(response.body.paths['/api/cart/items']).toBeDefined();
     expect(response.body.paths['/api/cart/items/{productId}']).toBeDefined();
+    expect(response.body.paths['/api/orders']).toBeDefined();
     expect(response.body.paths['/api/admin/users']).toBeDefined();
     expect(response.body.paths['/api/admin/moderators']).toBeDefined();
     expect(response.body.paths['/api/admin/moderators/{userId}']).toBeDefined();
     expect(response.body.paths['/api/admin/orders']).toBeDefined();
+    expect(response.body.paths['/api/admin/orders/{orderId}/status']).toBeDefined();
   });
 
   it('serves Swagger UI page', async () => {

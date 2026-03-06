@@ -5,6 +5,7 @@ import {
   getAllOrdersController,
   getAllUsersController,
   removeModeratorController,
+  updateOrderStatusController,
   updateModeratorController
 } from '../controllers/admin.controller.js';
 import { asyncHandler } from '../middlewares/async-handler.js';
@@ -23,4 +24,9 @@ adminRouter.get(
   '/orders',
   requireRole(USER_ROLES.admin, USER_ROLES.moderator),
   asyncHandler(getAllOrdersController)
+);
+adminRouter.patch(
+  '/orders/:orderId/status',
+  requireRole(USER_ROLES.admin, USER_ROLES.moderator),
+  asyncHandler(updateOrderStatusController)
 );

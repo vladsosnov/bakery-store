@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { fetchCart, removeCartItem, updateCartItemQuantity } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
+import { placeOrder } from '@src/services/order-api';
 
 import * as S from './CartPage.styles';
 
@@ -22,6 +23,7 @@ export const CartPage: FC = () => {
   >([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [pendingByProduct, setPendingByProduct] = useState<Record<string, boolean>>({});
+  const [isOrdering, setIsOrdering] = useState(false);
 
   useEffect(() => {
     if (!session) {
@@ -190,6 +192,27 @@ export const CartPage: FC = () => {
     void removeItem();
   };
 
+  const handlePlaceOrderClick = () => {
+    const placeOrderRequest = async () => {
+      try {
+        setIsOrdering(true);
+        const response = await placeOrder();
+        setItems(response.data.cart.items);
+        setTotalPrice(response.data.cart.totalPrice);
+        toast.success('Order placed successfully.');
+      } catch (error) {
+        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
+          ? error.response?.data?.error ?? 'Failed to place order.'
+          : 'Failed to place order.';
+        toast.error(errorMessage);
+      } finally {
+        setIsOrdering(false);
+      }
+    };
+
+    void placeOrderRequest();
+  };
+
   return (
     <S.Section>
       <S.Card>
@@ -239,6 +262,15 @@ export const CartPage: FC = () => {
               ))}
             </S.ItemList>
             <S.Total>Total: ${totalPrice.toFixed(2)}</S.Total>
+            <S.CheckoutBar>
+              <S.CheckoutButton
+                type="button"
+                onClick={handlePlaceOrderClick}
+                disabled={isOrdering || Object.values(pendingByProduct).some(Boolean)}
+              >
+                {isOrdering ? 'Placing order...' : 'Place order'}
+              </S.CheckoutButton>
+            </S.CheckoutBar>
           </>
         )}
       </S.Card>

@@ -79,6 +79,7 @@ describe('SiteLayout chat', () => {
 
     expect(screen.queryByRole('link', { name: /sign in/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /sign up/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /my orders/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /profile/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });

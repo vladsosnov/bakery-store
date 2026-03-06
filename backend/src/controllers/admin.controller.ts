@@ -5,6 +5,7 @@ import {
   listAllOrders,
   listAllUsers,
   removeModerator,
+  updateOrderStatus,
   updateModerator
 } from '../services/admin.service.js';
 
@@ -43,5 +44,13 @@ export const getAllOrdersController = async (_req: Request, res: Response) => {
 
   return res.status(200).json({
     data: orders
+  });
+};
+
+export const updateOrderStatusController = async (req: Request, res: Response) => {
+  const order = await updateOrderStatus(req.params.orderId, req.body);
+
+  return res.status(200).json({
+    data: order
   });
 };

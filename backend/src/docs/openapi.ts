@@ -18,6 +18,7 @@ const openApiDefinition = {
     { name: 'Auth', description: 'Authentication endpoints' },
     { name: 'Products', description: 'Product catalog endpoints' },
     { name: 'Cart', description: 'Cart endpoints' },
+    { name: 'Orders', description: 'Customer orders endpoints' },
     { name: 'Admin', description: 'Admin-only endpoints' }
   ],
   components: {
@@ -174,6 +175,32 @@ const openApiDefinition = {
           totalPrice: { type: 'number', example: 16 }
         },
         required: ['items', 'totalItems', 'totalPrice']
+      },
+      OrderItem: {
+        type: 'object',
+        properties: {
+          productId: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
+          name: { type: 'string', example: 'Sourdough loaf' },
+          price: { type: 'number', example: 8 },
+          quantity: { type: 'number', example: 2 },
+          lineTotal: { type: 'number', example: 16 }
+        },
+        required: ['productId', 'name', 'price', 'quantity', 'lineTotal']
+      },
+      Order: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
+          status: { type: 'string', enum: ['placed', 'in progress', 'in delivery'], example: 'placed' },
+          totalItems: { type: 'number', example: 2 },
+          totalPrice: { type: 'number', example: 16 },
+          createdAt: { type: 'string', format: 'date-time' },
+          items: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/OrderItem' }
+          }
+        },
+        required: ['id', 'status', 'totalItems', 'totalPrice', 'createdAt', 'items']
       },
       AddCartItemRequest: {
         type: 'object',
@@ -769,6 +796,52 @@ const openApiDefinition = {
         }
       }
     },
+    '/api/orders': {
+      get: {
+        tags: ['Orders'],
+        summary: 'List current customer orders',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Customer orders'
+          },
+          403: {
+            description: 'Only customers can access orders',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      },
+      post: {
+        tags: ['Orders'],
+        summary: 'Place order from current customer cart',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          201: {
+            description: 'Order placed and cart cleared'
+          },
+          400: {
+            description: 'Cart is empty',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          409: {
+            description: 'Stock conflict',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
     '/api/admin/users': {
       get: {
         tags: ['Admin'],
@@ -906,6 +979,60 @@ const openApiDefinition = {
           },
           403: {
             description: 'Forbidden',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/admin/orders/{orderId}/status': {
+      patch: {
+        tags: ['Admin'],
+        summary: 'Update order status (admin/moderator)',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'orderId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: {
+                    type: 'string',
+                    enum: ['placed', 'in progress', 'in delivery'],
+                    example: 'in progress'
+                  }
+                },
+                required: ['status']
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Order status updated'
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          404: {
+            description: 'Order not found',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }

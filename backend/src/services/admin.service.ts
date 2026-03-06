@@ -2,6 +2,7 @@ import { ZodError, z } from 'zod';
 import { Types } from 'mongoose';
 
 import { UserModel } from '../models/user.model.js';
+import { listAllOrdersForDashboard, updateOrderStatusForDashboard } from './order.service.js';
 import { USER_ROLES } from '../types/user-role.js';
 import { hashPassword } from '../utils/password.js';
 
@@ -166,11 +167,9 @@ export const removeModerator = async (userId: string) => {
 };
 
 export const listAllOrders = async () => {
-  return [] as Array<{
-    id: string;
-    customerEmail: string;
-    status: string;
-    totalPrice: number;
-    createdAt: string;
-  }>;
+  return listAllOrdersForDashboard();
+};
+
+export const updateOrderStatus = async (orderId: string, payload: unknown) => {
+  return updateOrderStatusForDashboard(orderId, payload);
 };

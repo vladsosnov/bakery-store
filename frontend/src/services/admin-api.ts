@@ -37,13 +37,37 @@ export type UpdateModeratorRequest = {
 export type AdminOrder = {
   id: string;
   customerEmail: string;
-  status: string;
+  customerName: string;
+  customerPhone: string;
+  status: AdminOrderStatus;
+  totalItems: number;
   totalPrice: number;
   createdAt: string;
+  items: Array<{
+    productId: string;
+    name: string;
+    quantity: number;
+    lineTotal: number;
+  }>;
+  deliveryAddress: {
+    zip: string;
+    street: string;
+    city: string;
+  };
 };
+
+export const ORDER_STATUS_OPTIONS = ['placed', 'in progress', 'in delivery'] as const;
+export type AdminOrderStatus = (typeof ORDER_STATUS_OPTIONS)[number];
 
 type OrdersResponse = {
   data: AdminOrder[];
+};
+
+type OrderStatusResponse = {
+  data: {
+    id: string;
+    status: AdminOrderStatus;
+  };
 };
 
 export const getAdminUsers = async () => {
@@ -67,5 +91,12 @@ export const deleteAdminModerator = async (userId: string) => {
 
 export const getAdminOrders = async () => {
   const response = await apiAuthClient.get<OrdersResponse>('/api/admin/orders');
+  return response.data;
+};
+
+export const updateAdminOrderStatus = async (orderId: string, status: AdminOrderStatus) => {
+  const response = await apiAuthClient.patch<OrderStatusResponse>(`/api/admin/orders/${orderId}/status`, {
+    status
+  });
   return response.data;
 };

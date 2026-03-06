@@ -11,12 +11,17 @@ jest.mock('@src/services/admin-api', () => ({
   getAdminOrders: jest.fn().mockResolvedValue({ data: [] }),
   createAdminModerator: jest.fn(),
   updateAdminModerator: jest.fn(),
-  deleteAdminModerator: jest.fn()
+  deleteAdminModerator: jest.fn(),
+  ORDER_STATUS_OPTIONS: ['placed', 'in progress', 'in delivery'],
+  updateAdminOrderStatus: jest.fn()
 }));
 
 describe('AdminDashboardPage', () => {
   const getAdminUsersMock = adminApi.getAdminUsers as jest.MockedFunction<typeof adminApi.getAdminUsers>;
   const getAdminOrdersMock = adminApi.getAdminOrders as jest.MockedFunction<typeof adminApi.getAdminOrders>;
+  const updateAdminOrderStatusMock = adminApi.updateAdminOrderStatus as jest.MockedFunction<
+    typeof adminApi.updateAdminOrderStatus
+  >;
 
   const setSession = (role: 'admin' | 'moderator' | 'customer') => {
     localStorage.setItem(
@@ -50,6 +55,7 @@ describe('AdminDashboardPage', () => {
       ]
     });
     getAdminOrdersMock.mockResolvedValue({ data: [] });
+    updateAdminOrderStatusMock.mockReset();
 
     setSession('admin');
   });
@@ -111,5 +117,109 @@ describe('AdminDashboardPage', () => {
     expect(await screen.findByRole('button', { name: /all orders/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /all users/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /log usage/i })).not.toBeInTheDocument();
+  });
+
+  it('updates order status from orders tab', async () => {
+    const user = userEvent.setup();
+
+    getAdminOrdersMock.mockResolvedValue({
+      data: [
+        {
+          id: 'order-1',
+          customerName: 'John Doe',
+          customerEmail: 'customer@bakery.local',
+          customerPhone: '+15550001122',
+          status: 'placed',
+          totalItems: 2,
+          totalPrice: 12,
+          createdAt: new Date().toISOString(),
+          items: [
+            {
+              productId: 'p1',
+              name: 'Sourdough loaf',
+              quantity: 2,
+              lineTotal: 12
+            }
+          ],
+          deliveryAddress: {
+            zip: '10001',
+            street: '5th Avenue 10',
+            city: 'New York'
+          }
+        }
+      ]
+    });
+    updateAdminOrderStatusMock.mockResolvedValue({
+      data: {
+        id: 'order-1',
+        status: 'in progress'
+      }
+    });
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(await screen.findByRole('button', { name: /all orders/i }));
+    const statusSelect = await screen.findByRole('combobox', {
+      name: /order status for customer@bakery.local/i
+    });
+    await user.selectOptions(statusSelect, 'in progress');
+
+    expect(updateAdminOrderStatusMock).toHaveBeenCalledWith('order-1', 'in progress');
+  });
+
+  it('filters by status and searches by customer or order number', async () => {
+    const user = userEvent.setup();
+
+    getAdminOrdersMock.mockResolvedValue({
+      data: [
+        {
+          id: 'order-123456',
+          customerName: 'John Doe',
+          customerEmail: 'john@bakery.local',
+          customerPhone: '+15550001122',
+          status: 'placed',
+          totalItems: 2,
+          totalPrice: 12,
+          createdAt: new Date().toISOString(),
+          items: [],
+          deliveryAddress: { zip: '10001', street: '5th Avenue 10', city: 'New York' }
+        },
+        {
+          id: 'order-654321',
+          customerName: 'Anna Smith',
+          customerEmail: 'anna@bakery.local',
+          customerPhone: '+15550003344',
+          status: 'in delivery',
+          totalItems: 1,
+          totalPrice: 9,
+          createdAt: new Date().toISOString(),
+          items: [],
+          deliveryAddress: { zip: '20001', street: 'Main Street 1', city: 'Washington' }
+        }
+      ]
+    });
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(await screen.findByRole('button', { name: /all orders/i }));
+    expect(await screen.findByText(/john doe/i)).toBeInTheDocument();
+    expect(screen.getByText(/anna smith/i)).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: /filter orders by status/i }), 'in delivery');
+    expect(screen.queryByText(/john doe/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/anna smith/i)).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: /filter orders by status/i }), 'all');
+    await user.type(screen.getByRole('searchbox', { name: /search orders/i }), '123456');
+    expect(screen.getByText(/john doe/i)).toBeInTheDocument();
+    expect(screen.queryByText(/anna smith/i)).not.toBeInTheDocument();
   });
 });

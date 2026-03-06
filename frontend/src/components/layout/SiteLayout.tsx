@@ -123,6 +123,15 @@ export const SiteLayout: FC = () => {
                     Admin dashboard
                   </S.AuthLink>
                 ) : null}
+                {session.user.role === 'customer' ? (
+                  <S.AuthLink
+                    to={ROUTES.orders}
+                    $variant="ghost"
+                    className={({ isActive }) => (isActive ? 'active' : undefined)}
+                  >
+                    My orders
+                  </S.AuthLink>
+                ) : null}
                 <S.AuthLink
                   to={ROUTES.profile}
                   $variant="ghost"

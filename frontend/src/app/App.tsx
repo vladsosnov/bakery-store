@@ -7,6 +7,7 @@ import { AdminDashboardPage } from '../components/pages/AdminDashboardPage';
 import { CartPage } from '../components/pages/CartPage';
 import { ChangePasswordPage } from '../components/pages/ChangePasswordPage';
 import { HomePage } from '../components/pages/HomePage';
+import { MyOrdersPage } from '../components/pages/MyOrdersPage';
 import { ProfilePage } from '../components/pages/ProfilePage';
 import { SignInPage } from '../components/pages/SignInPage';
 import { SignUpPage } from '../components/pages/SignUpPage';
@@ -24,6 +25,7 @@ export const App: FC = () => {
           <Route path={ROUTE_SEGMENTS.shop} element={<ShopPage />} />
           <Route path={ROUTE_SEGMENTS.about} element={<AboutPage />} />
           <Route path={ROUTE_SEGMENTS.cart} element={<CartPage />} />
+          <Route path={ROUTE_SEGMENTS.orders} element={<MyOrdersPage />} />
           <Route path={ROUTE_SEGMENTS.profile} element={<ProfilePage />} />
           <Route path={ROUTE_SEGMENTS.adminDashboard} element={<AdminDashboardPage />} />
           <Route path={ROUTE_SEGMENTS.signIn} element={<SignInPage />} />

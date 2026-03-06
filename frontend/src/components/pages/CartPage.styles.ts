@@ -108,3 +108,24 @@ export const Total = styled.p`
   font-weight: 700;
   color: ${colors.brandBrown};
 `;
+
+export const CheckoutBar = styled.div`
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const CheckoutButton = styled.button`
+  border-radius: 12px;
+  border: none;
+  background: ${colors.accentGreen};
+  color: ${colors.white};
+  font-weight: 700;
+  padding: 11px 14px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
