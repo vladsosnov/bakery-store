@@ -1,72 +1,27 @@
-import axios from 'axios';
-import { useEffect, useMemo, useState, type ChangeEvent, type FC, type FormEventHandler } from 'react';
-import { toast } from 'sonner';
+import type { FC } from 'react';
 
-import {
-  changePasswordByEmail,
-  getMyProfile,
-  setOwnPassword,
-  updateMyProfile,
-  type UserProfile
-} from '@src/services/auth-api';
-import { getAuthSession, updateAuthSessionUser } from '@src/services/auth-session';
-
-import * as S from './ProfilePage.styles';
+import { useProfilePage } from '@src/hooks/useProfilePage';
+import * as S from './styles/ProfilePage.styles';
 
 export const ProfilePage: FC = () => {
-  const session = useMemo(() => getAuthSession(), []);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isProfileLoading, setIsProfileLoading] = useState(true);
-  const [profileLoadError, setProfileLoadError] = useState<string | null>(null);
-
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [zip, setZip] = useState('');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [isProfileSaving, setIsProfileSaving] = useState(false);
-
-  const [email, setEmail] = useState(session?.user.email ?? '');
-  const [isResetSubmitting, setIsResetSubmitting] = useState(false);
-  const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [isSetSubmitting, setIsSetSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!session) {
-      setIsProfileLoading(false);
-      return;
-    }
-
-    const loadProfile = async () => {
-      setIsProfileLoading(true);
-      setProfileLoadError(null);
-
-      try {
-        const response = await getMyProfile();
-        const nextProfile = response.data;
-
-        setProfile(nextProfile);
-        setFirstName(nextProfile.firstName);
-        setLastName(nextProfile.lastName);
-        setPhoneNumber(nextProfile.phoneNumber);
-        setZip(nextProfile.address.zip);
-        setStreet(nextProfile.address.street);
-        setCity(nextProfile.address.city);
-        setEmail(nextProfile.email);
-      } catch {
-        toast.error('Failed to load profile data.');
-        setProfileLoadError('Failed to load profile data.');
-      } finally {
-        setIsProfileLoading(false);
-      }
-    };
-
-    void loadProfile();
-  }, [session]);
+  const {
+    session,
+    profile,
+    isProfileLoading,
+    profileLoadError,
+    isCustomer,
+    profileForm,
+    isProfileSaving,
+    passwordForm,
+    isResetSubmitting,
+    temporaryPassword,
+    isSetSubmitting,
+    updateProfileFormField,
+    updatePasswordFormField,
+    handleProfileSubmit,
+    handlePasswordResetSubmit,
+    handleSetOwnPasswordSubmit
+  } = useProfilePage();
 
   if (!session) {
     return (
@@ -101,189 +56,90 @@ export const ProfilePage: FC = () => {
     );
   }
 
-  const isCustomer = profile.role === 'customer';
-
-  const handleFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFirstName(event.target.value);
-  };
-
-  const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setLastName(event.target.value);
-  };
-
-  const handlePhoneNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPhoneNumber(event.target.value);
-  };
-
-  const handleZipChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setZip(event.target.value);
-  };
-
-  const handleStreetChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setStreet(event.target.value);
-  };
-
-  const handleCityChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setCity(event.target.value);
-  };
-
-  const handleProfileSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
-    setIsProfileSaving(true);
-
-    try {
-      const response = await updateMyProfile({
-        firstName,
-        lastName,
-        phoneNumber,
-        address: {
-          zip,
-          street,
-          city
-        }
-      });
-
-      setProfile(response.data);
-      updateAuthSessionUser({
-        firstName: response.data.firstName,
-        lastName: response.data.lastName
-      });
-      toast.success('Profile updated successfully.');
-    } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to update profile. Please try again.'
-        : 'Failed to update profile. Please try again.';
-      toast.error(errorMessage);
-    } finally {
-      setIsProfileSaving(false);
-    }
-  };
-
-  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
-
-  const handlePasswordResetSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
-    setIsResetSubmitting(true);
-    setTemporaryPassword(null);
-
-    try {
-      const response = await changePasswordByEmail({ email });
-      toast.success(response.data.message);
-      setTemporaryPassword(response.data.temporaryPassword);
-    } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to change password. Please try again.'
-        : 'Failed to change password. Please try again.';
-      toast.error(errorMessage);
-    } finally {
-      setIsResetSubmitting(false);
-    }
-  };
-
-  const handleCurrentPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setCurrentPassword(event.target.value);
-  };
-
-  const handleNewPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewPassword(event.target.value);
-  };
-
-  const handleConfirmNewPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setConfirmNewPassword(event.target.value);
-  };
-
-  const handleSetOwnPasswordSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
-    setIsSetSubmitting(true);
-
-    if (newPassword !== confirmNewPassword) {
-      toast.error('New password and confirmation must match.');
-      setIsSetSubmitting(false);
-      return;
-    }
-
-    try {
-      const response = await setOwnPassword({
-        email: profile.email,
-        currentPassword,
-        newPassword
-      });
-
-      toast.success(response.data.message);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmNewPassword('');
-    } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to set password. Please try again.'
-        : 'Failed to set password. Please try again.';
-      toast.error(errorMessage);
-    } finally {
-      setIsSetSubmitting(false);
-    }
-  };
-
   return (
     <S.Section>
       <S.Card>
-        <S.Title>Profile</S.Title>
-        <S.Subtitle>Your account details.</S.Subtitle>
+        <S.BlockTitle>Personal info</S.BlockTitle>
 
         <S.InfoGrid>
           <S.Label>Email</S.Label>
           <S.Value>{profile.email}</S.Value>
-
-          {!isCustomer ? (
-            <>
-              <S.Label>Role</S.Label>
-              <S.Value>{profile.role}</S.Value>
-            </>
-          ) : null}
         </S.InfoGrid>
-      </S.Card>
 
-      <S.Card>
-        <S.BlockTitle>Personal info</S.BlockTitle>
-        <S.Subtitle>Update your name, phone, and delivery address.</S.Subtitle>
+        {!isCustomer && <S.InfoGrid>
+          <S.Label>Role</S.Label>
+          <S.Value>{profile.role}</S.Value>
+        </S.InfoGrid>}
 
         <S.Form onSubmit={handleProfileSubmit}>
           <S.FieldLabel>
             First name
-            <S.Input type="text" value={firstName} onChange={handleFirstNameChange} required />
+            <S.Input
+              type="text"
+              value={profileForm.firstName}
+              onChange={updateProfileFormField('firstName')}
+              required
+            />
           </S.FieldLabel>
 
           <S.FieldLabel>
             Last name
-            <S.Input type="text" value={lastName} onChange={handleLastNameChange} required />
+            <S.Input
+              type="text"
+              value={profileForm.lastName}
+              onChange={updateProfileFormField('lastName')}
+              required
+            />
           </S.FieldLabel>
 
-          <S.FieldLabel>
-            Phone number
-            <S.Input type="tel" value={phoneNumber} onChange={handlePhoneNumberChange} required />
-          </S.FieldLabel>
+          {isCustomer && (
+            <>
+              <S.FieldLabel>
+                Phone number
+                <S.Input
+                  type="tel"
+                  value={profileForm.phoneNumber}
+                  onChange={updateProfileFormField('phoneNumber')}
+                  required
+                />
+              </S.FieldLabel>
 
-          <S.FieldLabel>
-            ZIP
-            <S.Input type="text" value={zip} onChange={handleZipChange} required />
-          </S.FieldLabel>
+              <S.FieldLabel>
+                ZIP
+                <S.Input
+                  type="text"
+                  value={profileForm.zip}
+                  onChange={updateProfileFormField('zip')}
+                  required
+                />
+              </S.FieldLabel>
 
-          <S.FieldLabel>
-            Address
-            <S.Input type="text" value={street} onChange={handleStreetChange} required />
-          </S.FieldLabel>
+              <S.FieldLabel>
+                Address
+                <S.Input
+                  type="text"
+                  value={profileForm.street}
+                  onChange={updateProfileFormField('street')}
+                  required
+                />
+              </S.FieldLabel>
 
-          <S.FieldLabel>
-            City
-            <S.Input type="text" value={city} onChange={handleCityChange} required />
-          </S.FieldLabel>
+              <S.FieldLabel>
+                City
+                <S.Input
+                  type="text"
+                  value={profileForm.city}
+                  onChange={updateProfileFormField('city')}
+                  required
+                />
+              </S.FieldLabel>
+            </>
+          )}
 
           <S.SubmitButton type="submit" disabled={isProfileSaving}>
             {isProfileSaving ? 'Saving...' : 'Save profile'}
           </S.SubmitButton>
         </S.Form>
-
       </S.Card>
 
       <S.Card>
@@ -295,8 +151,8 @@ export const ProfilePage: FC = () => {
             Email
             <S.Input
               type="email"
-              value={email}
-              onChange={handleEmailChange}
+              value={passwordForm.email}
+              onChange={updatePasswordFormField('email')}
               placeholder="vlad@bakerystore.com"
               required
             />
@@ -307,12 +163,12 @@ export const ProfilePage: FC = () => {
           </S.SubmitButton>
         </S.Form>
 
-        {temporaryPassword ? (
+        {temporaryPassword && (
           <>
             <S.Subtitle>Your temporary password:</S.Subtitle>
             <S.TempPassword>{temporaryPassword}</S.TempPassword>
           </>
-        ) : null}
+        )}
       </S.Card>
 
       <S.Card>
@@ -326,8 +182,8 @@ export const ProfilePage: FC = () => {
             Current password
             <S.Input
               type="password"
-              value={currentPassword}
-              onChange={handleCurrentPasswordChange}
+              value={passwordForm.currentPassword}
+              onChange={updatePasswordFormField('currentPassword')}
               placeholder="Enter current password"
               required
             />
@@ -337,8 +193,8 @@ export const ProfilePage: FC = () => {
             New password
             <S.Input
               type="password"
-              value={newPassword}
-              onChange={handleNewPasswordChange}
+              value={passwordForm.newPassword}
+              onChange={updatePasswordFormField('newPassword')}
               placeholder="Enter new password"
               required
             />
@@ -348,8 +204,8 @@ export const ProfilePage: FC = () => {
             Confirm new password
             <S.Input
               type="password"
-              value={confirmNewPassword}
-              onChange={handleConfirmNewPasswordChange}
+              value={passwordForm.confirmNewPassword}
+              onChange={updatePasswordFormField('confirmNewPassword')}
               placeholder="Repeat new password"
               required
             />
@@ -359,7 +215,6 @@ export const ProfilePage: FC = () => {
             {isSetSubmitting ? 'Saving...' : 'Set new password'}
           </S.SubmitButton>
         </S.Form>
-
       </S.Card>
     </S.Section>
   );

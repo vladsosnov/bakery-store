@@ -38,12 +38,14 @@ const setPasswordSchema = z.object({
 const updateProfileSchema = z.object({
   firstName: z.string().trim().min(1, 'firstName is required'),
   lastName: z.string().trim().min(1, 'lastName is required'),
-  phoneNumber: z.string().trim().min(1, 'phoneNumber is required'),
-  address: z.object({
-    zip: z.string().trim().min(1, 'zip is required'),
-    street: z.string().trim().min(1, 'street is required'),
-    city: z.string().trim().min(1, 'city is required')
-  })
+  phoneNumber: z.string().trim().optional(),
+  address: z
+    .object({
+      zip: z.string().trim().optional(),
+      street: z.string().trim().optional(),
+      city: z.string().trim().optional()
+    })
+    .optional()
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -303,12 +305,25 @@ export const updateMyProfile = async (userId: string, payload: unknown) => {
 
   user.firstName = data.firstName;
   user.lastName = data.lastName;
-  user.phoneNumber = data.phoneNumber;
-  user.address = {
-    zip: data.address.zip,
-    street: data.address.street,
-    city: data.address.city
-  };
+
+  if (user.role === USER_ROLES.customer) {
+    const phoneNumber = data.phoneNumber?.trim() ?? '';
+    const zip = data.address?.zip?.trim() ?? '';
+    const street = data.address?.street?.trim() ?? '';
+    const city = data.address?.city?.trim() ?? '';
+
+    if (!phoneNumber || !zip || !street || !city) {
+      throw new AuthError('phoneNumber and full address are required for customer profile', 400, 'VALIDATION_ERROR');
+    }
+
+    user.phoneNumber = phoneNumber;
+    user.address = {
+      zip,
+      street,
+      city
+    };
+  }
+
   await user.save();
 
   return toUserProfile(user);

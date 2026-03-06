@@ -1,54 +1,23 @@
-import axios from 'axios';
-import { useEffect, useMemo, useState, type FC, type MouseEvent } from 'react';
-import { toast } from 'sonner';
+import type { FC } from 'react';
 
-import { fetchCart, removeCartItem, updateCartItemQuantity } from '@src/services/cart-api';
-import { getAuthSession } from '@src/services/auth-session';
-import { placeOrder } from '@src/services/order-api';
-
-import * as S from './CartPage.styles';
+import { useCart } from '@src/hooks/useCart';
+import * as S from './styles/CartPage.styles';
 
 export const CartPage: FC = () => {
-  const session = useMemo(() => getAuthSession(), []);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [items, setItems] = useState<
-    Array<{
-      productId: string;
-      name: string;
-      price: number;
-      quantity: number;
-      lineTotal: number;
-    }>
-  >([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [pendingByProduct, setPendingByProduct] = useState<Record<string, boolean>>({});
-  const [isOrdering, setIsOrdering] = useState(false);
-
-  useEffect(() => {
-    if (!session) {
-      setIsLoading(false);
-      return;
-    }
-
-    const loadCart = async () => {
-      setIsLoading(true);
-      setErrorMessage(null);
-
-      try {
-        const response = await fetchCart();
-        setItems(response.data.items);
-        setTotalPrice(response.data.totalPrice);
-      } catch {
-        toast.error('Failed to load cart.');
-        setErrorMessage('Failed to load cart.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadCart();
-  }, [session]);
+  const {
+    session,
+    isLoading,
+    errorMessage,
+    items,
+    totalPrice,
+    pendingByProduct,
+    isOrdering,
+    isAnyItemPending,
+    handleIncreaseClick,
+    handleDecreaseClick,
+    handleRemoveClick,
+    handlePlaceOrderClick
+  } = useCart();
 
   if (!session) {
     return (
@@ -56,6 +25,28 @@ export const CartPage: FC = () => {
         <S.Card>
           <S.Title>Cart</S.Title>
           <S.Subtitle>Please sign in to access your cart.</S.Subtitle>
+        </S.Card>
+      </S.Section>
+    );
+  }
+
+  if (session.user.role === 'moderator') {
+    return (
+      <S.Section>
+        <S.Card>
+          <S.Title>Cart</S.Title>
+          <S.Subtitle>As a moderator, you can not use cart or place orders.</S.Subtitle>
+        </S.Card>
+      </S.Section>
+    );
+  }
+
+  if (session.user.role === 'admin') {
+    return (
+      <S.Section>
+        <S.Card>
+          <S.Title>Cart</S.Title>
+          <S.Subtitle>As an admin, you can not use cart or place orders.</S.Subtitle>
         </S.Card>
       </S.Section>
     );
@@ -82,136 +73,6 @@ export const CartPage: FC = () => {
       </S.Section>
     );
   }
-
-  const applyCartResponse = (response: Awaited<ReturnType<typeof fetchCart>>) => {
-    setItems(response.data.items);
-    setTotalPrice(response.data.totalPrice);
-  };
-
-  const setProductPending = (productId: string, pending: boolean) => {
-    setPendingByProduct((prev) => ({
-      ...prev,
-      [productId]: pending
-    }));
-  };
-
-  const handleIncreaseClick = (event: MouseEvent<HTMLButtonElement>) => {
-    const productId = event.currentTarget.dataset.productId;
-
-    if (!productId) {
-      return;
-    }
-
-    const cartItem = items.find((item) => item.productId === productId);
-    if (!cartItem) {
-      return;
-    }
-
-    const updateQuantity = async () => {
-      try {
-        setProductPending(productId, true);
-        const response = await updateCartItemQuantity({
-          productId,
-          quantity: cartItem.quantity + 1
-        });
-
-        applyCartResponse(response);
-      } catch (error) {
-        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-          ? error.response?.data?.error ?? 'Failed to update quantity.'
-          : 'Failed to update quantity.';
-        toast.error(errorMessage);
-      } finally {
-        setProductPending(productId, false);
-      }
-    };
-
-    void updateQuantity();
-  };
-
-  const handleDecreaseClick = (event: MouseEvent<HTMLButtonElement>) => {
-    const productId = event.currentTarget.dataset.productId;
-
-    if (!productId) {
-      return;
-    }
-
-    const cartItem = items.find((item) => item.productId === productId);
-    if (!cartItem) {
-      return;
-    }
-
-    if (cartItem.quantity <= 1) {
-      return;
-    }
-
-    const updateQuantity = async () => {
-      try {
-        setProductPending(productId, true);
-        const response = await updateCartItemQuantity({
-          productId,
-          quantity: cartItem.quantity - 1
-        });
-
-        applyCartResponse(response);
-      } catch (error) {
-        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-          ? error.response?.data?.error ?? 'Failed to update quantity.'
-          : 'Failed to update quantity.';
-        toast.error(errorMessage);
-      } finally {
-        setProductPending(productId, false);
-      }
-    };
-
-    void updateQuantity();
-  };
-
-  const handleRemoveClick = (event: MouseEvent<HTMLButtonElement>) => {
-    const productId = event.currentTarget.dataset.productId;
-
-    if (!productId) {
-      return;
-    }
-
-    const removeItem = async () => {
-      try {
-        setProductPending(productId, true);
-        const response = await removeCartItem({ productId });
-        applyCartResponse(response);
-      } catch (error) {
-        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-          ? error.response?.data?.error ?? 'Failed to remove item.'
-          : 'Failed to remove item.';
-        toast.error(errorMessage);
-      } finally {
-        setProductPending(productId, false);
-      }
-    };
-
-    void removeItem();
-  };
-
-  const handlePlaceOrderClick = () => {
-    const placeOrderRequest = async () => {
-      try {
-        setIsOrdering(true);
-        const response = await placeOrder();
-        setItems(response.data.cart.items);
-        setTotalPrice(response.data.cart.totalPrice);
-        toast.success('Order placed successfully.');
-      } catch (error) {
-        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-          ? error.response?.data?.error ?? 'Failed to place order.'
-          : 'Failed to place order.';
-        toast.error(errorMessage);
-      } finally {
-        setIsOrdering(false);
-      }
-    };
-
-    void placeOrderRequest();
-  };
 
   return (
     <S.Section>
@@ -266,7 +127,7 @@ export const CartPage: FC = () => {
               <S.CheckoutButton
                 type="button"
                 onClick={handlePlaceOrderClick}
-                disabled={isOrdering || Object.values(pendingByProduct).some(Boolean)}
+                disabled={isOrdering || isAnyItemPending}
               >
                 {isOrdering ? 'Placing order...' : 'Place order'}
               </S.CheckoutButton>

@@ -7,11 +7,13 @@ import {
   updateCartItemQuantityController
 } from '../controllers/cart.controller.js';
 import { asyncHandler } from '../middlewares/async-handler.js';
-import { requireAuth } from '../middlewares/auth.middleware.js';
+import { requireAuth, requireRole } from '../middlewares/auth.middleware.js';
+import { USER_ROLES } from '../types/user-role.js';
 
 export const cartRouter = Router();
 
 cartRouter.use(requireAuth);
+cartRouter.use(requireRole(USER_ROLES.customer));
 cartRouter.get('/', asyncHandler(getCartController));
 cartRouter.post('/items', asyncHandler(addCartItemController));
 cartRouter.patch('/items/:productId', asyncHandler(updateCartItemQuantityController));

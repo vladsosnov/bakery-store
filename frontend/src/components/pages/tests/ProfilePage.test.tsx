@@ -60,4 +60,44 @@ describe('ProfilePage', () => {
     expect(screen.getByRole('heading', { name: /reset password/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /generate temporary password/i })).toBeInTheDocument();
   });
+
+  it('hides phone and address fields for moderator users', async () => {
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token',
+        user: {
+          id: 'm1',
+          firstName: 'Marta',
+          lastName: 'Baker',
+          email: 'marta@bakery.local',
+          role: 'moderator'
+        }
+      })
+    );
+    mockedGetMyProfile.mockResolvedValue({
+      data: {
+        id: 'm1',
+        firstName: 'Marta',
+        lastName: 'Baker',
+        email: 'marta@bakery.local',
+        role: 'moderator',
+        phoneNumber: '',
+        address: {
+          zip: '',
+          street: '',
+          city: ''
+        }
+      }
+    });
+
+    render(<ProfilePage />);
+
+    expect(await screen.findByDisplayValue('Marta')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/phone number/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^zip$/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/address/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/city/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/^Role$/i)).toBeInTheDocument();
+  });
 });

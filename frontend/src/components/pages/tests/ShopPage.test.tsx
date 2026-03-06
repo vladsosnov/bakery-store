@@ -191,4 +191,28 @@ describe('ShopPage', () => {
       expect(screen.queryByText(/chocolate celebration cake/i)).not.toBeInTheDocument();
     });
   });
+
+  it('disables add to cart for moderator users', async () => {
+    mockedGetAuthSession.mockReturnValue({
+      accessToken: 'token',
+      user: {
+        id: 'u2',
+        firstName: 'Marta',
+        lastName: 'Baker',
+        email: 'marta@bakery.local',
+        role: 'moderator'
+      }
+    });
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText(/butter croissant/i)).toBeInTheDocument();
+    const button = screen.getAllByRole('button', { name: /unavailable/i })[0];
+    expect(button).toBeDisabled();
+    expect(mockedAddToCart).not.toHaveBeenCalled();
+  });
 });

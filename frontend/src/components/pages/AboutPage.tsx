@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import * as S from './AboutPage.styles';
+import * as S from './styles/AboutPage.styles';
 
 export const AboutPage: FC = () => {
   return (

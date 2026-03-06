@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useMemo, useState, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -6,7 +5,8 @@ import { toast } from 'sonner';
 import { addToCart, fetchCart } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
 import { listProducts, type ApiProduct } from '@src/services/product-api';
-import * as S from './ShopPage.styles';
+import { toErrorMessage } from '@src/utils/error';
+import * as S from './styles/ShopPage.styles';
 
 type Category = 'All' | 'Bread' | 'Cakes' | 'Pastries' | 'Cookies';
 type ProductTag = 'All' | string;
@@ -62,6 +62,9 @@ const mapApiProduct = (product: ApiProduct): Product => {
 };
 
 export const ShopPage: FC = () => {
+  const session = useMemo(() => getAuthSession(), []);
+  const isCustomer = session?.user.role === 'customer';
+  const isBlockedCartRole = Boolean(session) && !isCustomer;
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -163,10 +166,13 @@ export const ShopPage: FC = () => {
     if (addingProductId === productId) {
       return;
     }
-    const session = getAuthSession();
-
     if (!session) {
       toast.error('Sign in first to add products to your cart.');
+      return;
+    }
+
+    if (!isCustomer) {
+      toast.error('Moderators can not add products to cart.');
       return;
     }
 
@@ -182,10 +188,7 @@ export const ShopPage: FC = () => {
 
         setCartByProduct(nextCartByProduct);
       } catch (error) {
-        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-          ? error.response?.data?.error ?? 'Failed to add product to cart.'
-          : 'Failed to add product to cart.';
-        toast.error(errorMessage);
+        toast.error(toErrorMessage(error, 'Failed to add product to cart.'));
       } finally {
         setAddingProductId(null);
       }
@@ -214,8 +217,7 @@ export const ShopPage: FC = () => {
   }, []);
 
   useEffect(() => {
-    const session = getAuthSession();
-    if (!session) {
+    if (!session || !isCustomer) {
       setCartByProduct({});
       return;
     }
@@ -235,7 +237,7 @@ export const ShopPage: FC = () => {
     };
 
     void loadCart();
-  }, []);
+  }, [isCustomer, session]);
 
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
@@ -268,6 +270,22 @@ export const ShopPage: FC = () => {
       return byCategory && bySearch && byVegan && byGlutenFree && byPrice && byTag;
     });
   }, [activeCategory, activeTag, products, search, veganOnly, glutenFreeOnly, underTwenty]);
+
+  const getAddToCartLabel = (product: Product) => {
+    if (isBlockedCartRole) {
+      return 'Unavailable';
+    }
+
+    if (addingProductId === product.id) {
+      return 'Adding...';
+    }
+
+    if ((cartByProduct[product.id] ?? 0) >= product.stock) {
+      return 'Max in cart';
+    }
+
+    return 'Add to cart';
+  };
 
   return (
     <S.Main>
@@ -392,16 +410,13 @@ export const ShopPage: FC = () => {
                             type="button"
                             data-product-id={product.id}
                             disabled={
+                              isBlockedCartRole ||
                               addingProductId === product.id ||
                               (cartByProduct[product.id] ?? 0) >= product.stock
                             }
                             onClick={handleAddToCartClick}
                           >
-                            {addingProductId === product.id
-                              ? 'Adding...'
-                              : (cartByProduct[product.id] ?? 0) >= product.stock
-                                ? 'Max in cart'
-                                : 'Add to cart'}
+                            {getAddToCartLabel(product)}
                           </S.AddToCartButton>
                         </S.ProductActions>
                       </S.ProductBody>

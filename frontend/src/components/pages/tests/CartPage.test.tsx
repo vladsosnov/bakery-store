@@ -161,4 +161,25 @@ describe('CartPage', () => {
     await user.click(await screen.findByRole('button', { name: /place order/i }));
     expect(mockedPlaceOrder).toHaveBeenCalled();
   });
+
+  it('shows restriction message for moderator users', () => {
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token',
+        user: {
+          id: 'm1',
+          firstName: 'Marta',
+          lastName: 'Baker',
+          email: 'marta@bakery.local',
+          role: 'moderator'
+        }
+      })
+    );
+
+    render(<CartPage />);
+
+    expect(screen.getByText(/as a moderator, you can not use cart or place orders/i)).toBeInTheDocument();
+    expect(mockedFetchCart).not.toHaveBeenCalled();
+  });
 });

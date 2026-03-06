@@ -94,8 +94,8 @@ type UserProfileResponse = {
 type UpdateProfileRequest = {
   firstName: string;
   lastName: string;
-  phoneNumber: string;
-  address: {
+  phoneNumber?: string;
+  address?: {
     zip: string;
     street: string;
     city: string;

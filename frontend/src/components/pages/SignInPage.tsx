@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState, type ChangeEvent, type FC, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -6,7 +5,8 @@ import { toast } from 'sonner';
 import { ROUTES } from '@src/app/routes';
 import { loginUser } from '@src/services/auth-api';
 import { setAuthSession } from '@src/services/auth-session';
-import * as S from './SignInPage.styles';
+import { toErrorMessage } from '@src/utils/error';
+import * as S from './styles/SignInPage.styles';
 
 export const SignInPage: FC = () => {
   const navigate = useNavigate();
@@ -39,11 +39,7 @@ export const SignInPage: FC = () => {
       toast.success(`Welcome back, ${response.data.user.firstName}!`);
       navigate(ROUTES.home);
     } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to sign in. Please try again.'
-        : 'Failed to sign in. Please try again.';
-
-      toast.error(errorMessage);
+      toast.error(toErrorMessage(error, 'Failed to sign in. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

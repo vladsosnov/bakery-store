@@ -1,24 +1,12 @@
-import axios from 'axios';
 import { useEffect, useMemo, useState, type FC } from 'react';
 import { toast } from 'sonner';
 
 import { getAuthSession } from '@src/services/auth-session';
 import { getMyOrders, type MyOrder } from '@src/services/order-api';
 import { USER_ROLES } from '@src/types/user-role';
-import * as S from './MyOrdersPage.styles';
-
-const formatOrderDate = (value: string | null) => {
-  if (!value) {
-    return 'Unknown date';
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return 'Unknown date';
-  }
-
-  return date.toLocaleString();
-};
+import { formatOrderDate } from '@src/utils/date';
+import { toErrorMessage } from '@src/utils/error';
+import * as S from './styles/MyOrdersPage.styles';
 
 export const MyOrdersPage: FC = () => {
   const session = useMemo(() => getAuthSession(), []);
@@ -40,9 +28,7 @@ export const MyOrdersPage: FC = () => {
         const response = await getMyOrders();
         setOrders(response.data);
       } catch (error) {
-        const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-          ? error.response?.data?.error ?? 'Failed to load your orders.'
-          : 'Failed to load your orders.';
+        const errorMessage = toErrorMessage(error, 'Failed to load your orders.');
         toast.error(errorMessage);
         setErrorMessage(errorMessage);
       } finally {
@@ -50,7 +36,7 @@ export const MyOrdersPage: FC = () => {
       }
     };
 
-    void loadOrders();
+    loadOrders();
   }, [session]);
 
   if (!session) {

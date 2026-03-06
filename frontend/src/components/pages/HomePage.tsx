@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FC, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { shopRoutes } from '@src/app/routes';
-import * as S from './HomePage.styles';
+import * as S from './styles/HomePage.styles';
 
 type Slide = {
   id: number;
@@ -18,6 +18,8 @@ type BenefitCard = {
   title: string;
   text: string;
 };
+
+const SLIDE_TIMEOUT = 4500;
 
 const SLIDES: Slide[] = [
   {
@@ -87,7 +89,7 @@ export const HomePage: FC = () => {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setSlideIndex((prev) => (prev + 1) % SLIDES.length);
-    }, 4500);
+    }, SLIDE_TIMEOUT);
 
     return () => window.clearTimeout(timer);
   }, [slideIndex]);

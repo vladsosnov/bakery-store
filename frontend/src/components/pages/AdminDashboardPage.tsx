@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   useCallback,
   useEffect,
@@ -6,7 +5,6 @@ import {
   useState,
   type ChangeEvent,
   type FC,
-  type FormEventHandler,
   type MouseEvent
 } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -14,35 +12,25 @@ import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
 import {
-  createAdminModerator,
-  deleteAdminModerator,
   getAdminOrders,
   getAdminUsers,
-  ORDER_STATUS_OPTIONS,
   type AdminOrder,
   type AdminOrderStatus,
   type AdminUser,
-  updateAdminOrderStatus,
-  updateAdminModerator
+  updateAdminOrderStatus
 } from '@src/services/admin-api';
+import { CreateModeratorModal } from '@src/components/modals/CreateModeratorModal';
+import { EditModeratorModal } from '@src/components/modals/EditModeratorModal';
+import { RemoveModeratorModal } from '@src/components/modals/RemoveModeratorModal';
+import { LogsTab } from '@src/components/pages/tabs/LogsTab';
+import { OrdersTab } from '@src/components/pages/tabs/OrdersTab';
+import { UsersTab } from '@src/components/pages/tabs/UsersTab';
 import { getAuthSession } from '@src/services/auth-session';
 import { USER_ROLES } from '@src/types/user-role';
-import * as S from './AdminDashboardPage.styles';
+import { toErrorMessage } from '@src/utils/error';
+import * as S from './styles/AdminDashboardPage.styles';
 
 type AdminTab = 'users' | 'orders' | 'logs';
-
-type EditModeratorState = {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isActive: boolean;
-};
-
-type RemoveModeratorState = {
-  userId: string;
-  fullName: string;
-};
 
 export const AdminDashboardPage: FC = () => {
   const session = useMemo(() => getAuthSession(), []);
@@ -57,15 +45,9 @@ export const AdminDashboardPage: FC = () => {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isCreateSubmitting, setIsCreateSubmitting] = useState(false);
-  const [editState, setEditState] = useState<EditModeratorState | null>(null);
-  const [removeState, setRemoveState] = useState<RemoveModeratorState | null>(null);
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [selectedModeratorForEdit, setSelectedModeratorForEdit] = useState<AdminUser | null>(null);
+  const [selectedModeratorForRemove, setSelectedModeratorForRemove] = useState<AdminUser | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | AdminOrderStatus>('all');
   const [orderSearchTerm, setOrderSearchTerm] = useState('');
@@ -84,10 +66,7 @@ export const AdminDashboardPage: FC = () => {
         setOrders(ordersResponse.data);
       }
     } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to load admin dashboard.'
-        : 'Failed to load admin dashboard.';
-      toast.error(errorMessage);
+      toast.error(toErrorMessage(error, 'Failed to load admin dashboard.'));
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +78,7 @@ export const AdminDashboardPage: FC = () => {
       return;
     }
 
-    void loadDashboardData();
+    loadDashboardData();
   }, [session, isAdmin, isModerator, loadDashboardData]);
 
   useEffect(() => {
@@ -112,64 +91,19 @@ export const AdminDashboardPage: FC = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsCreateModalOpen(false);
-        setEditState(null);
-        setRemoveState(null);
+        setSelectedModeratorForEdit(null);
+        setSelectedModeratorForRemove(null);
       }
     };
 
-    if (isCreateModalOpen || editState || removeState) {
+    if (isCreateModalOpen || selectedModeratorForEdit || selectedModeratorForRemove) {
       window.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isCreateModalOpen, editState, removeState]);
-
-  const handleCreateFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFirstName(event.target.value);
-  };
-
-  const handleCreateLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setLastName(event.target.value);
-  };
-
-  const handleCreateEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
-
-  const handleCreatePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
-
-  const handleCreateModeratorSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
-    setIsCreateSubmitting(true);
-
-    try {
-      const response = await createAdminModerator({
-        firstName,
-        lastName,
-        email,
-        password
-      });
-
-      setUsers((prev) => [response.data, ...prev]);
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setPassword('');
-      setIsCreateModalOpen(false);
-      toast.success('Moderator created successfully.');
-    } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to create moderator.'
-        : 'Failed to create moderator.';
-      toast.error(errorMessage);
-    } finally {
-      setIsCreateSubmitting(false);
-    }
-  };
+  }, [isCreateModalOpen, selectedModeratorForEdit, selectedModeratorForRemove]);
 
   const handleEditClick = (event: MouseEvent<HTMLButtonElement>) => {
     const userId = event.currentTarget.dataset.userId;
@@ -182,87 +116,8 @@ export const AdminDashboardPage: FC = () => {
       return;
     }
 
-    setRemoveState(null);
-    setEditState({
-      userId: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      isActive: user.isActive
-    });
-  };
-
-  const handleEditFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!editState) {
-      return;
-    }
-
-    setEditState({
-      ...editState,
-      firstName: event.target.value
-    });
-  };
-
-  const handleEditLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!editState) {
-      return;
-    }
-
-    setEditState({
-      ...editState,
-      lastName: event.target.value
-    });
-  };
-
-  const handleEditEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!editState) {
-      return;
-    }
-
-    setEditState({
-      ...editState,
-      email: event.target.value
-    });
-  };
-
-  const handleEditIsActiveChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!editState) {
-      return;
-    }
-
-    setEditState({
-      ...editState,
-      isActive: event.target.checked
-    });
-  };
-
-  const handleSaveEditClick = async () => {
-    if (!editState) {
-      return;
-    }
-
-    setEditingUserId(editState.userId);
-    try {
-      const response = await updateAdminModerator(editState.userId, {
-        firstName: editState.firstName,
-        lastName: editState.lastName,
-        email: editState.email,
-        isActive: editState.isActive
-      });
-
-      setUsers((prev) =>
-        prev.map((user) => (user.id === editState.userId ? response.data : user))
-      );
-      setEditState(null);
-      toast.success('Moderator updated successfully.');
-    } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to update moderator.'
-        : 'Failed to update moderator.';
-      toast.error(errorMessage);
-    } finally {
-      setEditingUserId(null);
-    }
+    setSelectedModeratorForRemove(null);
+    setSelectedModeratorForEdit(user);
   };
 
   const handleDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -276,33 +131,8 @@ export const AdminDashboardPage: FC = () => {
       return;
     }
 
-    setEditState(null);
-    setRemoveState({
-      userId: user.id,
-      fullName: `${user.firstName} ${user.lastName}`
-    });
-  };
-
-  const handleConfirmRemoveClick = async () => {
-    if (!removeState) {
-      return;
-    }
-
-    const userId = removeState.userId;
-    setEditingUserId(userId);
-    try {
-      await deleteAdminModerator(userId);
-      setUsers((prev) => prev.filter((user) => user.id !== userId));
-      setRemoveState(null);
-      toast.success('Moderator removed successfully.');
-    } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to remove moderator.'
-        : 'Failed to remove moderator.';
-      toast.error(errorMessage);
-    } finally {
-      setEditingUserId(null);
-    }
+    setSelectedModeratorForEdit(null);
+    setSelectedModeratorForRemove(user);
   };
 
   const handleUsersTabClick = () => {
@@ -342,17 +172,10 @@ export const AdminDashboardPage: FC = () => {
       });
       toast.success('Order status updated.');
     } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to update order status.'
-        : 'Failed to update order status.';
-      toast.error(errorMessage);
+      toast.error(toErrorMessage(error, 'Failed to update order status.'));
     } finally {
       setPendingOrderId(null);
     }
-  };
-
-  const handleOrderStatusSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    void handleOrderStatusChange(event);
   };
 
   const getDeliveryAddressText = (order: AdminOrder) => {
@@ -387,14 +210,6 @@ export const AdminDashboardPage: FC = () => {
     });
   }, [orders, orderSearchTerm, orderStatusFilter]);
 
-  const handleOrderStatusFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setOrderStatusFilter(event.target.value as 'all' | AdminOrderStatus);
-  };
-
-  const handleOrderSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setOrderSearchTerm(event.target.value);
-  };
-
   const handleLogsTabClick = () => {
     if (!isAdmin) {
       return;
@@ -404,25 +219,24 @@ export const AdminDashboardPage: FC = () => {
   };
 
   const handleOpenCreateModeratorModal = () => {
-    setEditState(null);
-    setRemoveState(null);
+    setSelectedModeratorForEdit(null);
+    setSelectedModeratorForRemove(null);
     setIsCreateModalOpen(true);
   };
 
-  const handleCloseCreateModeratorModal = () => {
+  const handleModeratorCreated = (user: AdminUser) => {
+    setUsers((prev) => [user, ...prev]);
     setIsCreateModalOpen(false);
   };
 
-  const handleCloseEditModeratorModal = () => {
-    setEditState(null);
+  const handleModeratorUpdated = (user: AdminUser) => {
+    setUsers((prev) => prev.map((existingUser) => (existingUser.id === user.id ? user : existingUser)));
+    setSelectedModeratorForEdit(null);
   };
 
-  const handleCloseRemoveModeratorModal = () => {
-    setRemoveState(null);
-  };
-
-  const handleModalCardClick = (event: MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+  const handleModeratorRemoved = (userId: string) => {
+    setUsers((prev) => prev.filter((existingUser) => existingUser.id !== userId));
+    setSelectedModeratorForRemove(null);
   };
 
   if (!session) {
@@ -457,275 +271,51 @@ export const AdminDashboardPage: FC = () => {
       </S.HeaderCard>
 
       {isAdmin && activeTab === 'users' ? (
-        <S.Panel>
-          <S.HeadWrapper>
-            <S.BlockTitle $isTitleWithActions>All users</S.BlockTitle>
-            <S.CreateButton type="button" onClick={handleOpenCreateModeratorModal}>
-            Create moderator
-            </S.CreateButton>
-          </S.HeadWrapper>
-
-          {isLoading ? <S.EmptyText>Loading users...</S.EmptyText> : null}
-
-          {!isLoading ? (
-            <S.UserList>
-              {users.map((user) => {
-                const isModerator = user.role === USER_ROLES.moderator;
-                const isPending = editingUserId === user.id;
-
-                return (
-                  <S.UserItem key={user.id}>
-                    <S.UserRow>
-                      <S.UserName>
-                        {user.firstName} {user.lastName}
-                      </S.UserName>
-                      <S.RolePill $role={user.role}>{user.role}</S.RolePill>
-                      <S.StatusBadge $active={user.isActive}>
-                        {user.isActive ? 'active' : 'disabled'}
-                      </S.StatusBadge>
-                      <span>{user.email}</span>
-                    </S.UserRow>
-
-                    {isModerator ? (
-                      <S.Actions>
-                        <S.ActionButton
-                          type="button"
-                          data-user-id={user.id}
-                          onClick={handleEditClick}
-                          disabled={isPending}
-                        >
-                          Edit
-                        </S.ActionButton>
-                        <S.ActionButton
-                          type="button"
-                          $danger
-                          data-user-id={user.id}
-                          onClick={handleDeleteClick}
-                          disabled={isPending}
-                        >
-                          Remove
-                        </S.ActionButton>
-                      </S.Actions>
-                    ) : null}
-                  </S.UserItem>
-                );
-              })}
-            </S.UserList>
-          ) : null}
-        </S.Panel>
+        <UsersTab
+          isLoading={isLoading}
+          users={users}
+          onOpenCreateModeratorModal={handleOpenCreateModeratorModal}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteClick}
+        />
       ) : null}
 
       {activeTab === 'orders' ? (
-        <S.Panel>
-          <S.BlockTitle>All orders</S.BlockTitle>
-          <S.OrdersFilterRow>
-            <S.StatusSelect
-              value={orderStatusFilter}
-              onChange={handleOrderStatusFilterChange}
-              aria-label="Filter orders by status"
-            >
-              <option value="all">All statuses</option>
-              {ORDER_STATUS_OPTIONS.map((status) => (
-                <option key={`filter-${status}`} value={status}>
-                  {status}
-                </option>
-              ))}
-            </S.StatusSelect>
-            <S.SearchInput
-              type="search"
-              value={orderSearchTerm}
-              onChange={handleOrderSearchChange}
-              placeholder="Search by customer or order #"
-              aria-label="Search orders"
-            />
-          </S.OrdersFilterRow>
-
-          {filteredOrders.length === 0 ? (
-            <S.EmptyText>
-              {orders.length === 0
-                ? 'No orders yet.'
-                : 'No orders match current filters.'}
-            </S.EmptyText>
-          ) : (
-            <S.UserList>
-              {filteredOrders.map((order) => (
-                <S.UserItem key={order.id}>
-                  <S.UserRow>
-                    <S.UserName>{order.customerName}</S.UserName>
-                    <span>Order #{order.id.slice(-6)}</span>
-                    <span>{order.customerEmail}</span>
-                    {isModerator ? null : <S.RolePill $role="moderator">{order.status}</S.RolePill>}
-                    <span>{order.totalItems} items</span>
-                    <span>${order.totalPrice.toFixed(2)}</span>
-                  </S.UserRow>
-                  <S.OrderDetails>
-                    <S.MutedText>Delivery: {getDeliveryAddressText(order)}</S.MutedText>
-                    <S.MutedText>
-                      Phone: {order.customerPhone.trim() !== '' ? order.customerPhone : 'Phone is not set'}
-                    </S.MutedText>
-                    <S.OrderItemList>
-                      {order.items.map((item) => (
-                        <S.OrderItem key={`${order.id}-${item.productId}`}>
-                          {item.name} x {item.quantity} - ${item.lineTotal.toFixed(2)}
-                        </S.OrderItem>
-                      ))}
-                    </S.OrderItemList>
-                  </S.OrderDetails>
-                  <S.Actions>
-                    <S.StatusSelect
-                      data-order-id={order.id}
-                      value={order.status}
-                      onChange={handleOrderStatusSelectChange}
-                      disabled={pendingOrderId === order.id}
-                      aria-label={`Order status for ${order.customerEmail}`}
-                    >
-                      {ORDER_STATUS_OPTIONS.map((status) => (
-                        <option key={`${order.id}-${status}`} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </S.StatusSelect>
-                  </S.Actions>
-                </S.UserItem>
-              ))}
-            </S.UserList>
-          )}
-        </S.Panel>
+        <OrdersTab
+          orders={orders}
+          filteredOrders={filteredOrders}
+          isModerator={isModerator}
+          pendingOrderId={pendingOrderId}
+          orderStatusFilter={orderStatusFilter}
+          orderSearchTerm={orderSearchTerm}
+          onOrderStatusFilterChange={(e) => setOrderStatusFilter(e.target.value as AdminOrderStatus)}
+          onOrderSearchChange={(e) => setOrderSearchTerm(e.target.value)}
+          onOrderStatusSelectChange={(e) => handleOrderStatusChange(e)}
+          getDeliveryAddressText={getDeliveryAddressText}
+        />
       ) : null}
 
-      {isAdmin && activeTab === 'logs' ? (
-        <S.Panel>
-          <S.BlockTitle>Log usage</S.BlockTitle>
-          <S.EmptyText>Usage logs module will be implemented later.</S.EmptyText>
-        </S.Panel>
-      ) : null}
+      {isAdmin && activeTab === 'logs' ? <LogsTab /> : null}
 
-      {isAdmin && isCreateModalOpen ? (
-        <S.ModalOverlay role="presentation" onClick={handleCloseCreateModeratorModal}>
-          <S.ModalCard
-            role="dialog"
-            aria-modal="true"
-            aria-label="Create moderator dialog"
-            onClick={handleModalCardClick}
-          >
-            <S.ModalHeader>
-              <S.BlockTitle $isTitleWithActions>Create moderator</S.BlockTitle>
-              <S.CloseButton type="button" onClick={handleCloseCreateModeratorModal}>
-                Close
-              </S.CloseButton>
-            </S.ModalHeader>
-            <S.Form onSubmit={handleCreateModeratorSubmit}>
-              <S.Label>
-                First name
-                <S.Input value={firstName} onChange={handleCreateFirstNameChange} required />
-              </S.Label>
-              <S.Label>
-                Last name
-                <S.Input value={lastName} onChange={handleCreateLastNameChange} required />
-              </S.Label>
-              <S.Label>
-                Email
-                <S.Input type="email" value={email} onChange={handleCreateEmailChange} required />
-              </S.Label>
-              <S.Label>
-                Temporary password
-                <S.Input
-                  type="password"
-                  value={password}
-                  onChange={handleCreatePasswordChange}
-                  minLength={8}
-                  required
-                />
-              </S.Label>
-              <S.SubmitButton type="submit" disabled={isCreateSubmitting}>
-                {isCreateSubmitting ? 'Creating...' : 'Create moderator'}
-              </S.SubmitButton>
-            </S.Form>
-          </S.ModalCard>
-        </S.ModalOverlay>
-      ) : null}
+      <CreateModeratorModal
+        isOpen={isAdmin && isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={handleModeratorCreated}
+      />
 
-      {isAdmin && editState ? (
-        <S.ModalOverlay role="presentation" onClick={handleCloseEditModeratorModal}>
-          <S.ModalCard
-            role="dialog"
-            aria-modal="true"
-            aria-label="Edit moderator dialog"
-            onClick={handleModalCardClick}
-          >
-            <S.ModalHeader>
-              <S.BlockTitle $isTitleWithActions>Edit moderator</S.BlockTitle>
-              <S.CloseButton type="button" onClick={handleCloseEditModeratorModal}>
-                Close
-              </S.CloseButton>
-            </S.ModalHeader>
-            <S.Form>
-              <S.Label>
-                First name
-                <S.Input value={editState.firstName} onChange={handleEditFirstNameChange} />
-              </S.Label>
-              <S.Label>
-                Last name
-                <S.Input value={editState.lastName} onChange={handleEditLastNameChange} />
-              </S.Label>
-              <S.Label>
-                Email
-                <S.Input type="email" value={editState.email} onChange={handleEditEmailChange} />
-              </S.Label>
-              <S.InlineCheckboxLabel>
-                Active
-                <input type="checkbox" checked={editState.isActive} onChange={handleEditIsActiveChange} />
-              </S.InlineCheckboxLabel>
-            </S.Form>
-            <S.ModalActions>
-              <S.SubmitButton
-                type="button"
-                disabled={editingUserId === editState.userId}
-                onClick={handleSaveEditClick}
-              >
-                {editingUserId === editState.userId ? 'Saving...' : 'Save'}
-              </S.SubmitButton>
-              <S.CloseButton type="button" onClick={handleCloseEditModeratorModal}>
-                Cancel
-              </S.CloseButton>
-            </S.ModalActions>
-          </S.ModalCard>
-        </S.ModalOverlay>
-      ) : null}
+      <EditModeratorModal
+        isOpen={Boolean(isAdmin && selectedModeratorForEdit)}
+        moderator={selectedModeratorForEdit}
+        onClose={() => setSelectedModeratorForEdit(null)}
+        onUpdated={handleModeratorUpdated}
+      />
 
-      {isAdmin && removeState ? (
-        <S.ModalOverlay role="presentation" onClick={handleCloseRemoveModeratorModal}>
-          <S.ModalCard
-            role="dialog"
-            aria-modal="true"
-            aria-label="Remove moderator confirmation dialog"
-            onClick={handleModalCardClick}
-          >
-            <S.ModalHeader>
-              <S.BlockTitle $isTitleWithActions>Remove moderator</S.BlockTitle>
-              <S.CloseButton type="button" onClick={handleCloseRemoveModeratorModal}>
-                Close
-              </S.CloseButton>
-            </S.ModalHeader>
-            <S.ModalBodyText>
-              Are you sure you want to remove {removeState.fullName}? This action cannot be undone.
-            </S.ModalBodyText>
-            <S.ModalActions>
-              <S.ActionButton
-                type="button"
-                $danger
-                onClick={handleConfirmRemoveClick}
-                disabled={editingUserId === removeState.userId}
-              >
-                {editingUserId === removeState.userId ? 'Removing...' : 'Remove moderator'}
-              </S.ActionButton>
-              <S.CloseButton type="button" onClick={handleCloseRemoveModeratorModal}>
-                Cancel
-              </S.CloseButton>
-            </S.ModalActions>
-          </S.ModalCard>
-        </S.ModalOverlay>
-      ) : null}
+      <RemoveModeratorModal
+        isOpen={Boolean(isAdmin && selectedModeratorForRemove)}
+        moderator={selectedModeratorForRemove}
+        onClose={() => setSelectedModeratorForRemove(null)}
+        onRemoved={handleModeratorRemoved}
+      />
     </S.Section>
   );
 };

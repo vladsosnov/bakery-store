@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState, type ChangeEvent, type FC, type FormEventHandler } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -6,7 +5,8 @@ import { toast } from 'sonner';
 import { ROUTES } from '@src/app/routes';
 import { changePasswordByEmail } from '@src/services/auth-api';
 import { getAuthSession } from '@src/services/auth-session';
-import * as S from './ChangePasswordPage.styles';
+import { toErrorMessage } from '@src/utils/error';
+import * as S from './styles/ChangePasswordPage.styles';
 
 export const ChangePasswordPage: FC = () => {
   const session = getAuthSession();
@@ -28,10 +28,7 @@ export const ChangePasswordPage: FC = () => {
       toast.success(response.data.message);
       setTemporaryPassword(response.data.temporaryPassword);
     } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to change password. Please try again.'
-        : 'Failed to change password. Please try again.';
-      toast.error(errorMessage);
+      toast.error(toErrorMessage(error, 'Failed to change password. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

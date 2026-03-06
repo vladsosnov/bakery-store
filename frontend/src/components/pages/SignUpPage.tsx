@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState, type FC, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -6,7 +5,8 @@ import { toast } from 'sonner';
 import { ROUTES } from '@src/app/routes';
 import { registerUser } from '@src/services/auth-api';
 import { setAuthSession } from '@src/services/auth-session';
-import * as S from './SignUpPage.styles';
+import { toErrorMessage } from '@src/utils/error';
+import * as S from './styles/SignUpPage.styles';
 
 export const SignUpPage: FC = () => {
   const navigate = useNavigate();
@@ -37,10 +37,7 @@ export const SignUpPage: FC = () => {
       setPassword('');
       navigate(ROUTES.home);
     } catch (error) {
-      const errorMessage = axios.isAxiosError<{ error?: string }>(error)
-        ? error.response?.data?.error ?? 'Failed to create account. Please try again.'
-        : 'Failed to create account. Please try again.';
-      toast.error(errorMessage);
+      toast.error(toErrorMessage(error, 'Failed to create account. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
