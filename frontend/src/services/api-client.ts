@@ -6,11 +6,15 @@ const DEFAULT_HEADERS = {
   'Content-Type': 'application/json'
 } as const;
 
+const API_BASE_URL = typeof __API_BASE_URL__ === 'string' ? __API_BASE_URL__ : '';
+
 export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
   headers: DEFAULT_HEADERS
 });
 
 export const apiAuthClient = axios.create({
+  baseURL: API_BASE_URL,
   headers: DEFAULT_HEADERS
 });
 

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
 import { AboutPage } from '@src/components/pages/about/AboutPage';
@@ -17,7 +17,7 @@ import { CartPage } from '@src/components/pages/cart/CartPage';
 
 export const App: FC = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Toaster richColors position="top-right" />
       <Routes>
         <Route element={<SiteLayout />}>
@@ -34,6 +34,6 @@ export const App: FC = () => {
         </Route>
         <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
