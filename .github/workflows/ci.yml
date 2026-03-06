@@ -43,9 +43,22 @@ jobs:
       - name: Install backend deps
         working-directory: backend
         run: npm ci
-      - name: Run backend unit tests
+      - name: Run backend coverage
         working-directory: backend
-        run: npm test
+        run: npm run test:coverage -- --coverageReporters=text-summary --coverageReporters=lcov
+      - name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: backend/coverage/lcov.info
+          flags: backend
+          name: backend-api
+          fail_ci_if_error: false
+      - name: Upload backend coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage
 
   frontend-ui-tests:
     runs-on: ubuntu-latest
