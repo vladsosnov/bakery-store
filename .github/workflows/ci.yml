@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci --include=optional
+        run: npm install
       - name: Install backend deps
         working-directory: backend
         run: npm ci --include=optional
@@ -74,17 +74,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
-      - name: Install dependencies
-        working-directory: ${{ matrix.app }}
+      - name: Install frontend deps
+        if: matrix.app == 'frontend'
+        working-directory: frontend
+        run: npm install
+      - name: Install backend deps
+        if: matrix.app == 'backend'
+        working-directory: backend
         run: npm ci --include=optional
-      - name: Workaround npm optional deps bug for Rollup (frontend)
-        if: matrix.app == 'frontend'
-        working-directory: frontend
-        run: npm install --no-save @rollup/rollup-linux-x64-gnu
-      - name: Workaround npm optional deps bug for SWC (frontend)
-        if: matrix.app == 'frontend'
-        working-directory: frontend
-        run: npm install --no-save @swc/core @swc/core-linux-x64-gnu
       - name: Build ${{ matrix.app }}
         working-directory: ${{ matrix.app }}
         run: npm run build
@@ -99,7 +96,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci --include=optional
+        run: npm install
       - name: Run frontend coverage
         working-directory: frontend
         run: npm run test:coverage -- --coverageReporters=text-summary --coverageReporters=lcov --coverageReporters=cobertura --coverageReporters=json-summary

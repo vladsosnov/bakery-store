@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 permissions:
   contents: read
@@ -28,13 +28,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci --include=optional
-      - name: Workaround npm optional deps bug for Rollup
-        working-directory: frontend
-        run: npm install --no-save @rollup/rollup-linux-x64-gnu
-      - name: Workaround npm optional deps bug for SWC
-        working-directory: frontend
-        run: npm install --no-save @swc/core @swc/core-linux-x64-gnu
+        run: npm install
       - name: Build frontend
         working-directory: frontend
         env:
