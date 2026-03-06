@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 
+import { env } from './config/env.js';
 import { openApiSpec } from './docs/openapi.js';
 import { getHealthStatus } from './health.js';
 import { authRouter } from './routes/auth.routes.js';
@@ -18,9 +19,25 @@ import { OrderError } from './services/order.service.js';
 import { ProductError } from './services/product.service.js';
 
 export const app = express();
+const allowedOrigins = new Set(
+  env.CORS_ORIGINS.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+);
 
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    }
+  })
+);
 app.use(express.json());
 app.use(morgan('dev'));
 
