@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
+import { Input } from '@src/components/common/Input';
+import { SubmitButton } from '@src/components/common/SubmitButton';
 import { loginUser } from '@src/services/auth-api';
 import { setAuthSession } from '@src/services/auth-session';
 import { toErrorMessage } from '@src/utils/error';
-import * as S from './SignInPage.styles';
+import * as S from './styles/SignInPage.styles';
 
 export const SignInPage: FC = () => {
   const navigate = useNavigate();
@@ -55,7 +57,7 @@ export const SignInPage: FC = () => {
         <S.Form onSubmit={handleSubmit}>
           <S.Label>
             Email
-            <S.Input
+            <Input
               type="email"
               placeholder="vlad@bakerystore.com"
               value={email}
@@ -66,7 +68,7 @@ export const SignInPage: FC = () => {
 
           <S.Label>
             Password
-            <S.Input
+            <Input
               type="password"
               placeholder="Enter your password"
               value={password}
@@ -75,9 +77,9 @@ export const SignInPage: FC = () => {
             />
           </S.Label>
 
-          <S.SubmitButton type="submit" disabled={isSubmitting}>
+          <SubmitButton type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Signing in...' : 'Sign in'}
-          </S.SubmitButton>
+          </SubmitButton>
         </S.Form>
 
         <S.FooterText>

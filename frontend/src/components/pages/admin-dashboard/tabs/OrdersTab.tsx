@@ -17,6 +17,7 @@ type OrdersTabProps = {
   onOrderStatusFilterChange: ChangeEventHandler<HTMLSelectElement>;
   onOrderSearchChange: ChangeEventHandler<HTMLInputElement>;
   onOrderStatusSelectChange: ChangeEventHandler<HTMLSelectElement>;
+  getAllowedStatusOptions: (status: AdminOrderStatus) => readonly AdminOrderStatus[];
   getDeliveryAddressText: (order: AdminOrder) => string;
 };
 
@@ -30,8 +31,63 @@ export const OrdersTab: FC<OrdersTabProps> = ({
   onOrderStatusFilterChange,
   onOrderSearchChange,
   onOrderStatusSelectChange,
+  getAllowedStatusOptions,
   getDeliveryAddressText
 }) => {
+  const activeOrders = filteredOrders.filter((order) => order.status !== 'in delivery');
+  const inDeliveryOrders = filteredOrders.filter((order) => order.status === 'in delivery');
+
+  const renderOrderList = (list: AdminOrder[]) => {
+    if (list.length === 0) {
+      return <S.EmptyText>No orders in this section.</S.EmptyText>;
+    }
+
+    return (
+      <S.UserList>
+        {list.map((order) => (
+          <S.UserItem key={order.id}>
+            <S.UserRow>
+              <S.UserName>{order.customerName}</S.UserName>
+              <span>Order #{order.id.slice(-6)}</span>
+              <span>{order.customerEmail}</span>
+              {isModerator ? null : <S.RolePill $role="moderator">{order.status}</S.RolePill>}
+              <span>{order.totalItems} items</span>
+              <span>${order.totalPrice.toFixed(2)}</span>
+            </S.UserRow>
+            <S.OrderDetails>
+              <S.MutedText>Delivery: {getDeliveryAddressText(order)}</S.MutedText>
+              <S.MutedText>
+                Phone: {order.customerPhone.trim() !== '' ? order.customerPhone : 'Phone is not set'}
+              </S.MutedText>
+              <S.OrderItemList>
+                {order.items.map((item) => (
+                  <S.OrderItem key={`${order.id}-${item.productId}`}>
+                    {item.name} x {item.quantity} - ${item.lineTotal.toFixed(2)}
+                  </S.OrderItem>
+                ))}
+              </S.OrderItemList>
+            </S.OrderDetails>
+            <S.Actions>
+              <S.StatusSelect
+                data-order-id={order.id}
+                value={order.status}
+                onChange={onOrderStatusSelectChange}
+                disabled={pendingOrderId === order.id}
+                aria-label={`Order status for ${order.customerEmail}`}
+              >
+                {getAllowedStatusOptions(order.status).map((status) => (
+                  <option key={`${order.id}-${status}`} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </S.StatusSelect>
+            </S.Actions>
+          </S.UserItem>
+        ))}
+      </S.UserList>
+    );
+  };
+
   return (
     <S.Panel>
       <S.BlockTitle>All orders</S.BlockTitle>
@@ -62,48 +118,16 @@ export const OrdersTab: FC<OrdersTabProps> = ({
           {orders.length === 0 ? 'No orders yet.' : 'No orders match current filters.'}
         </S.EmptyText>
       ) : (
-        <S.UserList>
-          {filteredOrders.map((order) => (
-            <S.UserItem key={order.id}>
-              <S.UserRow>
-                <S.UserName>{order.customerName}</S.UserName>
-                <span>Order #{order.id.slice(-6)}</span>
-                <span>{order.customerEmail}</span>
-                {isModerator ? null : <S.RolePill $role="moderator">{order.status}</S.RolePill>}
-                <span>{order.totalItems} items</span>
-                <span>${order.totalPrice.toFixed(2)}</span>
-              </S.UserRow>
-              <S.OrderDetails>
-                <S.MutedText>Delivery: {getDeliveryAddressText(order)}</S.MutedText>
-                <S.MutedText>
-                  Phone: {order.customerPhone.trim() !== '' ? order.customerPhone : 'Phone is not set'}
-                </S.MutedText>
-                <S.OrderItemList>
-                  {order.items.map((item) => (
-                    <S.OrderItem key={`${order.id}-${item.productId}`}>
-                      {item.name} x {item.quantity} - ${item.lineTotal.toFixed(2)}
-                    </S.OrderItem>
-                  ))}
-                </S.OrderItemList>
-              </S.OrderDetails>
-              <S.Actions>
-                <S.StatusSelect
-                  data-order-id={order.id}
-                  value={order.status}
-                  onChange={onOrderStatusSelectChange}
-                  disabled={pendingOrderId === order.id}
-                  aria-label={`Order status for ${order.customerEmail}`}
-                >
-                  {ORDER_STATUS_OPTIONS.map((status) => (
-                    <option key={`${order.id}-${status}`} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </S.StatusSelect>
-              </S.Actions>
-            </S.UserItem>
-          ))}
-        </S.UserList>
+        <S.SectionList>
+          <S.Subsection>
+            <S.BlockTitle>Active orders</S.BlockTitle>
+            {renderOrderList(activeOrders)}
+          </S.Subsection>
+          <S.Subsection>
+            <S.BlockTitle>In delivery</S.BlockTitle>
+            {renderOrderList(inDeliveryOrders)}
+          </S.Subsection>
+        </S.SectionList>
       )}
     </S.Panel>
   );

@@ -29,6 +29,7 @@ import { toErrorMessage } from '@src/utils/error';
 import * as S from './AdminDashboardPage.styles';
 
 type AdminTab = 'users' | 'orders' | 'logs';
+const ORDER_STATUS_FLOW: readonly AdminOrderStatus[] = ['placed', 'in progress', 'in delivery'];
 
 export const AdminDashboardPage: FC = () => {
   const session = useMemo(() => getAuthSession(), []);
@@ -37,6 +38,7 @@ export const AdminDashboardPage: FC = () => {
   const dashboardSubtitle = isAdmin
     ? 'Manage users and moderators, inspect orders, and prepare usage logs.'
     : 'Inspect and manage customer orders.';
+  
   const [activeTab, setActiveTab] = useState<AdminTab>(() =>
     session?.user.role === USER_ROLES.moderator ? 'orders' : 'users'
   );
@@ -152,6 +154,14 @@ export const AdminDashboardPage: FC = () => {
     }
 
     const nextStatus = event.target.value as AdminOrderStatus;
+    const order = orders.find((existingOrder) => existingOrder.id === orderId);
+    if (!order) {
+      return;
+    }
+    if (ORDER_STATUS_FLOW.indexOf(nextStatus) < ORDER_STATUS_FLOW.indexOf(order.status)) {
+      toast.error('Order status can only move forward.');
+      return;
+    }
 
     setPendingOrderId(orderId);
     try {
@@ -182,6 +192,10 @@ export const AdminDashboardPage: FC = () => {
     );
 
     return parts.length > 0 ? parts.join(', ') : 'Address is not set';
+  };
+
+  const getAllowedStatusOptions = (status: AdminOrderStatus) => {
+    return ORDER_STATUS_FLOW.slice(ORDER_STATUS_FLOW.indexOf(status));
   };
 
   const filteredOrders = useMemo(() => {
@@ -289,6 +303,7 @@ export const AdminDashboardPage: FC = () => {
           onOrderStatusFilterChange={(e) => setOrderStatusFilter(e.target.value as AdminOrderStatus)}
           onOrderSearchChange={(e) => setOrderSearchTerm(e.target.value)}
           onOrderStatusSelectChange={(e) => handleOrderStatusChange(e)}
+          getAllowedStatusOptions={getAllowedStatusOptions}
           getDeliveryAddressText={getDeliveryAddressText}
         />
       ) : null}

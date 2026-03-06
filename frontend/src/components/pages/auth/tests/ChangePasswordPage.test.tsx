@@ -65,6 +65,8 @@ describe('ChangePasswordPage', () => {
     });
     expect(mockedToastSuccess).toHaveBeenCalledWith('Temporary password generated.');
     expect(await screen.findByText('temp-1234')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/email/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /generate temporary password/i })).not.toBeInTheDocument();
   });
 
   it('shows error toast on failed request', async () => {

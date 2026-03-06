@@ -1,5 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 import { colors } from '@src/styles/colors';
+import { shadows } from '@src/styles/shadows';
 
 const slideEnter = keyframes`
   from {
@@ -28,7 +29,7 @@ export const Slider = styled.article`
   min-height: 360px;
   display: flex;
   align-items: flex-end;
-  box-shadow: 0 16px 30px rgba(117, 79, 52, 0.18);
+  box-shadow: ${shadows.surfaceRaised};
 `;
 
 export const SlideStage = styled.div`
@@ -52,7 +53,7 @@ export const SlideImage = styled.img`
 export const SlideOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(34, 19, 13, 0.78), rgba(34, 19, 13, 0.22));
+  background: linear-gradient(90deg, ${colors.overlayHeroStrong}, ${colors.overlayHeroSoft});
 `;
 
 export const SlideContent = styled.div`
@@ -78,8 +79,8 @@ export const Subtitle = styled.p`
 `;
 
 export const CTAButton = styled.button`
-  border: 1px solid ${colors.brandBrown};
-  background: ${colors.brandBrown};
+  border: 1px solid ${colors.brown};
+  background: ${colors.brown};
   color: ${colors.white};
   border-radius: 999px;
   padding: 10px 16px;
@@ -102,7 +103,7 @@ export const SliderDot = styled.button<{ $active: boolean }>`
   border-radius: 50%;
   border: 0;
   cursor: pointer;
-  background: ${(props) => (props.$active ? colors.white : 'rgba(255, 255, 255, 0.5)')};
+  background: ${(props) => (props.$active ? colors.white : colors.overlayWhite50)};
 `;
 
 export const CardsSection = styled.section`
@@ -118,7 +119,7 @@ export const CardsHeading = styled.h2`
 export const CardsText = styled.p`
   margin-bottom: 12px;
   max-width: 700px;
-  color: ${colors.warmMuted};
+  color: ${colors.brownLight};
 `;
 
 export const CardsGrid = styled.div`
@@ -130,9 +131,9 @@ export const CardsGrid = styled.div`
 export const Card = styled.article`
   background: ${colors.white};
   border-radius: 16px;
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   padding: 20px;
-  box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  box-shadow: ${shadows.surface};
 `;
 
 export const CardTitle = styled.h3`
@@ -141,5 +142,5 @@ export const CardTitle = styled.h3`
 
 export const CardText = styled.p`
   margin-bottom: 0;
-  color: ${colors.textMuted};
+  color: ${colors.brownLight};
 `;

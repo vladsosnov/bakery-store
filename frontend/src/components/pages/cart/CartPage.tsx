@@ -104,7 +104,7 @@ export const CartPage: FC = () => {
                       type="button"
                       data-product-id={item.productId}
                       onClick={handleIncreaseClick}
-                      disabled={Boolean(pendingByProduct[item.productId])}
+                      disabled={Boolean(pendingByProduct[item.productId]) || item.quantity >= item.availableStock}
                       aria-label={`Increase quantity for ${item.name}`}
                     >
                       +

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
 import { colors } from '@src/styles/colors';
+import { shadows } from '@src/styles/shadows';
 
 export const Main = styled.main`
   width: min(1200px, 94vw);
@@ -18,7 +19,7 @@ export const Title = styled.h1`
 
 export const Subtitle = styled.p`
   margin: 8px 0 0;
-  color: ${colors.warmMuted};
+  color: ${colors.brownLight};
 `;
 
 export const Layout = styled.section`
@@ -33,10 +34,10 @@ export const Layout = styled.section`
 
 export const Sidebar = styled.aside`
   background: ${colors.white};
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 20px;
   padding: 14px;
-  box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  box-shadow: ${shadows.surface};
   align-self: start;
   position: sticky;
   top: 84px;
@@ -67,12 +68,12 @@ export const CheckboxLabel = styled.label`
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
-  color: #5d4137;
+  color: ${colors.brownLight};
   transition: color 160ms ease, transform 160ms ease;
   cursor: pointer;
 
   &:hover {
-    color: #452f28;
+    color: ${colors.brown};
     transform: translateX(1px);
   }
 
@@ -87,22 +88,28 @@ export const ResetButton = styled.button`
   margin-top: 10px;
   width: 100%;
   border-radius: 12px;
-  border: 1px solid #d8b8a5;
-  background: ${colors.provincialPink};
-  color: ${colors.brandBrown};
+  border: 1px solid ${colors.border};
+  background: ${colors.surface};
+  color: ${colors.brown};
   padding: 10px 12px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 
   &:hover {
-    background: #f4e8de;
-    box-shadow: 0 8px 16px rgba(83, 51, 51, 0.12);
+    background: ${colors.surface};
+    box-shadow: ${shadows.interactive};
     transform: translateY(-1px);
   }
 
   &:active {
     transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.1);
   }
 `;
 
@@ -112,17 +119,17 @@ export const Content = styled.div`
 
 export const Toolbar = styled.div`
   background: ${colors.white};
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 20px;
   padding: 14px;
-  box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  box-shadow: ${shadows.surface};
   transition: box-shadow 200ms ease;
 `;
 
 export const SearchInput = styled.input`
   width: 100%;
   border-radius: 12px;
-  border: 1px solid ${colors.inputBorder};
+  border: 1px solid ${colors.border};
   padding: 12px 13px;
   font-size: 0.98rem;
   transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
@@ -130,7 +137,7 @@ export const SearchInput = styled.input`
   &:focus {
     outline: none;
     border-color: ${colors.accentGreen};
-    box-shadow: 0 0 0 4px rgba(47, 111, 81, 0.13);
+    box-shadow: ${shadows.focusRing};
     background: ${colors.white};
   }
 `;
@@ -144,21 +151,19 @@ export const Categories = styled.div`
 
 export const CategoryButton = styled.button<{ $active: boolean }>`
   border-radius: 999px;
-  border: 1px solid ${(props) => (props.$active ? colors.accentGreen : '#d8b8a5')};
-  background: ${(props) => (props.$active ? colors.accentGreen : colors.provincialPink)};
-  color: ${(props) => (props.$active ? colors.white : '#5b3f36')};
+  border: 1px solid ${(props) => (props.$active ? colors.accentGreen : colors.border)};
+  background: ${(props) => (props.$active ? colors.accentGreen : colors.surface)};
+  color: ${(props) => (props.$active ? colors.white : colors.brownLight)};
   padding: 8px 12px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: ${(props) =>
-    props.$active ? '0 8px 16px rgba(47, 111, 81, 0.25)' : '0 2px 6px rgba(93, 65, 55, 0.08)'};
+  box-shadow: ${(props) => (props.$active ? shadows.interactive : shadows.surface)};
   transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease,
     border-color 180ms ease, color 180ms ease;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: ${(props) =>
-    props.$active ? '0 10px 18px rgba(47, 111, 81, 0.32)' : '0 7px 14px rgba(93, 65, 55, 0.14)'};
+    box-shadow: ${(props) => (props.$active ? shadows.interactiveHover : shadows.surfaceRaised)};
   }
 
   &:active {
@@ -168,7 +173,7 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
 
 export const Summary = styled.p<{ $error?: boolean }>`
   margin: 14px 0 0;
-  color: ${(props) => (props.$error ? colors.errorRed : colors.vintageBrown)};
+  color: ${(props) => (props.$error ? colors.errorRed : colors.brownLight)};
 `;
 
 export const ProductsGrid = styled.div`
@@ -181,15 +186,15 @@ export const ProductsGrid = styled.div`
 
 export const ProductCard = styled.article`
   background: ${colors.white};
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  box-shadow: ${shadows.surface};
   transition: transform 200ms ease, box-shadow 200ms ease;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 14px 28px rgba(118, 77, 48, 0.16);
+    box-shadow: ${shadows.surfaceRaised};
   }
 `;
 
@@ -210,7 +215,7 @@ export const ProductTitle = styled.h3`
 
 export const ProductMeta = styled.p`
   margin: 8px 0 0;
-  color: ${colors.vintageBrown};
+  color: ${colors.brownLight};
   font-size: 0.92rem;
 `;
 
@@ -236,8 +241,8 @@ export const ProductActions = styled.div`
 
 export const ItemCount = styled.span`
   border-radius: 999px;
-  background: #f5ece5;
-  color: #5e4339;
+  background: ${colors.surface};
+  color: ${colors.brownLight};
   padding: 7px 10px;
   font-size: 0.76rem;
   font-weight: 700;
@@ -256,7 +261,7 @@ export const AddToCartButton = styled.button`
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 9px 16px rgba(47, 111, 81, 0.25);
+    box-shadow: ${shadows.interactive};
   }
 
   &:disabled {
@@ -269,8 +274,8 @@ export const AddToCartButton = styled.button`
 
 export const ProductTag = styled.span`
   border-radius: 999px;
-  background: #f5ece5;
-  color: #5e4339;
+  background: ${colors.surface};
+  color: ${colors.brownLight};
   padding: 4px 8px;
   font-size: 0.75rem;
   font-weight: 700;
@@ -279,10 +284,10 @@ export const ProductTag = styled.span`
 export const EmptyState = styled.div<{ $error?: boolean }>`
   margin-top: 16px;
   background: ${colors.white};
-  border: 1px dashed #d8b8a5;
+  border: 1px dashed ${colors.border};
   border-radius: 14px;
   padding: 18px;
-  color: ${(props) => (props.$error ? colors.errorRed : colors.vintageBrown)};
+  color: ${(props) => (props.$error ? colors.errorRed : colors.brownLight)};
   animation: ${fadeInLift} 220ms ease;
 `;
 

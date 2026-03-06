@@ -1,6 +1,9 @@
 import styled from 'styled-components';
+import { CardSurface } from '@src/components/common/CardSurface';
+import { FormLabel } from '@src/components/common/FormLabel';
 import { colors } from '@src/styles/colors';
 import { pageContainer } from '@src/styles/layout';
+import { shadows } from '@src/styles/shadows';
 
 export const Section = styled.section`
   ${pageContainer}
@@ -9,20 +12,14 @@ export const Section = styled.section`
   gap: 18px;
 `;
 
-export const Panel = styled.article`
-  border-radius: 20px;
-  border: 1px solid ${colors.softBorder};
-  background: ${colors.white};
-  box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
-  padding: 24px;
-`;
+export const Panel = styled(CardSurface)``;
 
 export const AccentPanel = styled.article`
   border-radius: 20px;
-  background: linear-gradient(145deg, #205245, ${colors.accentGreen});
+  background: linear-gradient(145deg, ${colors.brownLight}, ${colors.accentGreen});
   color: ${colors.white};
   padding: 24px;
-  box-shadow: 0 18px 36px rgba(47, 111, 81, 0.3);
+  box-shadow: ${shadows.panelAccent};
 `;
 
 export const AccentTitle = styled.h1`
@@ -40,7 +37,7 @@ export const AccentList = styled.ul`
 `;
 
 export const Eyebrow = styled.p`
-  color: ${colors.supremeBrown};
+  color: ${colors.brownLight};
   font-weight: 700;
 `;
 
@@ -51,7 +48,7 @@ export const Title = styled.h2`
 
 export const Subtitle = styled.p`
   margin-top: 0;
-  color: ${colors.romanCoffee};
+  color: ${colors.brownLight};
 `;
 
 export const Form = styled.form`
@@ -60,32 +57,10 @@ export const Form = styled.form`
   margin-top: 18px;
 `;
 
-export const Label = styled.label`
-  display: grid;
-  gap: 6px;
-  font-weight: 600;
-`;
-
-export const Input = styled.input`
-  border-radius: 12px;
-  border: 1px solid ${colors.inputBorder};
-  padding: 12px 13px;
-  font-size: 0.98rem;
-`;
-
-export const SubmitButton = styled.button`
-  margin-top: 8px;
-  border-radius: 12px;
-  border: none;
-  background: ${colors.brandBrown};
-  color: ${colors.white};
-  font-weight: 700;
-  padding: 12px 14px;
-  cursor: pointer;
-`;
+export const Label = styled(FormLabel)``;
 
 export const FooterText = styled.p`
   margin-bottom: 0;
   margin-top: 14px;
-  color: ${colors.textMuted};
+  color: ${colors.brownLight};
 `;

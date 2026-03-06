@@ -1,6 +1,8 @@
 import { useEffect, useState, type FC } from 'react';
 import { toast } from 'sonner';
 
+import { Input } from '@src/components/common/Input';
+import { SubmitButton } from '@src/components/common/SubmitButton';
 import { updateAdminModerator } from '@src/services/admin-api';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
 import type { AdminUser } from '@src/types/admin';
@@ -65,7 +67,7 @@ export const EditModeratorModal: FC<EditModeratorModalProps> = ({
   }
 
   return (
-    <S.ModalOverlay role="presentation" onClick={onClose}>
+    <S.ModalOverlay role="presentation" onClick={isSubmitting ? undefined : onClose}>
       <S.ModalCard
         role="dialog"
         aria-modal="true"
@@ -74,22 +76,22 @@ export const EditModeratorModal: FC<EditModeratorModalProps> = ({
       >
         <S.ModalHeader>
           <S.BlockTitle $isTitleWithActions>Edit moderator</S.BlockTitle>
-          <S.CloseButton type="button" onClick={onClose}>
+          <S.CloseButton type="button" onClick={onClose} disabled={isSubmitting}>
             Close
           </S.CloseButton>
         </S.ModalHeader>
         <S.Form>
           <S.Label>
             First name
-            <S.Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           </S.Label>
           <S.Label>
             Last name
-            <S.Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </S.Label>
           <S.Label>
             Email
-            <S.Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </S.Label>
           <S.InlineCheckboxLabel>
             Active
@@ -97,10 +99,10 @@ export const EditModeratorModal: FC<EditModeratorModalProps> = ({
           </S.InlineCheckboxLabel>
         </S.Form>
         <S.ModalActions>
-          <S.SubmitButton type="button" disabled={isSubmitting} onClick={handleSaveClick}>
+          <SubmitButton type="button" disabled={isSubmitting} onClick={handleSaveClick}>
             {isSubmitting ? 'Saving...' : 'Save'}
-          </S.SubmitButton>
-          <S.CloseButton type="button" onClick={onClose}>
+          </SubmitButton>
+          <S.CloseButton type="button" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </S.CloseButton>
         </S.ModalActions>

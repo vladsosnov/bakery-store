@@ -329,11 +329,14 @@ describe('ShopPage', () => {
     );
 
     await screen.findByText(/butter croissant/i);
+    expect(screen.getByRole('button', { name: /reset filters/i })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Cakes' }));
+    expect(screen.getByRole('button', { name: /reset filters/i })).toBeEnabled();
     await user.click(screen.getByRole('button', { name: /#party/i }));
     await user.click(screen.getByRole('checkbox', { name: /vegan only/i }));
     await user.click(screen.getByRole('button', { name: /reset filters/i }));
 
+    expect(screen.getByRole('button', { name: /reset filters/i })).toBeDisabled();
     expect(screen.getByText(/butter croissant/i)).toBeInTheDocument();
     expect(screen.getByText(/chocolate celebration cake/i)).toBeInTheDocument();
   });

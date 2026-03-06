@@ -1,7 +1,10 @@
 import styled from 'styled-components';
 
+import { CardSurface } from '@src/components/common/CardSurface';
+import { FormLabel } from '@src/components/common/FormLabel';
 import { colors } from '@src/styles/colors';
 import { pageContainer } from '@src/styles/layout';
+import { shadows } from '@src/styles/shadows';
 
 export const Section = styled.section`
   ${pageContainer}
@@ -9,13 +12,7 @@ export const Section = styled.section`
   gap: 18px;
 `;
 
-export const HeaderCard = styled.article`
-  border-radius: 20px;
-  border: 1px solid ${colors.softBorder};
-  background: ${colors.white};
-  box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
-  padding: 24px;
-`;
+export const HeaderCard = styled(CardSurface)``;
 
 export const Title = styled.h1`
   margin-top: 0;
@@ -23,7 +20,7 @@ export const Title = styled.h1`
 `;
 
 export const Subtitle = styled.p`
-  color: ${colors.romanCoffee};
+  color: ${colors.brownLight};
   margin-bottom: 8px;
 `;
 
@@ -35,21 +32,15 @@ export const Tabs = styled.div`
 
 export const TabButton = styled.button<{ $active: boolean }>`
   border-radius: 12px;
-  border: 1px solid ${(props) => (props.$active ? colors.accentGreen : colors.inputBorder)};
+  border: 1px solid ${(props) => (props.$active ? colors.accentGreen : colors.border)};
   background: ${(props) => (props.$active ? colors.accentGreen : colors.white)};
-  color: ${(props) => (props.$active ? colors.white : colors.brandBrown)};
+  color: ${(props) => (props.$active ? colors.white : colors.brown)};
   padding: 9px 12px;
   font-weight: 700;
   cursor: pointer;
 `;
 
-export const Panel = styled.article`
-  border-radius: 20px;
-  border: 1px solid ${colors.softBorder};
-  background: ${colors.white};
-  box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
-  padding: 24px;
-`;
+export const Panel = styled(CardSurface)``;
 
 export const HeadWrapper = styled.div`
   display: flex;
@@ -70,11 +61,7 @@ export const Form = styled.form`
   margin-bottom: 18px;
 `;
 
-export const Label = styled.label`
-  display: grid;
-  gap: 6px;
-  font-weight: 600;
-`;
+export const Label = styled(FormLabel)``;
 
 export const InlineCheckboxLabel = styled.label`
   display: inline-flex;
@@ -83,27 +70,10 @@ export const InlineCheckboxLabel = styled.label`
   font-weight: 600;
 `;
 
-export const Input = styled.input`
-  border-radius: 12px;
-  border: 1px solid ${colors.inputBorder};
-  padding: 11px 12px;
-  font-size: 0.97rem;
-`;
-
-export const SubmitButton = styled.button`
-  border-radius: 12px;
-  border: none;
-  background: ${colors.accentGreen};
-  color: ${colors.white};
-  font-weight: 700;
-  padding: 11px 12px;
-  cursor: pointer;
-`;
-
 export const CreateButton = styled.button`
   border-radius: 12px;
   border: none;
-  background: ${colors.brandBrown};
+  background: ${colors.brown};
   color: ${colors.white};
   font-weight: 700;
   padding: 11px 14px;
@@ -119,7 +89,7 @@ export const UserList = styled.ul`
 `;
 
 export const UserItem = styled.li`
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 12px;
   padding: 12px;
   display: flex;
@@ -135,7 +105,7 @@ export const UserRow = styled.div`
 `;
 
 export const UserName = styled.strong`
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
 `;
 
 export const RolePill = styled.span<{ $role: 'customer' | 'moderator' | 'admin' }>`
@@ -144,7 +114,7 @@ export const RolePill = styled.span<{ $role: 'customer' | 'moderator' | 'admin' 
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: lowercase;
-  border: 1px solid ${colors.inputBorder};
+  border: 1px solid ${colors.border};
   background: ${(props) => {
     if (props.$role === 'admin') {
       return '#f7e1d5';
@@ -166,9 +136,9 @@ export const Actions = styled.div`
 
 export const ActionButton = styled.button<{ $danger?: boolean }>`
   border-radius: 10px;
-  border: 1px solid ${(props) => (props.$danger ? colors.errorRed : colors.inputBorder)};
+  border: 1px solid ${(props) => (props.$danger ? colors.errorRed : colors.border)};
   background: ${colors.white};
-  color: ${(props) => (props.$danger ? colors.errorRed : colors.brandBrown)};
+  color: ${(props) => (props.$danger ? colors.errorRed : colors.brown)};
   padding: 7px 10px;
   font-weight: 700;
   cursor: pointer;
@@ -185,18 +155,18 @@ export const StatusBadge = styled.span<{ $active: boolean }>`
   font-size: 0.78rem;
   font-weight: 700;
   padding: 4px 9px;
-  background: ${(props) => (props.$active ? '#e7f4ed' : '#faece8')};
+  background: ${(props) => (props.$active ? colors.bgStatusSuccess : '#faece8')};
   color: ${(props) => (props.$active ? colors.accentGreen : colors.errorMuted)};
 `;
 
 export const EmptyText = styled.p`
-  color: ${colors.romanCoffee};
+  color: ${colors.brownLight};
 `;
 
 export const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(18, 10, 7, 0.45);
+  background: ${colors.overlayModal};
   display: grid;
   place-items: center;
   padding: 20px;
@@ -206,9 +176,9 @@ export const ModalOverlay = styled.div`
 export const ModalCard = styled.div`
   width: min(560px, 100%);
   border-radius: 20px;
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   background: ${colors.white};
-  box-shadow: 0 24px 50px rgba(48, 21, 13, 0.26);
+  box-shadow: ${shadows.overlayModal};
   padding: 24px;
 `;
 
@@ -220,9 +190,9 @@ export const ModalHeader = styled.div`
 `;
 
 export const CloseButton = styled.button`
-  border: 1px solid ${colors.inputBorder};
+  border: 1px solid ${colors.border};
   background: ${colors.white};
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
   border-radius: 10px;
   padding: 8px 10px;
   font-weight: 700;
@@ -230,7 +200,7 @@ export const CloseButton = styled.button`
 `;
 
 export const ModalBodyText = styled.p`
-  color: ${colors.romanCoffee};
+  color: ${colors.brownLight};
   margin-top: 8px;
   margin-bottom: 0;
 `;
@@ -243,9 +213,9 @@ export const ModalActions = styled.div`
 
 export const StatusSelect = styled.select`
   border-radius: 10px;
-  border: 1px solid ${colors.inputBorder};
+  border: 1px solid ${colors.border};
   background: ${colors.white};
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
   font-weight: 600;
   padding: 7px 10px;
 `;
@@ -261,9 +231,9 @@ export const OrdersFilterRow = styled.div`
 export const SearchInput = styled.input`
   min-width: 260px;
   border-radius: 10px;
-  border: 1px solid ${colors.inputBorder};
+  border: 1px solid ${colors.border};
   background: ${colors.white};
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
   padding: 8px 10px;
 `;
 
@@ -274,16 +244,27 @@ export const OrderDetails = styled.div`
 `;
 
 export const MutedText = styled.p`
-  color: ${colors.romanCoffee};
+  color: ${colors.brownLight};
   margin: 0;
 `;
 
 export const OrderItemList = styled.ul`
   margin: 0;
   padding-left: 18px;
-  color: ${colors.vintageBrown};
+  color: ${colors.brownLight};
 `;
 
 export const OrderItem = styled.li`
   margin-top: 4px;
+`;
+
+export const SectionList = styled.div`
+  display: grid;
+  gap: 14px;
+`;
+
+export const Subsection = styled.section`
+  border: 1px solid ${colors.border};
+  border-radius: 14px;
+  padding: 12px;
 `;

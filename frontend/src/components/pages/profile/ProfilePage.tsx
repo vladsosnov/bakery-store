@@ -1,5 +1,7 @@
 import type { FC } from 'react';
 
+import { Input } from '@src/components/common/Input';
+import { SubmitButton } from '@src/components/common/SubmitButton';
 import { useProfilePage } from '@src/components/pages/profile/useProfilePage';
 import * as S from './ProfilePage.styles';
 
@@ -74,20 +76,22 @@ export const ProfilePage: FC = () => {
         <S.Form onSubmit={handleProfileSubmit}>
           <S.FieldLabel>
             First name
-            <S.Input
+            <Input
               type="text"
               value={profileForm.firstName}
               onChange={updateProfileFormField('firstName')}
+              disabled={isProfileSaving}
               required
             />
           </S.FieldLabel>
 
           <S.FieldLabel>
             Last name
-            <S.Input
+            <Input
               type="text"
               value={profileForm.lastName}
               onChange={updateProfileFormField('lastName')}
+              disabled={isProfileSaving}
               required
             />
           </S.FieldLabel>
@@ -96,49 +100,53 @@ export const ProfilePage: FC = () => {
             <>
               <S.FieldLabel>
                 Phone number
-                <S.Input
+                <Input
                   type="tel"
                   value={profileForm.phoneNumber}
                   onChange={updateProfileFormField('phoneNumber')}
+                  disabled={isProfileSaving}
                   required
                 />
               </S.FieldLabel>
 
               <S.FieldLabel>
                 ZIP
-                <S.Input
+                <Input
                   type="text"
                   value={profileForm.zip}
                   onChange={updateProfileFormField('zip')}
+                  disabled={isProfileSaving}
                   required
                 />
               </S.FieldLabel>
 
               <S.FieldLabel>
                 Address
-                <S.Input
+                <Input
                   type="text"
                   value={profileForm.street}
                   onChange={updateProfileFormField('street')}
+                  disabled={isProfileSaving}
                   required
                 />
               </S.FieldLabel>
 
               <S.FieldLabel>
                 City
-                <S.Input
+                <Input
                   type="text"
                   value={profileForm.city}
                   onChange={updateProfileFormField('city')}
+                  disabled={isProfileSaving}
                   required
                 />
               </S.FieldLabel>
             </>
           )}
 
-          <S.SubmitButton type="submit" disabled={isProfileSaving}>
+          <SubmitButton type="submit" disabled={isProfileSaving}>
             {isProfileSaving ? 'Saving...' : 'Save profile'}
-          </S.SubmitButton>
+          </SubmitButton>
         </S.Form>
       </S.Card>
 
@@ -149,18 +157,19 @@ export const ProfilePage: FC = () => {
         <S.Form onSubmit={handlePasswordResetSubmit}>
           <S.FieldLabel>
             Email
-            <S.Input
+            <Input
               type="email"
               value={passwordForm.email}
               onChange={updatePasswordFormField('email')}
               placeholder="vlad@bakerystore.com"
+              disabled={isResetSubmitting}
               required
             />
           </S.FieldLabel>
 
-          <S.SubmitButton type="submit" disabled={isResetSubmitting}>
+          <SubmitButton type="submit" disabled={isResetSubmitting}>
             {isResetSubmitting ? 'Generating...' : 'Generate temporary password'}
-          </S.SubmitButton>
+          </SubmitButton>
         </S.Form>
 
         {temporaryPassword && (
@@ -180,40 +189,43 @@ export const ProfilePage: FC = () => {
         <S.Form onSubmit={handleSetOwnPasswordSubmit}>
           <S.FieldLabel>
             Current password
-            <S.Input
+            <Input
               type="password"
               value={passwordForm.currentPassword}
               onChange={updatePasswordFormField('currentPassword')}
               placeholder="Enter current password"
+              disabled={isSetSubmitting}
               required
             />
           </S.FieldLabel>
 
           <S.FieldLabel>
             New password
-            <S.Input
+            <Input
               type="password"
               value={passwordForm.newPassword}
               onChange={updatePasswordFormField('newPassword')}
               placeholder="Enter new password"
+              disabled={isSetSubmitting}
               required
             />
           </S.FieldLabel>
 
           <S.FieldLabel>
             Confirm new password
-            <S.Input
+            <Input
               type="password"
               value={passwordForm.confirmNewPassword}
               onChange={updatePasswordFormField('confirmNewPassword')}
               placeholder="Repeat new password"
+              disabled={isSetSubmitting}
               required
             />
           </S.FieldLabel>
 
-          <S.SubmitButton type="submit" disabled={isSetSubmitting}>
+          <SubmitButton type="submit" disabled={isSetSubmitting}>
             {isSetSubmitting ? 'Saving...' : 'Set new password'}
-          </S.SubmitButton>
+          </SubmitButton>
         </S.Form>
       </S.Card>
     </S.Section>

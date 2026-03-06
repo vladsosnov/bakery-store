@@ -17,6 +17,7 @@ type ShopFiltersProps = {
   glutenFreeOnly: boolean;
   underTwenty: boolean;
   filteredCount: number;
+  isResetDisabled: boolean;
   onSearchChange: ChangeEventHandler<HTMLInputElement>;
   onCategorySelect: (category: Category) => void;
   onTagSelect: (tag: ProductTag) => void;
@@ -34,6 +35,7 @@ export const ShopFilters: FC<ShopFiltersProps> = ({
   glutenFreeOnly,
   underTwenty,
   filteredCount,
+  isResetDisabled,
   onSearchChange,
   onCategorySelect,
   onTagSelect,
@@ -81,7 +83,7 @@ export const ShopFilters: FC<ShopFiltersProps> = ({
           </S.CheckboxLabel>
         </S.SideGroup>
 
-        <S.ResetButton type="button" onClick={onReset}>
+        <S.ResetButton type="button" onClick={onReset} disabled={isResetDisabled}>
           Reset filters
         </S.ResetButton>
       </S.Sidebar>

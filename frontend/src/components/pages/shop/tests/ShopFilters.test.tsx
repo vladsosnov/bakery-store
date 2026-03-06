@@ -13,6 +13,7 @@ describe('ShopFilters', () => {
     glutenFreeOnly: false,
     underTwenty: false,
     filteredCount: 12,
+    isResetDisabled: false,
     onSearchChange: jest.fn(),
     onCategorySelect: jest.fn(),
     onTagSelect: jest.fn(),
@@ -73,5 +74,15 @@ describe('ShopFilters', () => {
     expect(baseProps.onFilterToggle).toHaveBeenNthCalledWith(2, 'glutenFreeOnly', true);
     expect(baseProps.onFilterToggle).toHaveBeenNthCalledWith(3, 'underTwenty', true);
     expect(baseProps.onReset).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables reset button when no filters are active', () => {
+    render(
+      <ShopFilters {...baseProps} isResetDisabled>
+        <div />
+      </ShopFilters>
+    );
+
+    expect(screen.getByRole('button', { name: /reset filters/i })).toBeDisabled();
   });
 });

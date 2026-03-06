@@ -11,47 +11,32 @@ export const Section = styled.section`
   gap: 18px;
 `;
 
-export const Card = styled(CardSurface)``;
+export const Panel = styled(CardSurface)`
+  max-width: 560px;
+`;
+
+export const Eyebrow = styled.p`
+  color: ${colors.brownLight};
+  font-weight: 700;
+`;
 
 export const Title = styled.h1`
-  margin-top: 0;
-  margin-bottom: 8px;
+  margin-top: 8px;
+  margin-bottom: 6px;
 `;
 
 export const Subtitle = styled.p`
-  color: ${colors.brownLight};
-  margin-top: 4px;
-`;
-
-export const InfoGrid = styled.dl`
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 8px 12px;
-  margin-top: 18px;
-`;
-
-export const Label = styled.dt`
-  font-weight: 700;
-  color: ${colors.brown};
-`;
-
-export const Value = styled.dd`
-  margin: 0;
-  color: ${colors.brownLight};
-`;
-
-export const BlockTitle = styled.h2`
   margin-top: 0;
-  margin-bottom: 8px;
+  color: ${colors.brownLight};
 `;
 
 export const Form = styled.form`
   display: grid;
   gap: 12px;
-  margin-top: 14px;
+  margin-top: 18px;
 `;
 
-export const FieldLabel = styled(FormLabel)``;
+export const Label = styled(FormLabel)``;
 
 export const Status = styled.p<{ $isError: boolean }>`
   margin-bottom: 0;
@@ -60,7 +45,7 @@ export const Status = styled.p<{ $isError: boolean }>`
 `;
 
 export const TempPassword = styled.code`
-  margin-top: 10px;
+  margin-top: 12px;
   display: inline-block;
   border-radius: 10px;
   background: ${colors.surface};
@@ -68,4 +53,10 @@ export const TempPassword = styled.code`
   color: ${colors.brown};
   padding: 9px 12px;
   font-weight: 700;
+`;
+
+export const FooterText = styled.p`
+  margin-bottom: 0;
+  margin-top: 14px;
+  color: ${colors.brownLight};
 `;

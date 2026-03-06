@@ -1,6 +1,8 @@
 import { useEffect, useState, type ChangeEvent, type FC, type FormEventHandler, type MouseEvent } from 'react';
 import { toast } from 'sonner';
 
+import { Input } from '@src/components/common/Input';
+import { SubmitButton } from '@src/components/common/SubmitButton';
 import { createAdminModerator } from '@src/services/admin-api';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
 import type { AdminUser } from '@src/types/admin';
@@ -75,7 +77,7 @@ export const CreateModeratorModal: FC<CreateModeratorModalProps> = ({
   }
 
   return (
-    <S.ModalOverlay role="presentation" onClick={onClose}>
+    <S.ModalOverlay role="presentation" onClick={isSubmitting ? undefined : onClose}>
       <S.ModalCard
         role="dialog"
         aria-modal="true"
@@ -84,26 +86,26 @@ export const CreateModeratorModal: FC<CreateModeratorModalProps> = ({
       >
         <S.ModalHeader>
           <S.BlockTitle $isTitleWithActions>Create moderator</S.BlockTitle>
-          <S.CloseButton type="button" onClick={onClose}>
+          <S.CloseButton type="button" onClick={onClose} disabled={isSubmitting}>
             Close
           </S.CloseButton>
         </S.ModalHeader>
         <S.Form onSubmit={handleSubmit}>
           <S.Label>
             First name
-            <S.Input value={form.firstName} onChange={handleFormFieldChange('firstName')} required />
+            <Input value={form.firstName} onChange={handleFormFieldChange('firstName')} required />
           </S.Label>
           <S.Label>
             Last name
-            <S.Input value={form.lastName} onChange={handleFormFieldChange('lastName')} required />
+            <Input value={form.lastName} onChange={handleFormFieldChange('lastName')} required />
           </S.Label>
           <S.Label>
             Email
-            <S.Input type="email" value={form.email} onChange={handleFormFieldChange('email')} required />
+            <Input type="email" value={form.email} onChange={handleFormFieldChange('email')} required />
           </S.Label>
           <S.Label>
             Temporary password
-            <S.Input
+            <Input
               type="password"
               value={form.password}
               onChange={handleFormFieldChange('password')}
@@ -111,9 +113,9 @@ export const CreateModeratorModal: FC<CreateModeratorModalProps> = ({
               required
             />
           </S.Label>
-          <S.SubmitButton type="submit" disabled={isSubmitting}>
+          <SubmitButton type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Creating...' : 'Create moderator'}
-          </S.SubmitButton>
+          </SubmitButton>
         </S.Form>
       </S.ModalCard>
     </S.ModalOverlay>

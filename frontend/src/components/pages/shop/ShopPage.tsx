@@ -40,6 +40,13 @@ export const ShopPage: FC = () => {
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [cartByProduct, setCartByProduct] = useState<Record<string, number>>({});
   const availableTags = useMemo(() => getAvailableTags(products), [products]);
+  const isResetDisabled =
+    search.trim() === '' &&
+    activeCategory === 'All' &&
+    activeTag === 'All' &&
+    !veganOnly &&
+    !glutenFreeOnly &&
+    !underTwenty;
 
   const syncUrlFilters = (category: Category, tag: ProductTag) => {
     const params = new URLSearchParams(searchParams);
@@ -228,6 +235,7 @@ export const ShopPage: FC = () => {
           glutenFreeOnly={glutenFreeOnly}
           underTwenty={underTwenty}
           filteredCount={filteredProducts.length}
+          isResetDisabled={isResetDisabled}
           onSearchChange={handleSearchChange}
           onCategorySelect={handleCategorySelect}
           onTagSelect={handleTagSelect}

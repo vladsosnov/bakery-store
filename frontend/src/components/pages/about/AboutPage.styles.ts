@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { colors } from '@src/styles/colors';
+import { shadows } from '@src/styles/shadows';
 
 export const Main = styled.main``;
 
@@ -11,10 +12,10 @@ export const Section = styled.section`
 
 export const Hero = styled.article`
   background: ${colors.white};
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  box-shadow: ${shadows.surface};
 `;
 
 export const HeroTitle = styled.h1`
@@ -30,10 +31,10 @@ export const Grid = styled.div`
 
 export const Card = styled.article`
   background: ${colors.white};
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 16px;
   padding: 18px;
-  box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
+  box-shadow: ${shadows.surface};
 `;
 
 export const CardTitle = styled.h2`
@@ -44,8 +45,7 @@ export const CardText = styled.p`
   margin-bottom: 0;
 `;
 
-export const ContactLine = styled.p`
-`;
+export const ContactLine = styled.p``;
 
 export const ContactLineLast = styled.p`
   margin-bottom: 0;

@@ -148,7 +148,7 @@ export const addItemToCart = async (userId: string, payload: unknown) => {
   const nextQuantity = currentQuantity + data.quantity;
 
   if (nextQuantity > product.stock) {
-    throw new CartError('Not enough stock available', 409, 'OUT_OF_STOCK', {
+    throw new CartError('Maximum available stock reached. You cannot add more items.', 409, 'OUT_OF_STOCK', {
       availableStock: product.stock,
       currentInCart: currentQuantity,
       requestedToAdd: data.quantity
@@ -181,7 +181,7 @@ export const updateCartItemQuantity = async (userId: string, productId: string, 
   }
 
   if (data.quantity > product.stock) {
-    throw new CartError('Not enough stock available', 409, 'OUT_OF_STOCK', {
+    throw new CartError('Maximum available stock reached. You cannot add more items.', 409, 'OUT_OF_STOCK', {
       availableStock: product.stock,
       requestedQuantity: data.quantity
     });

@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { AUTH_STORAGE_KEY } from '@src/services/auth-session';
 import * as adminApi from '@src/services/admin-api';
@@ -16,12 +17,20 @@ jest.mock('@src/services/admin-api', () => ({
   updateAdminOrderStatus: jest.fn()
 }));
 
+jest.mock('sonner', () => ({
+  toast: {
+    success: jest.fn(),
+    error: jest.fn()
+  }
+}));
+
 describe('AdminDashboardPage', () => {
   const getAdminUsersMock = adminApi.getAdminUsers as jest.MockedFunction<typeof adminApi.getAdminUsers>;
   const getAdminOrdersMock = adminApi.getAdminOrders as jest.MockedFunction<typeof adminApi.getAdminOrders>;
   const updateAdminOrderStatusMock = adminApi.updateAdminOrderStatus as jest.MockedFunction<
     typeof adminApi.updateAdminOrderStatus
   >;
+  const toastErrorMock = jest.mocked(toast.error);
 
   const setSession = (role: 'admin' | 'moderator' | 'customer') => {
     localStorage.setItem(
@@ -56,6 +65,7 @@ describe('AdminDashboardPage', () => {
     });
     getAdminOrdersMock.mockResolvedValue({ data: [] });
     updateAdminOrderStatusMock.mockReset();
+    toastErrorMock.mockReset();
 
     setSession('admin');
   });
@@ -75,6 +85,36 @@ describe('AdminDashboardPage', () => {
 
     await user.click(screen.getByRole('button', { name: /create moderator/i }));
     expect(screen.getByRole('dialog', { name: /create moderator dialog/i })).toBeInTheDocument();
+  });
+
+  it('redirects to sign in when session is missing', () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+
+    render(
+      <MemoryRouter initialEntries={['/admin']}>
+        <Routes>
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/sign-in" element={<div>Sign in page</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Sign in page')).toBeInTheDocument();
+  });
+
+  it('redirects customer to home page', () => {
+    setSession('customer');
+
+    render(
+      <MemoryRouter initialEntries={['/admin']}>
+        <Routes>
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/" element={<div>Home page</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Home page')).toBeInTheDocument();
   });
 
   it('opens edit moderator modal when clicking edit', async () => {
@@ -115,8 +155,22 @@ describe('AdminDashboardPage', () => {
     );
 
     expect(await screen.findByRole('button', { name: /all orders/i })).toBeInTheDocument();
+    expect(screen.getByText(/inspect and manage customer orders\./i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /all users/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /log usage/i })).not.toBeInTheDocument();
+  });
+
+  it('opens logs tab for admin', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(await screen.findByRole('button', { name: /log usage/i }));
+    expect(await screen.findByText(/usage logs module will be implemented later\./i)).toBeInTheDocument();
   });
 
   it('updates order status from orders tab', async () => {
@@ -166,9 +220,50 @@ describe('AdminDashboardPage', () => {
     const statusSelect = await screen.findByRole('combobox', {
       name: /order status for customer@bakery.local/i
     });
+    expect(within(statusSelect).getByRole('option', { name: 'placed' })).toBeInTheDocument();
     await user.selectOptions(statusSelect, 'in progress');
 
     expect(updateAdminOrderStatusMock).toHaveBeenCalledWith('order-1', 'in progress');
+  });
+
+  it('does not allow rollback status options for progressed orders', async () => {
+    const user = userEvent.setup();
+    getAdminOrdersMock.mockResolvedValue({
+      data: [
+        {
+          id: 'order-2',
+          customerName: 'Anna Doe',
+          customerEmail: 'anna@bakery.local',
+          customerPhone: '+15550009999',
+          status: 'in progress',
+          totalItems: 1,
+          totalPrice: 10,
+          createdAt: new Date().toISOString(),
+          items: [],
+          deliveryAddress: {
+            zip: '10001',
+            street: '5th Avenue 10',
+            city: 'New York'
+          }
+        }
+      ]
+    });
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(await screen.findByRole('button', { name: /all orders/i }));
+    const statusSelect = await screen.findByRole('combobox', {
+      name: /order status for anna@bakery.local/i
+    });
+
+    expect(statusSelect).toHaveDisplayValue('in progress');
+    expect(within(statusSelect).queryByRole('option', { name: 'placed' })).not.toBeInTheDocument();
+    expect(within(statusSelect).getByRole('option', { name: 'in progress' })).toBeInTheDocument();
+    expect(within(statusSelect).getByRole('option', { name: 'in delivery' })).toBeInTheDocument();
   });
 
   it('filters by status and searches by customer or order number', async () => {
@@ -210,6 +305,8 @@ describe('AdminDashboardPage', () => {
     );
 
     await user.click(await screen.findByRole('button', { name: /all orders/i }));
+    expect(screen.getByRole('heading', { name: /active orders/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /in delivery/i })).toBeInTheDocument();
     expect(await screen.findByText(/john doe/i)).toBeInTheDocument();
     expect(screen.getByText(/anna smith/i)).toBeInTheDocument();
 
@@ -221,5 +318,103 @@ describe('AdminDashboardPage', () => {
     await user.type(screen.getByRole('searchbox', { name: /search orders/i }), '123456');
     expect(screen.getByText(/john doe/i)).toBeInTheDocument();
     expect(screen.queryByText(/anna smith/i)).not.toBeInTheDocument();
+  });
+
+  it('shows no-match text when filters exclude all orders', async () => {
+    const user = userEvent.setup();
+
+    getAdminOrdersMock.mockResolvedValue({
+      data: [
+        {
+          id: 'order-123456',
+          customerName: 'John Doe',
+          customerEmail: 'john@bakery.local',
+          customerPhone: '+15550001122',
+          status: 'placed',
+          totalItems: 2,
+          totalPrice: 12,
+          createdAt: new Date().toISOString(),
+          items: [],
+          deliveryAddress: { zip: '10001', street: '5th Avenue 10', city: 'New York' }
+        }
+      ]
+    });
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(await screen.findByRole('button', { name: /all orders/i }));
+    await user.type(screen.getByRole('searchbox', { name: /search orders/i }), 'not-existing-user');
+
+    expect(await screen.findByText(/no orders match current filters\./i)).toBeInTheDocument();
+  });
+
+  it('shows toast on dashboard load failure', async () => {
+    getAdminUsersMock.mockRejectedValueOnce(new Error('network'));
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to load admin dashboard.');
+    });
+  });
+
+  it('shows toast on order status update failure', async () => {
+    const user = userEvent.setup();
+
+    getAdminOrdersMock.mockResolvedValue({
+      data: [
+        {
+          id: 'order-1',
+          customerName: 'John Doe',
+          customerEmail: 'customer@bakery.local',
+          customerPhone: '+15550001122',
+          status: 'placed',
+          totalItems: 1,
+          totalPrice: 6,
+          createdAt: new Date().toISOString(),
+          items: [],
+          deliveryAddress: { zip: '10001', street: '5th Avenue 10', city: 'New York' }
+        }
+      ]
+    });
+    updateAdminOrderStatusMock.mockRejectedValueOnce(new Error('network'));
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(await screen.findByRole('button', { name: /all orders/i }));
+    const statusSelect = await screen.findByRole('combobox', {
+      name: /order status for customer@bakery.local/i
+    });
+    await user.selectOptions(statusSelect, 'in progress');
+
+    expect(toastErrorMock).toHaveBeenCalledWith('Failed to update order status.');
+  });
+
+  it('closes create modal on Escape key', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole('button', { name: /create moderator/i }));
+    expect(screen.getByRole('dialog', { name: /create moderator dialog/i })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog', { name: /create moderator dialog/i })).not.toBeInTheDocument();
   });
 });

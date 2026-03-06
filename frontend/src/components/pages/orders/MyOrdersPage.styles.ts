@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { CardSurface } from '@src/components/common/CardSurface';
 import { colors } from '@src/styles/colors';
 import { pageContainer } from '@src/styles/layout';
 
@@ -7,13 +8,7 @@ export const Section = styled.section`
   ${pageContainer}
 `;
 
-export const Card = styled.article`
-  border-radius: 20px;
-  border: 1px solid ${colors.softBorder};
-  background: ${colors.white};
-  box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
-  padding: 24px;
-`;
+export const Card = styled(CardSurface)``;
 
 export const Title = styled.h1`
   margin-top: 0;
@@ -21,7 +16,7 @@ export const Title = styled.h1`
 `;
 
 export const Subtitle = styled.p`
-  color: ${colors.romanCoffee};
+  color: ${colors.brownLight};
 `;
 
 export const OrderList = styled.ul`
@@ -33,7 +28,7 @@ export const OrderList = styled.ul`
 `;
 
 export const OrderItem = styled.li`
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 12px;
   padding: 12px;
   display: grid;
@@ -51,8 +46,8 @@ export const OrderHeader = styled.div`
 export const Status = styled.span`
   border-radius: 999px;
   padding: 4px 9px;
-  border: 1px solid ${colors.inputBorder};
-  background: #e7f4ed;
+  border: 1px solid ${colors.border};
+  background: ${colors.bgStatusSuccess};
   color: ${colors.accentGreen};
   font-size: 0.8rem;
   font-weight: 700;
@@ -61,13 +56,13 @@ export const Status = styled.span`
 
 export const Total = styled.span`
   font-weight: 700;
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
 `;
 
 export const ItemList = styled.ul`
   margin: 0;
   padding-left: 18px;
-  color: ${colors.vintageBrown};
+  color: ${colors.brownLight};
 `;
 
 export const Item = styled.li`

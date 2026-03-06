@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
 import { colors } from '@src/styles/colors';
+import { shadows } from '@src/styles/shadows';
 
 export const Panel = styled.section`
   position: fixed;
@@ -11,9 +12,9 @@ export const Panel = styled.section`
   display: grid;
   grid-template-rows: auto 1fr auto;
   background: ${colors.white};
-  border: 1px solid #e9d3c5;
+  border: 1px solid ${colors.border};
   border-radius: 18px;
-  box-shadow: 0 20px 48px rgba(65, 43, 33, 0.28);
+  box-shadow: ${shadows.overlayStrong};
   overflow: hidden;
   z-index: 45;
   animation: ${fadeInLift} 240ms ease;
@@ -25,8 +26,8 @@ export const Header = styled.header`
   justify-content: space-between;
   gap: 10px;
   align-items: flex-start;
-  border-bottom: 1px solid #f2dfd3;
-  background: linear-gradient(135deg, ${colors.accentGreen}, #22513c);
+  border-bottom: 1px solid ${colors.border};
+  background: linear-gradient(135deg, ${colors.accentGreen}, ${colors.brownLight});
   color: ${colors.white};
 `;
 
@@ -45,7 +46,7 @@ export const HeaderMeta = styled.p`
 
 export const CloseButton = styled.button`
   border: none;
-  background: rgba(255, 255, 255, 0.2);
+  background: ${colors.overlayWhite20};
   color: ${colors.white};
   border-radius: 10px;
   padding: 7px 10px;
@@ -56,7 +57,7 @@ export const CloseButton = styled.button`
 export const Messages = styled.div`
   padding: 12px;
   overflow-y: auto;
-  background: linear-gradient(180deg, ${colors.white} 0%, #fff8f2 100%);
+  background: linear-gradient(180deg, ${colors.white} 0%, ${colors.surface} 100%);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -75,7 +76,7 @@ export const Bubble = styled.div<{ $role: 'user' | 'assistant' }>`
 `;
 
 export const Footer = styled.footer`
-  border-top: 1px solid #f2dfd3;
+  border-top: 1px solid ${colors.border};
   background: ${colors.white};
   padding: 10px;
 `;
@@ -89,9 +90,9 @@ export const QuickActions = styled.div`
 
 export const QuickButton = styled.button`
   border-radius: 999px;
-  border: 1px solid #d9bca9;
-  background: ${colors.provincialPink};
-  color: #5c3f34;
+  border: 1px solid ${colors.border};
+  background: ${colors.surface};
+  color: ${colors.brownLight};
   padding: 6px 10px;
   font-size: 0.78rem;
   font-weight: 700;
@@ -106,14 +107,14 @@ export const Composer = styled.form`
 
 export const Input = styled.input`
   border-radius: 10px;
-  border: 1px solid ${colors.inputBorder};
+  border: 1px solid ${colors.border};
   padding: 10px 11px;
   font-size: 0.92rem;
 
   &:focus {
     outline: none;
     border-color: ${colors.accentGreen};
-    box-shadow: 0 0 0 3px rgba(47, 111, 81, 0.14);
+    box-shadow: ${shadows.focusRing};
   }
 `;
 

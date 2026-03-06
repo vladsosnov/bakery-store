@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import {  useState, type FC } from 'react';
 import { toast } from 'sonner';
 
 import { deleteAdminModerator } from '@src/services/admin-api';
@@ -44,7 +44,7 @@ export const RemoveModeratorModal: FC<RemoveModeratorModalProps> = ({
   }
 
   return (
-    <S.ModalOverlay role="presentation" onClick={onClose}>
+    <S.ModalOverlay role="presentation" onClick={isSubmitting ? undefined : onClose}>
       <S.ModalCard
         role="dialog"
         aria-modal="true"
@@ -53,7 +53,7 @@ export const RemoveModeratorModal: FC<RemoveModeratorModalProps> = ({
       >
         <S.ModalHeader>
           <S.BlockTitle $isTitleWithActions>Remove moderator</S.BlockTitle>
-          <S.CloseButton type="button" onClick={onClose}>
+          <S.CloseButton type="button" onClick={onClose} disabled={isSubmitting}>
             Close
           </S.CloseButton>
         </S.ModalHeader>
@@ -64,7 +64,7 @@ export const RemoveModeratorModal: FC<RemoveModeratorModalProps> = ({
           <S.ActionButton type="button" $danger onClick={handleConfirm} disabled={isSubmitting}>
             {isSubmitting ? 'Removing...' : 'Remove moderator'}
           </S.ActionButton>
-          <S.CloseButton type="button" onClick={onClose}>
+          <S.CloseButton type="button" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </S.CloseButton>
         </S.ModalActions>

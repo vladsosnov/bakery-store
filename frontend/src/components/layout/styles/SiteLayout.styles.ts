@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { fadeInLift } from '@src/styles/animations';
 import { colors } from '@src/styles/colors';
+import { shadows } from '@src/styles/shadows';
 
 type AuthVariant = 'ghost' | 'solid';
 
@@ -9,8 +10,8 @@ export const Wrapper = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, ${colors.provincialPink} 0%, ${colors.white} 40%, ${colors.provincialPink} 100%);
-  color: #2d1d1d;
+  background: linear-gradient(180deg, ${colors.surface} 0%, ${colors.white} 40%, ${colors.surface} 100%);
+  color: ${colors.brown};
 `;
 
 export const Header = styled.header`
@@ -21,8 +22,8 @@ export const Header = styled.header`
   position: sticky;
   top: 0;
   backdrop-filter: blur(8px);
-  background-color: rgba(255, 247, 240, 0.85);
-  border-bottom: 1px solid ${colors.ivorySatin};
+  background-color: ${colors.overlayWarmHeader};
+  border-bottom: 1px solid ${colors.border};
   z-index: 20;
 `;
 
@@ -62,8 +63,8 @@ export const CartButton = styled.button<{ $open: boolean }>`
   gap: 8px;
   border-radius: 999px;
   border: none;
-  background: ${(props) => (props.$open ? colors.accentGreen : colors.provincialPink)};
-  color: ${(props) => (props.$open ? colors.white : colors.brandBrown)};
+  background: ${(props) => (props.$open ? colors.accentGreen : colors.surface)};
+  color: ${(props) => (props.$open ? colors.white : colors.brown)};
   padding: 10px 16px;
   font-weight: 600;
   cursor: pointer;
@@ -71,28 +72,28 @@ export const CartButton = styled.button<{ $open: boolean }>`
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 14px rgba(81, 51, 51, 0.14);
+    box-shadow: ${shadows.surfaceRaised};
   }
 `;
 
 const authLinkVariants = {
   ghost: css`
-    border: 1px solid ${colors.cinnamonTea};
-    background: ${colors.provincialPink};
-    color: ${colors.brandBrown};
+    border: 1px solid ${colors.border};
+    background: ${colors.surface};
+    color: ${colors.brown};
 
     &.active {
-      background: #f3e4d9;
+      background: ${colors.surface};
     }
   `,
   solid: css`
-    border: 1px solid ${colors.brandBrown};
-    background: ${colors.brandBrown};
+    border: 1px solid ${colors.brown};
+    background: ${colors.brown};
     color: ${colors.white};
 
     &.active {
-      background: ${colors.treehouse};
-      border-color: ${colors.treehouse};
+      background: ${colors.brown};
+      border-color: ${colors.brown};
     }
   `
 } as const;
@@ -113,9 +114,9 @@ export const LogoutButton = styled.button`
   padding: 10px 16px;
   cursor: pointer;
   font-weight: 600;
-  border: 1px solid ${colors.cinnamonTea};
-  background: ${colors.provincialPink};
-  color: ${colors.brandBrown};
+  border: 1px solid ${colors.border};
+  background: ${colors.surface};
+  color: ${colors.brown};
 `;
 
 export const Content = styled.div`
@@ -142,8 +143,8 @@ export const RouteTransition = styled.div`
 export const Footer = styled.footer`
   margin-top: 20px;
   padding: 24px 24px;
-  border-top: 1px solid ${colors.ivorySatin};
-  color: ${colors.warmMuted};
+  border-top: 1px solid ${colors.border};
+  color: ${colors.brownLight};
 `;
 
 export const ChatButton = styled.button<{ $open: boolean }>`
@@ -152,17 +153,17 @@ export const ChatButton = styled.button<{ $open: boolean }>`
   bottom: 18px;
   border: none;
   border-radius: 999px;
-  background: ${(props) => (props.$open ? colors.brandBrown : colors.accentGreen)};
+  background: ${(props) => (props.$open ? colors.brown : colors.accentGreen)};
   color: ${colors.white};
   padding: 14px 18px;
   font-weight: 700;
-  box-shadow: 0 10px 24px rgba(31, 90, 64, 0.35);
+  box-shadow: ${shadows.interactive};
   cursor: pointer;
   z-index: 30;
   transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 14px 26px rgba(31, 90, 64, 0.42);
+    box-shadow: ${shadows.interactiveHover};
   }
 `;

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { CardSurface } from '@src/components/common/CardSurface';
 import { colors } from '@src/styles/colors';
 import { pageContainer } from '@src/styles/layout';
 
@@ -7,13 +8,7 @@ export const Section = styled.section`
   ${pageContainer}
 `;
 
-export const Card = styled.article`
-  border-radius: 20px;
-  border: 1px solid ${colors.softBorder};
-  background: ${colors.white};
-  box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
-  padding: 24px;
-`;
+export const Card = styled(CardSurface)``;
 
 export const Title = styled.h1`
   margin-top: 0;
@@ -21,7 +16,7 @@ export const Title = styled.h1`
 `;
 
 export const Subtitle = styled.p`
-  color: ${colors.romanCoffee};
+  color: ${colors.brownLight};
 `;
 
 export const ItemList = styled.ul`
@@ -33,14 +28,14 @@ export const ItemList = styled.ul`
 `;
 
 export const Item = styled.li`
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   border-radius: 12px;
   padding: 10px 12px;
   display: grid;
   grid-template-columns: minmax(140px, 1fr) auto auto auto;
   gap: 10px;
   align-items: center;
-  color: ${colors.vintageBrown};
+  color: ${colors.brownLight};
 
   @media (max-width: 720px) {
     grid-template-columns: 1fr;
@@ -61,9 +56,9 @@ export const QuantityButton = styled.button`
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  border: 1px solid ${colors.softBorder};
+  border: 1px solid ${colors.border};
   background: ${colors.white};
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
   font-weight: 700;
   cursor: pointer;
 
@@ -79,13 +74,13 @@ export const QuantityValue = styled.span`
 
 export const ItemPrice = styled.span`
   font-weight: 700;
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
 `;
 
 export const RemoveButton = styled.button`
   border-radius: 10px;
-  border: 1px solid #e5beb8;
-  background: #fff3f0;
+  border: 1px solid ${colors.border};
+  background: ${colors.surface};
   color: ${colors.errorMuted};
   padding: 8px 10px;
   font-weight: 600;
@@ -99,14 +94,14 @@ export const RemoveButton = styled.button`
 
 export const Status = styled.p<{ $isError?: boolean }>`
   margin: 10px 0 0;
-  color: ${(props) => (props.$isError ? colors.errorRed : colors.romanCoffee)};
+  color: ${(props) => (props.$isError ? colors.errorRed : colors.brownLight)};
 `;
 
 export const Total = styled.p`
   margin-top: 14px;
   margin-bottom: 0;
   font-weight: 700;
-  color: ${colors.brandBrown};
+  color: ${colors.brown};
 `;
 
 export const CheckoutBar = styled.div`

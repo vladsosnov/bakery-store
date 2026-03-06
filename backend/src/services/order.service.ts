@@ -23,6 +23,12 @@ const updateOrderStatusSchema = z.object({
   status: z.enum(ORDER_STATUS_VALUES as [OrderStatus, ...OrderStatus[]])
 });
 
+const ORDER_STATUS_INDEX: Record<OrderStatus, number> = {
+  [ORDER_STATUSES.placed]: 0,
+  [ORDER_STATUSES.inProgress]: 1,
+  [ORDER_STATUSES.inDelivery]: 2
+};
+
 const buildOrderView = (order: {
   id?: string;
   _id?: Types.ObjectId;
@@ -198,6 +204,11 @@ export const updateOrderStatusForDashboard = async (orderId: string, payload: un
   const order = await OrderModel.findById(orderId);
   if (!order) {
     throw new OrderError('Order not found', 404, 'ORDER_NOT_FOUND');
+  }
+
+  const currentStatus = order.status as OrderStatus;
+  if (ORDER_STATUS_INDEX[data.status] < ORDER_STATUS_INDEX[currentStatus]) {
+    throw new OrderError('Order status can only move forward', 409, 'ORDER_STATUS_ROLLBACK_FORBIDDEN');
   }
 
   order.status = data.status;
