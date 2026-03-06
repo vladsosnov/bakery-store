@@ -61,6 +61,14 @@ jobs:
       - name: Run frontend coverage
         working-directory: frontend
         run: npm run test:coverage -- --coverageReporters=text-summary --coverageReporters=lcov --coverageReporters=cobertura --coverageReporters=json-summary
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: frontend/coverage/lcov.info
+          flags: frontend
+          name: frontend-ui
+          fail_ci_if_error: false
       - name: Upload frontend coverage artifact
         uses: actions/upload-artifact@v4
         with:
