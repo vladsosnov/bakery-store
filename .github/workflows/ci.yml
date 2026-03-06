@@ -77,6 +77,10 @@ jobs:
       - name: Install dependencies
         working-directory: ${{ matrix.app }}
         run: npm ci --include=optional
+      - name: Workaround npm optional deps bug for Rollup (frontend)
+        if: matrix.app == 'frontend'
+        working-directory: frontend
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
       - name: Build ${{ matrix.app }}
         working-directory: ${{ matrix.app }}
         run: npm run build
