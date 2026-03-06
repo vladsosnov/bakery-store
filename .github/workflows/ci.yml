@@ -81,6 +81,10 @@ jobs:
         if: matrix.app == 'frontend'
         working-directory: frontend
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
+      - name: Workaround npm optional deps bug for SWC (frontend)
+        if: matrix.app == 'frontend'
+        working-directory: frontend
+        run: npm install --no-save @swc/core @swc/core-linux-x64-gnu
       - name: Build ${{ matrix.app }}
         working-directory: ${{ matrix.app }}
         run: npm run build

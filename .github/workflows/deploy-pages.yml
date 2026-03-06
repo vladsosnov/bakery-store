@@ -32,6 +32,9 @@ jobs:
       - name: Workaround npm optional deps bug for Rollup
         working-directory: frontend
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
+      - name: Workaround npm optional deps bug for SWC
+        working-directory: frontend
+        run: npm install --no-save @swc/core @swc/core-linux-x64-gnu
       - name: Build frontend
         working-directory: frontend
         env:
