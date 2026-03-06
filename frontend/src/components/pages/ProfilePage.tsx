@@ -26,17 +26,14 @@ export const ProfilePage: FC = () => {
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [isProfileSaving, setIsProfileSaving] = useState(false);
-  const [profileStatus, setProfileStatus] = useState<string | null>(null);
 
   const [email, setEmail] = useState(session?.user.email ?? '');
   const [isResetSubmitting, setIsResetSubmitting] = useState(false);
-  const [resetStatusMessage, setResetStatusMessage] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [isSetSubmitting, setIsSetSubmitting] = useState(false);
-  const [setStatusMessage, setSetStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!session) {
@@ -133,7 +130,6 @@ export const ProfilePage: FC = () => {
   const handleProfileSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setIsProfileSaving(true);
-    setProfileStatus(null);
 
     try {
       const response = await updateMyProfile({
@@ -152,13 +148,12 @@ export const ProfilePage: FC = () => {
         firstName: response.data.firstName,
         lastName: response.data.lastName
       });
-      setProfileStatus('Profile updated successfully.');
+      toast.success('Profile updated successfully.');
     } catch (error) {
       const errorMessage = axios.isAxiosError<{ error?: string }>(error)
         ? error.response?.data?.error ?? 'Failed to update profile. Please try again.'
         : 'Failed to update profile. Please try again.';
       toast.error(errorMessage);
-      setProfileStatus(null);
     } finally {
       setIsProfileSaving(false);
     }
@@ -171,19 +166,17 @@ export const ProfilePage: FC = () => {
   const handlePasswordResetSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setIsResetSubmitting(true);
-    setResetStatusMessage(null);
     setTemporaryPassword(null);
 
     try {
       const response = await changePasswordByEmail({ email });
-      setResetStatusMessage(response.data.message);
+      toast.success(response.data.message);
       setTemporaryPassword(response.data.temporaryPassword);
     } catch (error) {
       const errorMessage = axios.isAxiosError<{ error?: string }>(error)
         ? error.response?.data?.error ?? 'Failed to change password. Please try again.'
         : 'Failed to change password. Please try again.';
       toast.error(errorMessage);
-      setResetStatusMessage(null);
     } finally {
       setIsResetSubmitting(false);
     }
@@ -204,7 +197,6 @@ export const ProfilePage: FC = () => {
   const handleSetOwnPasswordSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setIsSetSubmitting(true);
-    setSetStatusMessage(null);
 
     if (newPassword !== confirmNewPassword) {
       toast.error('New password and confirmation must match.');
@@ -219,7 +211,7 @@ export const ProfilePage: FC = () => {
         newPassword
       });
 
-      setSetStatusMessage(response.data.message);
+      toast.success(response.data.message);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
@@ -228,7 +220,6 @@ export const ProfilePage: FC = () => {
         ? error.response?.data?.error ?? 'Failed to set password. Please try again.'
         : 'Failed to set password. Please try again.';
       toast.error(errorMessage);
-      setSetStatusMessage(null);
     } finally {
       setIsSetSubmitting(false);
     }
@@ -293,7 +284,6 @@ export const ProfilePage: FC = () => {
           </S.SubmitButton>
         </S.Form>
 
-        {profileStatus ? <S.Status $isError={false}>{profileStatus}</S.Status> : null}
       </S.Card>
 
       <S.Card>
@@ -316,8 +306,6 @@ export const ProfilePage: FC = () => {
             {isResetSubmitting ? 'Generating...' : 'Generate temporary password'}
           </S.SubmitButton>
         </S.Form>
-
-        {resetStatusMessage ? <S.Status $isError={false}>{resetStatusMessage}</S.Status> : null}
 
         {temporaryPassword ? (
           <>
@@ -372,7 +360,6 @@ export const ProfilePage: FC = () => {
           </S.SubmitButton>
         </S.Form>
 
-        {setStatusMessage ? <S.Status $isError={false}>{setStatusMessage}</S.Status> : null}
       </S.Card>
     </S.Section>
   );

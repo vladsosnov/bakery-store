@@ -13,7 +13,6 @@ export const SignInPage: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -26,7 +25,6 @@ export const SignInPage: FC = () => {
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
-    setStatusMessage(null);
 
     try {
       const response = await loginUser({
@@ -38,7 +36,7 @@ export const SignInPage: FC = () => {
         accessToken: response.data.accessToken,
         user: response.data.user
       });
-      setStatusMessage(`Welcome back, ${response.data.user.firstName}!`);
+      toast.success(`Welcome back, ${response.data.user.firstName}!`);
       navigate(ROUTES.home);
     } catch (error) {
       const errorMessage = axios.isAxiosError<{ error?: string }>(error)
@@ -46,7 +44,6 @@ export const SignInPage: FC = () => {
         : 'Failed to sign in. Please try again.';
 
       toast.error(errorMessage);
-      setStatusMessage(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -86,12 +83,6 @@ export const SignInPage: FC = () => {
             {isSubmitting ? 'Signing in...' : 'Sign in'}
           </S.SubmitButton>
         </S.Form>
-
-        {statusMessage ? (
-          <S.FooterText role="status">
-            {statusMessage}
-          </S.FooterText>
-        ) : null}
 
         <S.FooterText>
           <Link to={ROUTES.changePassword}>Forgot password?</Link>

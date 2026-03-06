@@ -21,8 +21,6 @@ export const CartPage: FC = () => {
     }>
   >([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [hasError, setHasError] = useState(false);
   const [pendingByProduct, setPendingByProduct] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -34,8 +32,6 @@ export const CartPage: FC = () => {
     const loadCart = async () => {
       setIsLoading(true);
       setErrorMessage(null);
-      setStatusMessage(null);
-      setHasError(false);
 
       try {
         const response = await fetchCart();
@@ -112,8 +108,6 @@ export const CartPage: FC = () => {
     const updateQuantity = async () => {
       try {
         setProductPending(productId, true);
-        setStatusMessage(null);
-        setHasError(false);
         const response = await updateCartItemQuantity({
           productId,
           quantity: cartItem.quantity + 1
@@ -125,8 +119,6 @@ export const CartPage: FC = () => {
           ? error.response?.data?.error ?? 'Failed to update quantity.'
           : 'Failed to update quantity.';
         toast.error(errorMessage);
-        setStatusMessage(errorMessage);
-        setHasError(true);
       } finally {
         setProductPending(productId, false);
       }
@@ -154,8 +146,6 @@ export const CartPage: FC = () => {
     const updateQuantity = async () => {
       try {
         setProductPending(productId, true);
-        setStatusMessage(null);
-        setHasError(false);
         const response = await updateCartItemQuantity({
           productId,
           quantity: cartItem.quantity - 1
@@ -167,8 +157,6 @@ export const CartPage: FC = () => {
           ? error.response?.data?.error ?? 'Failed to update quantity.'
           : 'Failed to update quantity.';
         toast.error(errorMessage);
-        setStatusMessage(errorMessage);
-        setHasError(true);
       } finally {
         setProductPending(productId, false);
       }
@@ -187,8 +175,6 @@ export const CartPage: FC = () => {
     const removeItem = async () => {
       try {
         setProductPending(productId, true);
-        setStatusMessage(null);
-        setHasError(false);
         const response = await removeCartItem({ productId });
         applyCartResponse(response);
       } catch (error) {
@@ -196,8 +182,6 @@ export const CartPage: FC = () => {
           ? error.response?.data?.error ?? 'Failed to remove item.'
           : 'Failed to remove item.';
         toast.error(errorMessage);
-        setStatusMessage(errorMessage);
-        setHasError(true);
       } finally {
         setProductPending(productId, false);
       }
@@ -217,11 +201,6 @@ export const CartPage: FC = () => {
         ) : (
           <>
             <S.Subtitle>Items in your cart:</S.Subtitle>
-            {statusMessage ? (
-              <S.Status role={hasError ? 'alert' : 'status'} $isError={hasError}>
-                {statusMessage}
-              </S.Status>
-            ) : null}
             <S.ItemList>
               {items.map((item) => (
                 <S.Item key={item.productId}>

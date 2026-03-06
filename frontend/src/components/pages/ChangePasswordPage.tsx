@@ -12,7 +12,6 @@ export const ChangePasswordPage: FC = () => {
   const session = getAuthSession();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -22,19 +21,17 @@ export const ChangePasswordPage: FC = () => {
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    setStatusMessage(null);
     setTemporaryPassword(null);
 
     try {
       const response = await changePasswordByEmail({ email });
-      setStatusMessage(response.data.message);
+      toast.success(response.data.message);
       setTemporaryPassword(response.data.temporaryPassword);
     } catch (error) {
       const errorMessage = axios.isAxiosError<{ error?: string }>(error)
         ? error.response?.data?.error ?? 'Failed to change password. Please try again.'
         : 'Failed to change password. Please try again.';
       toast.error(errorMessage);
-      setStatusMessage(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -69,8 +66,6 @@ export const ChangePasswordPage: FC = () => {
             {isSubmitting ? 'Generating...' : 'Generate temporary password'}
           </S.SubmitButton>
         </S.Form>
-
-        {statusMessage ? <S.Status $isError={false}>{statusMessage}</S.Status> : null}
 
         {temporaryPassword ? (
           <>

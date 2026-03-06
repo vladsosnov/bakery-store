@@ -15,12 +15,10 @@ export const SignUpPage: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
-    setStatusMessage(null);
 
     try {
       const response = await registerUser({
@@ -35,9 +33,7 @@ export const SignUpPage: FC = () => {
         user: response.data.user
       });
 
-      setStatusMessage(
-        `Welcome, ${response.data.user.firstName}! Your account is ready.`
-      );
+      toast.success(`Welcome, ${response.data.user.firstName}! Your account is ready.`);
       setPassword('');
       navigate(ROUTES.home);
     } catch (error) {
@@ -45,7 +41,6 @@ export const SignUpPage: FC = () => {
         ? error.response?.data?.error ?? 'Failed to create account. Please try again.'
         : 'Failed to create account. Please try again.';
       toast.error(errorMessage);
-      setStatusMessage(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -120,12 +115,6 @@ export const SignUpPage: FC = () => {
             {isSubmitting ? 'Creating account...' : 'Create account'}
           </S.SubmitButton>
         </S.Form>
-
-        {statusMessage ? (
-          <S.FooterText role="status">
-            {statusMessage}
-          </S.FooterText>
-        ) : null}
 
         <S.FooterText>
           Already have an account? <Link to={ROUTES.signIn}>Sign in</Link>
