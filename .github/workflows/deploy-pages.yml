@@ -28,7 +28,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci
+        run: npm ci --include=optional
       - name: Build frontend
         working-directory: frontend
         env:

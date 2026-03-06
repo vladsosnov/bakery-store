@@ -24,10 +24,10 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci
+        run: npm ci --include=optional
       - name: Install backend deps
         working-directory: backend
-        run: npm ci
+        run: npm ci --include=optional
       - name: Lint frontend
         working-directory: frontend
         run: npm run lint
@@ -45,7 +45,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install backend deps
         working-directory: backend
-        run: npm ci
+        run: npm ci --include=optional
       - name: Run backend coverage
         working-directory: backend
         run: npm run test:coverage -- --coverageReporters=text-summary --coverageReporters=lcov
@@ -76,7 +76,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         working-directory: ${{ matrix.app }}
-        run: npm ci
+        run: npm ci --include=optional
       - name: Build ${{ matrix.app }}
         working-directory: ${{ matrix.app }}
         run: npm run build
@@ -91,7 +91,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci
+        run: npm ci --include=optional
       - name: Run frontend coverage
         working-directory: frontend
         run: npm run test:coverage -- --coverageReporters=text-summary --coverageReporters=lcov --coverageReporters=cobertura --coverageReporters=json-summary
