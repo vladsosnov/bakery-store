@@ -1,9 +1,53 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { toast } from 'sonner';
 
+import { ROUTES } from '@src/app/routes';
+import { loginUser } from '@src/services/auth-api';
+import { setAuthSession } from '@src/services/auth-session';
 import { SignInPage } from '../SignInPage';
 
+const mockNavigate = jest.fn();
+
+jest.mock('@src/services/auth-api', () => ({
+  loginUser: jest.fn()
+}));
+
+jest.mock('@src/services/auth-session', () => ({
+  setAuthSession: jest.fn()
+}));
+
+jest.mock('sonner', () => ({
+  toast: {
+    success: jest.fn(),
+    error: jest.fn()
+  }
+}));
+
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
+
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate
+  };
+});
+
+const mockedLoginUser = jest.mocked(loginUser);
+const mockedSetAuthSession = jest.mocked(setAuthSession);
+const mockedToastSuccess = jest.mocked(toast.success);
+const mockedToastError = jest.mocked(toast.error);
+
 describe('SignInPage', () => {
+  afterEach(() => {
+    mockedLoginUser.mockReset();
+    mockedSetAuthSession.mockReset();
+    mockedToastSuccess.mockReset();
+    mockedToastError.mockReset();
+    mockNavigate.mockReset();
+  });
+
   it('renders sign-in form fields and action', () => {
     render(
       <MemoryRouter>
@@ -16,5 +60,71 @@ describe('SignInPage', () => {
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^sign in$/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /forgot password/i })).toBeInTheDocument();
+  });
+
+  it('signs in user and navigates home', async () => {
+    const user = userEvent.setup();
+
+    mockedLoginUser.mockResolvedValue({
+      data: {
+        accessToken: 'token',
+        user: {
+          id: 'u1',
+          firstName: 'Vlad',
+          lastName: 'Sosnov',
+          email: 'vlad@bakery.local',
+          role: 'customer'
+        }
+      }
+    });
+
+    render(
+      <MemoryRouter>
+        <SignInPage />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText(/email/i), 'vlad@bakery.local');
+    await user.type(screen.getByLabelText(/password/i), 'password123');
+    await user.click(screen.getByRole('button', { name: /^sign in$/i }));
+
+    await waitFor(() => {
+      expect(mockedLoginUser).toHaveBeenCalledWith({
+        email: 'vlad@bakery.local',
+        password: 'password123'
+      });
+    });
+    expect(mockedSetAuthSession).toHaveBeenCalledWith({
+      accessToken: 'token',
+      user: {
+        id: 'u1',
+        firstName: 'Vlad',
+        lastName: 'Sosnov',
+        email: 'vlad@bakery.local',
+        role: 'customer'
+      }
+    });
+    expect(mockedToastSuccess).toHaveBeenCalledWith('Welcome back, Vlad!');
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.home);
+  });
+
+  it('shows error toast on failed sign-in', async () => {
+    const user = userEvent.setup();
+    mockedLoginUser.mockRejectedValue(new Error('network'));
+
+    render(
+      <MemoryRouter>
+        <SignInPage />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText(/email/i), 'vlad@bakery.local');
+    await user.type(screen.getByLabelText(/password/i), 'wrong');
+    await user.click(screen.getByRole('button', { name: /^sign in$/i }));
+
+    await waitFor(() => {
+      expect(mockedToastError).toHaveBeenCalledWith('Failed to sign in. Please try again.');
+    });
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });

@@ -7,6 +7,13 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { useESM: true, tsconfig: '<rootDir>/tsconfig.json' }]
   },
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx,js,jsx}',
+    '!src/app/*',
+    '!src/src/*',
+    '!src/styles/*',
+    '!src/types/*',
+  ],
   moduleNameMapper: {
     '^@src/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1'

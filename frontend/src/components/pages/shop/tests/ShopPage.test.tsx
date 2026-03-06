@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { shopRoutes } from '@src/app/routes';
 import { addToCart, fetchCart } from '@src/services/cart-api';
@@ -18,11 +19,18 @@ jest.mock('@src/services/cart-api', () => ({
 jest.mock('@src/services/auth-session', () => ({
   getAuthSession: jest.fn()
 }));
+jest.mock('sonner', () => ({
+  toast: {
+    error: jest.fn(),
+    success: jest.fn()
+  }
+}));
 
 const mockedListProducts = jest.mocked(listProducts);
 const mockedFetchCart = jest.mocked(fetchCart);
 const mockedAddToCart = jest.mocked(addToCart);
 const mockedGetAuthSession = jest.mocked(getAuthSession);
+const mockedToastError = jest.mocked(toast.error);
 
 const PRODUCTS_FIXTURE = [
   {
@@ -119,6 +127,7 @@ describe('ShopPage', () => {
     mockedFetchCart.mockReset();
     mockedAddToCart.mockReset();
     mockedGetAuthSession.mockReset();
+    mockedToastError.mockReset();
   });
 
   it('renders filters, categories, and search', async () => {
@@ -152,6 +161,21 @@ describe('ShopPage', () => {
     expect(screen.queryByText(/butter croissant/i)).not.toBeInTheDocument();
   });
 
+  it('shows empty state when filters produce no results', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    await screen.findByText(/butter croissant/i);
+    await user.type(screen.getByRole('searchbox', { name: /search products/i }), 'no-such-item');
+
+    expect(screen.getByText(/no results\. try changing filters or search query\./i)).toBeInTheDocument();
+  });
+
   it('increments item quantity near add to cart button', async () => {
     const user = userEvent.setup();
     render(
@@ -164,6 +188,74 @@ describe('ShopPage', () => {
     expect(screen.getAllByLabelText(/in cart: 0/i).length).toBeGreaterThan(0);
     await user.click(screen.getAllByRole('button', { name: /add to cart/i })[0]);
     expect(screen.getByLabelText(/in cart: 1/i)).toBeInTheDocument();
+  });
+
+  it('shows loading state before products are resolved', async () => {
+    let resolveProducts: ((value: typeof PRODUCTS_FIXTURE) => void) | undefined;
+    mockedListProducts.mockReturnValue(
+      new Promise((resolve) => {
+        resolveProducts = resolve;
+      })
+    );
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/loading products/i)).toBeInTheDocument();
+
+    resolveProducts?.(PRODUCTS_FIXTURE);
+    expect(await screen.findByText(/butter croissant/i)).toBeInTheDocument();
+  });
+
+  it('shows load error state when products request fails', async () => {
+    mockedListProducts.mockRejectedValue(new Error('network'));
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText(/failed to load products\. please try again\./i)).toBeInTheDocument();
+    expect(mockedToastError).toHaveBeenCalledWith('Failed to load products. Please try again.');
+  });
+
+  it('shows guest toast when trying to add to cart while signed out', async () => {
+    const user = userEvent.setup();
+    mockedGetAuthSession.mockReturnValue(null);
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    await screen.findByText(/butter croissant/i);
+    await user.click(screen.getAllByRole('button', { name: /add to cart/i })[0]);
+
+    expect(mockedAddToCart).not.toHaveBeenCalled();
+    expect(mockedToastError).toHaveBeenCalledWith('Sign in first to add products to your cart.');
+  });
+
+  it('shows toast when add to cart request fails', async () => {
+    const user = userEvent.setup();
+    mockedAddToCart.mockRejectedValue(new Error('network'));
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    await screen.findByText(/butter croissant/i);
+    await user.click(screen.getAllByRole('button', { name: /add to cart/i })[0]);
+
+    await waitFor(() => {
+      expect(mockedToastError).toHaveBeenCalledWith('Failed to add product to cart.');
+    });
   });
 
   it('applies tag filter from url query', async () => {
@@ -192,6 +284,17 @@ describe('ShopPage', () => {
     });
   });
 
+  it('falls back to all filters when url contains unsupported values', async () => {
+    render(
+      <MemoryRouter initialEntries={['/shop?category=Unknown&tag=Unknown']}>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText(/butter croissant/i)).toBeInTheDocument();
+    expect(screen.getByText(/chocolate celebration cake/i)).toBeInTheDocument();
+  });
+
   it('disables add to cart for moderator users', async () => {
     mockedGetAuthSession.mockReturnValue({
       accessToken: 'token',
@@ -214,5 +317,37 @@ describe('ShopPage', () => {
     const button = screen.getAllByRole('button', { name: /unavailable/i })[0];
     expect(button).toBeDisabled();
     expect(mockedAddToCart).not.toHaveBeenCalled();
+  });
+
+  it('resets filters back to defaults', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    await screen.findByText(/butter croissant/i);
+    await user.click(screen.getByRole('button', { name: 'Cakes' }));
+    await user.click(screen.getByRole('button', { name: /#party/i }));
+    await user.click(screen.getByRole('checkbox', { name: /vegan only/i }));
+    await user.click(screen.getByRole('button', { name: /reset filters/i }));
+
+    expect(screen.getByText(/butter croissant/i)).toBeInTheDocument();
+    expect(screen.getByText(/chocolate celebration cake/i)).toBeInTheDocument();
+  });
+
+  it('keeps cart quantities at zero when cart fetch fails', async () => {
+    mockedFetchCart.mockRejectedValue(new Error('network'));
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText(/butter croissant/i)).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/in cart: 0/i).length).toBeGreaterThan(0);
   });
 });
