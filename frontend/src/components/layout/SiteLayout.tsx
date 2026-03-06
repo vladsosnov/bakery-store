@@ -10,7 +10,7 @@ import {
   clearAuthSession,
   getAuthSession
 } from '@src/services/auth-session';
-import * as S from '@src/components/layout/SiteLayout.styles';
+import * as S from '@src/components/layout/styles/SiteLayout.styles';
 
 const navItems = [
   { to: ROUTES.home, label: 'Home', end: true },

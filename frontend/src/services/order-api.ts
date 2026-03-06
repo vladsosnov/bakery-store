@@ -1,23 +1,8 @@
 import { apiAuthClient } from './api-client';
 
 import type { CartResponse } from './cart-api';
-
-type OrderItem = {
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  lineTotal: number;
-};
-
-export type MyOrder = {
-  id: string;
-  status: string;
-  totalItems: number;
-  totalPrice: number;
-  createdAt: string | null;
-  items: OrderItem[];
-};
+import type { MyOrder } from '@src/types/order';
+export type { MyOrder } from '@src/types/order';
 
 type PlaceOrderResponse = {
   data: {

@@ -1,8 +1,9 @@
 import { useEffect, useState, type FC } from 'react';
 import { toast } from 'sonner';
 
-import { type AdminUser, updateAdminModerator } from '@src/services/admin-api';
-import * as S from '@src/components/pages/styles/AdminDashboardPage.styles';
+import { updateAdminModerator } from '@src/services/admin-api';
+import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
+import type { AdminUser } from '@src/types/admin';
 import { toErrorMessage } from '@src/utils/error';
 
 type EditModeratorModalProps = {

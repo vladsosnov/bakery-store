@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { ROUTES } from '@src/app/routes';
 
-import * as S from './CartAuthPanel.styles';
+import * as S from './styles/CartAuthPanel.styles';
 
 type CartAuthPanelProps = {
   onClose: () => void;

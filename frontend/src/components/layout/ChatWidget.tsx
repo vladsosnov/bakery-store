@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent, type FC, type MouseEvent, type SyntheticEvent } from 'react';
 
-import * as S from './ChatWidget.styles';
+import * as S from './styles/ChatWidget.styles';
 
 type Message = {
   id: number;

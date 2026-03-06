@@ -1,5 +1,7 @@
 import type { UserRole } from '@src/types/user-role';
+import type { UserProfile } from '@src/types/user-profile';
 import { apiAuthClient, apiClient } from './api-client';
+export type { UserProfile } from '@src/types/user-profile';
 
 type RegisterRequest = {
   firstName: string;
@@ -71,20 +73,6 @@ export const setOwnPassword = async (payload: SetPasswordRequest) => {
   const response = await apiClient.post<SetPasswordResponse>('/api/auth/set-password', payload);
 
   return response.data;
-};
-
-export type UserProfile = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: UserRole;
-  phoneNumber: string;
-  address: {
-    zip: string;
-    street: string;
-    city: string;
-  };
 };
 
 type UserProfileResponse = {

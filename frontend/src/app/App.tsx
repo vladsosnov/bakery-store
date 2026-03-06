@@ -2,18 +2,18 @@ import type { FC } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
-import { AboutPage } from '../components/pages/AboutPage';
-import { AdminDashboardPage } from '../components/pages/AdminDashboardPage';
-import { CartPage } from '../components/pages/CartPage';
-import { ChangePasswordPage } from '../components/pages/ChangePasswordPage';
-import { HomePage } from '../components/pages/HomePage';
-import { MyOrdersPage } from '../components/pages/MyOrdersPage';
-import { ProfilePage } from '../components/pages/ProfilePage';
-import { SignInPage } from '../components/pages/SignInPage';
-import { SignUpPage } from '../components/pages/SignUpPage';
-import { ShopPage } from '../components/pages/ShopPage';
-import { SiteLayout } from '../components/layout/SiteLayout';
+import { AboutPage } from '@src/components/pages/about/AboutPage';
+import { AdminDashboardPage } from '@src/components/pages/admin-dashboard/AdminDashboardPage';
+import { ChangePasswordPage } from '@src/components/pages/auth/ChangePasswordPage';
+import { ProfilePage } from '@src/components/pages/profile/ProfilePage';
+import { HomePage } from '@src/components/pages/home/HomePage';
+import { MyOrdersPage } from '@src/components/pages/orders/MyOrdersPage';
+import { SignInPage } from '@src/components/pages/auth/SignInPage';
+import { SignUpPage } from '@src/components/pages/auth/SignUpPage';
+import { ShopPage } from '@src/components/pages/shop/ShopPage';
+import { SiteLayout } from '@src/components/layout/SiteLayout';
 import { ROUTES, ROUTE_SEGMENTS } from '@src/app/routes';
+import { CartPage } from '@src/components/pages/cart/CartPage';
 
 export const App: FC = () => {
   return (
