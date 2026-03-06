@@ -14,7 +14,7 @@ export const Panel = styled.article`
   border: 1px solid ${colors.softBorder};
   background: ${colors.white};
   box-shadow: 0 16px 34px rgba(118, 77, 48, 0.11);
-  padding: 28px;
+  padding: 24px;
   max-width: 560px;
 `;
 

@@ -115,4 +115,32 @@ describe('SiteLayout chat', () => {
     expect(screen.getByText(/cart content/i)).toBeInTheDocument();
     expect(screen.queryByText(/authorize first/i)).not.toBeInTheDocument();
   });
+
+  it('shows admin dashboard link for moderator users', () => {
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token',
+        user: {
+          id: 'u2',
+          firstName: 'Marta',
+          lastName: 'Baker',
+          email: 'marta@bakery.local',
+          role: 'moderator'
+        }
+      })
+    );
+
+    render(
+      <MemoryRouter initialEntries={[ROUTES.home]}>
+        <Routes>
+          <Route path={ROUTES.home} element={<SiteLayout />}>
+            <Route index element={<div>Home content</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole('link', { name: /admin dashboard/i })).toBeInTheDocument();
+  });
 });

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 
 import { AuthError } from '../services/auth.service.js';
+import type { UserRole } from '../types/user-role.js';
 import { verifyAccessToken } from '../utils/jwt.js';
 
 const extractBearerToken = (authorizationHeader?: string) => {
@@ -36,4 +37,18 @@ export const requireAuth = (req: Request, _res: Response, next: NextFunction) =>
   } catch {
     throw new AuthError('Unauthorized', 401, 'UNAUTHORIZED');
   }
+};
+
+export const requireRole = (...allowedRoles: UserRole[]) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.auth) {
+      throw new AuthError('Unauthorized', 401, 'UNAUTHORIZED');
+    }
+
+    if (!allowedRoles.includes(req.auth.role)) {
+      throw new AuthError('Forbidden', 403, 'FORBIDDEN');
+    }
+
+    next();
+  };
 };

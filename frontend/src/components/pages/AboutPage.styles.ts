@@ -13,7 +13,7 @@ export const Hero = styled.article`
   background: ${colors.white};
   border: 1px solid ${colors.softBorder};
   border-radius: 20px;
-  padding: 28px;
+  padding: 24px;
   box-shadow: 0 8px 18px rgba(118, 77, 48, 0.08);
 `;
 

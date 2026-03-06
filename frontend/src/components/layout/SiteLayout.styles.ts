@@ -17,7 +17,7 @@ export const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 28px;
+  padding: 16px 24px;
   position: sticky;
   top: 0;
   backdrop-filter: blur(8px);
@@ -141,7 +141,7 @@ export const RouteTransition = styled.div`
 
 export const Footer = styled.footer`
   margin-top: 20px;
-  padding: 24px 28px;
+  padding: 24px 24px;
   border-top: 1px solid ${colors.ivorySatin};
   color: ${colors.warmMuted};
 `;

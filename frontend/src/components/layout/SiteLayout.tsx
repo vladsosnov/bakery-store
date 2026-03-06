@@ -114,6 +114,15 @@ export const SiteLayout: FC = () => {
           <S.Auth>
             {session ? (
               <>
+                {session.user.role === 'admin' || session.user.role === 'moderator' ? (
+                  <S.AuthLink
+                    to={ROUTES.adminDashboard}
+                    $variant="ghost"
+                    className={({ isActive }) => (isActive ? 'active' : undefined)}
+                  >
+                    Admin dashboard
+                  </S.AuthLink>
+                ) : null}
                 <S.AuthLink
                   to={ROUTES.profile}
                   $variant="ghost"

@@ -17,7 +17,8 @@ const openApiDefinition = {
     { name: 'Health', description: 'Service health endpoints' },
     { name: 'Auth', description: 'Authentication endpoints' },
     { name: 'Products', description: 'Product catalog endpoints' },
-    { name: 'Cart', description: 'Cart endpoints' }
+    { name: 'Cart', description: 'Cart endpoints' },
+    { name: 'Admin', description: 'Admin-only endpoints' }
   ],
   components: {
     securitySchemes: {
@@ -762,6 +763,152 @@ const openApiDefinition = {
                   },
                   required: ['data']
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/admin/users': {
+      get: {
+        tags: ['Admin'],
+        summary: 'List all registered users',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'List of users'
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          403: {
+            description: 'Forbidden',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/admin/moderators': {
+      post: {
+        tags: ['Admin'],
+        summary: 'Create moderator account',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          201: {
+            description: 'Moderator created'
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          403: {
+            description: 'Forbidden',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/admin/moderators/{userId}': {
+      patch: {
+        tags: ['Admin'],
+        summary: 'Update moderator account',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'userId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        responses: {
+          200: {
+            description: 'Moderator updated'
+          },
+          403: {
+            description: 'Forbidden',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          404: {
+            description: 'Moderator not found',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      },
+      delete: {
+        tags: ['Admin'],
+        summary: 'Delete moderator account',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'userId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        responses: {
+          204: {
+            description: 'Moderator removed'
+          },
+          403: {
+            description: 'Forbidden',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          404: {
+            description: 'Moderator not found',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/admin/orders': {
+      get: {
+        tags: ['Admin'],
+        summary: 'List all orders',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'List of orders'
+          },
+          403: {
+            description: 'Forbidden',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
               }
             }
           }

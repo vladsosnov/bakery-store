@@ -53,7 +53,14 @@ To create the initial admin automatically on startup, set env vars:
 - `JWT_SECRET`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
-- `ADMIN_FIRST_NAME` (optional, default `Admin`)
-- `ADMIN_LAST_NAME` (optional, default `User`)
+- `ADMIN_FIRST_NAME` (optional, default `admin`)
+- `ADMIN_LAST_NAME` (optional, default `admin`)
 
 Admin is created only if no admin exists yet.
+
+Current defaults (used if env vars are not provided):
+
+- `ADMIN_FIRST_NAME=admin`
+- `ADMIN_LAST_NAME=admin`
+- `ADMIN_EMAIL=admin@admin.com`
+- `ADMIN_PASSWORD=adminadmin`

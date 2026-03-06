@@ -5,6 +5,7 @@ export const ROUTE_SEGMENTS = {
   about: 'about',
   cart: 'cart',
   profile: 'profile',
+  adminDashboard: 'admin',
   signIn: 'sign-in',
   signUp: 'sign-up',
   changePassword: 'change-password'
@@ -18,6 +19,7 @@ export const ROUTES = {
   about: toRoute(ROUTE_SEGMENTS.about),
   cart: toRoute(ROUTE_SEGMENTS.cart),
   profile: toRoute(ROUTE_SEGMENTS.profile),
+  adminDashboard: toRoute(ROUTE_SEGMENTS.adminDashboard),
   signIn: toRoute(ROUTE_SEGMENTS.signIn),
   signUp: toRoute(ROUTE_SEGMENTS.signUp),
   changePassword: toRoute(ROUTE_SEGMENTS.changePassword)
