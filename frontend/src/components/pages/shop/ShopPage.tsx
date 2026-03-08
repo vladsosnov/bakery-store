@@ -143,7 +143,7 @@ export const ShopPage: FC = () => {
       }
     };
 
-    void updateCart();
+    updateCart();
   };
 
   useEffect(() => {
@@ -156,13 +156,13 @@ export const ShopPage: FC = () => {
         setProducts(response.map(mapApiProduct));
       } catch {
         toast.error('Failed to load products. Please try again.');
-        setLoadError('Failed to load products. Please try again.');
+        setLoadError('Unable to load products list right now.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    void loadProducts();
+    loadProducts();
   }, []);
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export const ShopPage: FC = () => {
       }
     };
 
-    void loadCart();
+    loadCart();
   }, [isCustomer, session]);
 
   useEffect(() => {

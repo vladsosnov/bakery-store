@@ -219,7 +219,7 @@ describe('ShopPage', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText(/failed to load products\. please try again\./i)).toBeInTheDocument();
+    expect(await screen.findByText(/unable to load products list right now\./i)).toBeInTheDocument();
     expect(mockedToastError).toHaveBeenCalledWith('Failed to load products. Please try again.');
   });
 

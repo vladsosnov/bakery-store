@@ -47,7 +47,7 @@ export const useCart = () => {
       }
     };
 
-    void loadCart();
+    loadCart();
   }, [isCustomer, session]);
 
   const applyCartResponse = (response: Awaited<ReturnType<typeof fetchCart>>) => {
@@ -94,7 +94,7 @@ export const useCart = () => {
       }
     };
 
-    void updateQuantity();
+    updateQuantity();
   };
 
   const handleDecreaseClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -129,7 +129,7 @@ export const useCart = () => {
       }
     };
 
-    void updateQuantity();
+    updateQuantity();
   };
 
   const handleRemoveClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -155,7 +155,7 @@ export const useCart = () => {
       }
     };
 
-    void removeItem();
+    removeItem();
   };
 
   const handlePlaceOrderClick = () => {
@@ -178,7 +178,7 @@ export const useCart = () => {
       }
     };
 
-    void placeOrderRequest();
+    placeOrderRequest();
   };
 
   return {
