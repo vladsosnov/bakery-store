@@ -25,6 +25,12 @@ export const Header = styled.header`
   background-color: ${colors.overlayWarmHeader};
   border-bottom: 1px solid ${colors.border};
   z-index: 20;
+
+  @media (max-width: 960px) {
+    flex-wrap: wrap;
+    row-gap: 10px;
+    padding: 12px 14px;
+  }
 `;
 
 export const Brand = styled.strong`
@@ -35,6 +41,15 @@ export const Nav = styled.nav`
   display: flex;
   gap: 20px;
   font-weight: 600;
+
+  @media (max-width: 960px) {
+    order: 3;
+    width: 100%;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
 `;
 
 export const NavItem = styled(NavLink)`
@@ -49,12 +64,23 @@ export const Auth = styled.div`
   display: flex;
   gap: 10px;
   align-items: center;
+
+  @media (max-width: 960px) {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
 `;
 
 export const HeaderActions = styled.div`
   display: flex;
   gap: 10px;
   align-items: center;
+
+  @media (max-width: 960px) {
+    margin-left: auto;
+    gap: 8px;
+  }
 `;
 
 export const CartButton = styled.button<{ $open: boolean }>`
@@ -73,6 +99,11 @@ export const CartButton = styled.button<{ $open: boolean }>`
   &:hover {
     transform: translateY(-1px);
     box-shadow: ${shadows.surfaceRaised};
+  }
+
+  @media (max-width: 960px) {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 `;
 
@@ -107,6 +138,12 @@ export const AuthLink = styled(NavLink)<{ $variant: AuthVariant }>`
   line-height: 15px;
   text-decoration: none;
   ${(props) => authLinkVariants[props.$variant]}
+
+  @media (max-width: 960px) {
+    padding: 8px 12px;
+    font-size: 13px;
+    line-height: 14px;
+  }
 `;
 
 export const LogoutButton = styled.button`
@@ -117,6 +154,11 @@ export const LogoutButton = styled.button`
   border: 1px solid ${colors.border};
   background: ${colors.surface};
   color: ${colors.brown};
+
+  @media (max-width: 960px) {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 `;
 
 export const Content = styled.div`
