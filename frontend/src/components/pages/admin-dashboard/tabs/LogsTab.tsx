@@ -2,52 +2,15 @@ import { useMemo, type FC } from 'react';
 import Highcharts, { type Options } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
-import type { AdminOrder, AdminOrderStatus, AdminUser } from '@src/types/admin';
+import { ORDER_STATUS_OPTIONS, type AdminOrder, type AdminOrderStatus, type AdminUser } from '@src/types/admin';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
 import * as L from '@src/components/pages/admin-dashboard/tabs/LogsTab.styles';
 import { colors } from '@src/styles/colors';
+import { toDailySeries, getDayKey } from './Tabs.utils';
 
 type LogsTabProps = {
   orders: AdminOrder[];
   users: AdminUser[];
-};
-
-const DAY_RANGE = 7;
-const ORDER_STATUSES: readonly AdminOrderStatus[] = ['placed', 'in progress', 'in delivery'];
-
-const getDayKey = (dateValue: string) => {
-  return new Date(dateValue).toISOString().slice(0, 10);
-};
-
-const getLastDays = (days: number) => {
-  const result: { key: string; label: string }[] = [];
-  const today = new Date();
-
-  for (let offset = days - 1; offset >= 0; offset -= 1) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - offset);
-    const key = date.toISOString().slice(0, 10);
-    const label = date.toLocaleDateString(undefined, { weekday: 'short' });
-
-    result.push({ key, label });
-  }
-
-  return result;
-};
-
-const toDailySeries = (items: string[]) => {
-  const days = getLastDays(DAY_RANGE);
-  const counts = items.reduce<Record<string, number>>((acc, createdAt) => {
-    const dayKey = getDayKey(createdAt);
-    acc[dayKey] = (acc[dayKey] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  return days.map((day) => ({
-    key: day.key,
-    label: day.label,
-    value: counts[day.key] ?? 0
-  }));
 };
 
 export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
@@ -60,10 +23,11 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
   const totalRevenue = orders.reduce((acc, order) => acc + order.totalPrice, 0);
   const todayOrders = orders.filter((order) => getDayKey(order.createdAt) === todayKey).length;
   const todayUsers = users.filter((user) => user.createdAt && getDayKey(user.createdAt) === todayKey).length;
-  const statusCounts = ORDER_STATUSES.reduce<Record<AdminOrderStatus, number>>((acc, status) => {
+  const statusCounts = ORDER_STATUS_OPTIONS.reduce<Record<AdminOrderStatus, number>>((acc, status) => {
     acc[status] = orders.filter((order) => order.status === status).length;
     return acc;
   }, { placed: 0, 'in progress': 0, 'in delivery': 0 });
+  
   const commonChartOptions: Options = {
     chart: {
       backgroundColor: 'transparent',
@@ -78,6 +42,7 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
     legend: { enabled: false },
     title: { text: undefined }
   };
+
   const ordersChartOptions: Options = {
     ...commonChartOptions,
     xAxis: {
@@ -101,6 +66,7 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
       pointFormat: '<b>{point.y}</b> orders'
     }
   };
+
   const usersChartOptions: Options = {
     ...commonChartOptions,
     xAxis: {
@@ -124,6 +90,7 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
       pointFormat: '<b>{point.y}</b> registrations'
     }
   };
+  
   const statusChartOptions: Options = {
     ...commonChartOptions,
     chart: {
@@ -144,7 +111,7 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
     series: [
       {
         type: 'pie',
-        data: ORDER_STATUSES.map((status) => ({
+        data: ORDER_STATUS_OPTIONS.map((status) => ({
           name: status,
           y: statusCounts[status]
         }))
