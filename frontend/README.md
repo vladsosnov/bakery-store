@@ -21,8 +21,8 @@ For local development, Vite proxy routes `/api/*` to `http://localhost:4000`.
 ## Tests and Lint
 
 ```bash
-npm run test
-npm run test:coverage
-npm run lint
-npm run typecheck
+yarn test
+yarn test:coverage
+yarn lint
+yarn typecheck
 ```

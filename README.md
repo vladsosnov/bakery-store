@@ -13,6 +13,7 @@ Bakery Store is a full-stack e-commerce project built to demonstrate production-
 - Cart and order workflows
 - Profile management
 - Admin dashboard for users/moderators/orders
+- Admin analytics charts (orders activity, registrations, status pipeline) with Highcharts
 - WebSocket integration (Socket.IO) for real-time chat
 - API documentation (Swagger/OpenAPI)
 - Unit tests for frontend and backend
@@ -20,7 +21,7 @@ Bakery Store is a full-stack e-commerce project built to demonstrate production-
 
 ## Stack
 
-- Frontend: React, TypeScript, Vite, styled-components, Jest, Testing Library
+- Frontend: React, TypeScript, Vite, styled-components, Highcharts, Jest, Testing Library
 - Backend: Node.js, Express, TypeScript, MongoDB (Mongoose), JWT, Swagger, Socket.IO, Jest
 - DevOps: GitHub Actions, Codecov, GitHub Pages (frontend), Render (backend)
 
