@@ -308,7 +308,12 @@ export const AdminDashboardPage: FC = () => {
         />
       ) : null}
 
-      {isAdmin && activeTab === 'logs' ? <LogsTab /> : null}
+      {isAdmin && activeTab === 'logs' ? (
+        <LogsTab
+          orders={orders}
+          users={users}
+        />
+      ) : null}
 
       <CreateModeratorModal
         isOpen={isAdmin && isCreateModalOpen}

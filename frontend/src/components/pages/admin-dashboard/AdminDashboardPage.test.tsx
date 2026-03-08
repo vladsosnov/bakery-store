@@ -170,7 +170,7 @@ describe('AdminDashboardPage', () => {
     );
 
     await user.click(await screen.findByRole('button', { name: /log usage/i }));
-    expect(await screen.findByText(/usage logs module will be implemented later\./i)).toBeInTheDocument();
+    expect(await screen.findByText(/orders activity \(last 7 days\)/i)).toBeInTheDocument();
   });
 
   it('updates order status from orders tab', async () => {
