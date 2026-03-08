@@ -4,9 +4,65 @@
 [![Frontend Coverage](https://codecov.io/gh/vladsosnov/bakery-store/graph/badge.svg?flag=frontend&branch=main)](https://codecov.io/gh/vladsosnov/bakery-store)
 [![Backend Coverage](https://codecov.io/gh/vladsosnov/bakery-store/graph/badge.svg?flag=backend&branch=main)](https://codecov.io/gh/vladsosnov/bakery-store)
 
-Bakery Store is a full-stack e-commerce app for a bakery, built with React + TypeScript on the frontend and Node.js + Express + MongoDB on the backend. It includes authentication, role-based access (customer/moderator/admin), product catalog and filtering, cart and ordering flows, profile management, admin dashboard tools, and comprehensive unit test coverage with CI and Codecov reporting.
+Bakery Store is a full-stack e-commerce project built to demonstrate production-style frontend and backend development with testing, CI, API docs, and deployment.
 
-## Apps
+## What Is Implemented
 
-- `frontend/` - React + TypeScript + styled components
-- `backend/` - Node.js + Express + TypeScript + MongoDB
+- Authentication and authorization (customer, moderator, admin)
+- Product catalog with filtering/search/tags
+- Cart and order workflows
+- Profile management
+- Admin dashboard for users/moderators/orders
+- WebSocket integration (Socket.IO) for real-time chat
+- API documentation (Swagger/OpenAPI)
+- Unit tests for frontend and backend
+- GitHub Actions CI + Codecov coverage reporting
+
+## Stack
+
+- Frontend: React, TypeScript, Vite, styled-components, Jest, Testing Library
+- Backend: Node.js, Express, TypeScript, MongoDB (Mongoose), JWT, Swagger, Socket.IO, Jest
+- DevOps: GitHub Actions, Codecov, GitHub Pages (frontend), Render (backend)
+
+## Repository Structure
+
+- `frontend/` client application
+- `backend/` API server
+- `.github/workflows/` CI and deploy pipelines
+
+## Local Setup
+
+Prerequisites:
+
+- Node v20
+- MongoDB Atlas URI (or local MongoDB)
+
+Install dependencies:
+
+```bash
+cd frontend && yarn
+cd ../backend && yarn
+```
+
+Run locally (in separate terminals):
+
+```bash
+cd backend && yarn dev
+```
+
+```bash
+cd frontend && yarn dev
+```
+
+Local URLs:
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:4000`
+- API docs: `http://localhost:4000/api/docs`
+
+## Deployment
+
+- Frontend is deployed to GitHub Pages.
+- Backend is configured for Render Web Service deployment.
+- Note: on Render free tier, the backend sleeps after inactivity and may need a cold start.
+- Frontend build uses `VITE_API_URL` to call the backend API.

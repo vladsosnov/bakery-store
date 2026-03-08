@@ -1,66 +1,35 @@
-# backend
+# Backend
 
-Node.js + Express + TypeScript backend for Bakery Store.
-
-## Structure
-
-- `src/config/` environment and app config
-- `src/controllers/` request handlers
-- `src/db/` MongoDB connection and DB helpers
-- `src/middleware/` express middleware
-- `src/models/` Mongoose models
-- `src/routes/` route modules
-- `src/services/` business logic
-- `src/sockets/` WebSocket setup and events
-- `src/types/` backend TypeScript types
-- `src/utils/` utility helpers
-- `tests/` backend tests
-- `docs/` API documentation (OpenAPI/Swagger)
+Backend application for Bakery Store.
 
 ## Run
 
-1. `npm install`
-2. `npm run dev`
+```bash
+yarn
+yarn dev
+```
 
 Backend starts on `http://localhost:4000` by default.
 
-## Endpoints
+## API Docs
 
-- `GET /api/healthcheck`
-- `GET /api/openapi.json`
-- `GET /api/docs`
-- `POST /api/auth/register`
-  - body:
-    - `firstName: string`
-    - `lastName: string`
-    - `email: string`
-    - `password: string` (min 8 chars)
-  - response:
-    - `data.user`
-    - `data.accessToken` (JWT)
-- `POST /api/auth/login`
-  - body:
-    - `email: string`
-    - `password: string`
-  - response:
-    - `data.user`
-    - `data.accessToken` (JWT)
+- Swagger UI: `GET /api/docs`
+- OpenAPI JSON: `GET /api/openapi.json`
+- Healthcheck: `GET /api/healthcheck`
 
-## Admin Seeding (Code-only)
+## Env
 
-To create the initial admin automatically on startup, set env vars:
+Required:
 
-- `JWT_SECRET`
+- `MONGODB_URI`
+- `JWT_SECRET` (min 16 chars)
+
+Common:
+
+- `NODE_ENV` (`development` | `test` | `production`)
+- `PORT` (default `4000`)
+- `CORS_ORIGINS` (comma-separated; default `http://localhost:5173,https://vladsosnov.github.io`)
 - `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-- `ADMIN_FIRST_NAME` (optional, default `admin`)
-- `ADMIN_LAST_NAME` (optional, default `admin`)
-
-Admin is created only if no admin exists yet.
-
-Current defaults (used if env vars are not provided):
-
-- `ADMIN_FIRST_NAME=admin`
-- `ADMIN_LAST_NAME=admin`
-- `ADMIN_EMAIL=admin@admin.com`
-- `ADMIN_PASSWORD=adminadmin`
+- `ADMIN_PASSWORD` (min 8 chars)
+- `ADMIN_FIRST_NAME` (default `admin`)
+- `ADMIN_LAST_NAME` (default `admin`)
