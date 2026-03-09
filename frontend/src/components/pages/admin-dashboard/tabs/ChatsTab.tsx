@@ -63,9 +63,9 @@ export const ChatsTab: FC = () => {
       const nextThread =
         thread.id === selectedThreadId
           ? {
-              ...thread,
-              unreadForSupport: false
-            }
+            ...thread,
+            unreadForSupport: false
+          }
           : thread;
 
       setThreads((prev) => {

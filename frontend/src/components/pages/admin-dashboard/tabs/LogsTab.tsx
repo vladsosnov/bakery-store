@@ -1,12 +1,19 @@
-import { useMemo, type FC } from 'react';
-import Highcharts, { type Options } from 'highcharts';
+import { useEffect, useMemo, useState, type FC } from 'react';
+import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 import { ORDER_STATUS_OPTIONS, type AdminOrder, type AdminOrderStatus, type AdminUser } from '@src/types/admin';
+import { getModeratorChatThreads } from '@src/services/chat-api';
+import type { ChatThread } from '@src/types/chat';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
 import * as L from '@src/components/pages/admin-dashboard/tabs/LogsTab.styles';
-import { colors } from '@src/styles/colors';
 import { toDailySeries, getDayKey } from './Tabs.utils';
+import {
+  getChatMessagesChartOptions,
+  getOrdersChartOptions,
+  getStatusChartOptions,
+  getUsersChartOptions
+} from './LogsTab.chart-options';
 
 type LogsTabProps = {
   orders: AdminOrder[];
@@ -14,12 +21,47 @@ type LogsTabProps = {
 };
 
 export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
+  const [chatThreads, setChatThreads] = useState<ChatThread[]>([]);
+  const [isChatLoading, setIsChatLoading] = useState(true);
+  const [chatLoadError, setChatLoadError] = useState<string | null>(null);
   const todayKey = new Date().toISOString().slice(0, 10);
   const ordersDaily = useMemo(() => toDailySeries(orders.map((order) => order.createdAt)), [orders]);
   const usersDaily = useMemo(
     () => toDailySeries(users.map((user) => user.createdAt).filter((createdAt): createdAt is string => Boolean(createdAt))),
     [users]
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadChatMetrics = async () => {
+      setIsChatLoading(true);
+      setChatLoadError(null);
+
+      try {
+        const response = await getModeratorChatThreads();
+        if (isMounted) {
+          setChatThreads(response.data);
+        }
+      } catch {
+        if (isMounted) {
+          setChatThreads([]);
+          setChatLoadError('Failed to load chat metrics.');
+        }
+      } finally {
+        if (isMounted) {
+          setIsChatLoading(false);
+        }
+      }
+    };
+
+    loadChatMetrics();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const totalRevenue = orders.reduce((acc, order) => acc + order.totalPrice, 0);
   const todayOrders = orders.filter((order) => getDayKey(order.createdAt) === todayKey).length;
   const todayUsers = users.filter((user) => user.createdAt && getDayKey(user.createdAt) === todayKey).length;
@@ -27,97 +69,51 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
     acc[status] = orders.filter((order) => order.status === status).length;
     return acc;
   }, { placed: 0, 'in progress': 0, 'in delivery': 0 });
-  
-  const commonChartOptions: Options = {
-    chart: {
-      backgroundColor: 'transparent',
-      style: {
-        fontFamily: 'inherit'
-      }
-    },
-    accessibility: {
-      enabled: false
-    },
-    credits: { enabled: false },
-    legend: { enabled: false },
-    title: { text: undefined }
-  };
 
-  const ordersChartOptions: Options = {
-    ...commonChartOptions,
-    xAxis: {
-      categories: ordersDaily.map((item) => item.label),
-      lineColor: colors.border,
-      tickColor: colors.border
-    },
-    yAxis: {
-      title: { text: undefined },
-      allowDecimals: false,
-      gridLineColor: colors.border
-    },
-    series: [
-      {
-        type: 'column',
-        data: ordersDaily.map((item) => item.value),
-        color: colors.brown
-      }
-    ],
-    tooltip: {
-      pointFormat: '<b>{point.y}</b> orders'
-    }
-  };
+  const totalChatMessages = chatThreads.reduce((acc, thread) => acc + thread.messages.length, 0);
+  const activeConversations = chatThreads.filter((thread) => thread.unreadForSupport).length;
+  const conversationsToday = chatThreads.filter((thread) => getDayKey(thread.lastMessageAt) === todayKey).length;
+  const medianResponseTimeMinutes = useMemo(() => {
+    const responseDurationsMs: number[] = [];
 
-  const usersChartOptions: Options = {
-    ...commonChartOptions,
-    xAxis: {
-      categories: usersDaily.map((item) => item.label),
-      lineColor: colors.border,
-      tickColor: colors.border
-    },
-    yAxis: {
-      title: { text: undefined },
-      allowDecimals: false,
-      gridLineColor: colors.border
-    },
-    series: [
-      {
-        type: 'line',
-        data: usersDaily.map((item) => item.value),
-        color: colors.accentGreen
-      }
-    ],
-    tooltip: {
-      pointFormat: '<b>{point.y}</b> registrations'
-    }
-  };
-  
-  const statusChartOptions: Options = {
-    ...commonChartOptions,
-    chart: {
-      ...(commonChartOptions.chart ?? {}),
-      type: 'pie'
-    },
-    tooltip: {
-      pointFormat: '<b>{point.y}</b> ({point.percentage:.1f}%)'
-    },
-    plotOptions: {
-      pie: {
-        dataLabels: {
-          enabled: true,
-          format: '{point.name}: {point.y}'
+    chatThreads.forEach((thread) => {
+      let pendingCustomerMessageAt: number | null = null;
+      thread.messages.forEach((message) => {
+        const currentMessageTime = new Date(message.createdAt).getTime();
+
+        if (message.senderRole === 'customer') {
+          pendingCustomerMessageAt = currentMessageTime;
+          return;
         }
-      }
-    },
-    series: [
-      {
-        type: 'pie',
-        data: ORDER_STATUS_OPTIONS.map((status) => ({
-          name: status,
-          y: statusCounts[status]
-        }))
-      }
-    ]
-  };
+        if (message.senderRole === 'moderator' && pendingCustomerMessageAt) {
+          responseDurationsMs.push(currentMessageTime - pendingCustomerMessageAt);
+          pendingCustomerMessageAt = null;
+        }
+      });
+    });
+
+    if (responseDurationsMs.length === 0) {
+      return null;
+    }
+
+    const sorted = responseDurationsMs.sort((left, right) => left - right);
+    const middleIndex = Math.floor(sorted.length / 2);
+    const medianMs =
+      sorted.length % 2 === 0 ? (sorted[middleIndex - 1] + sorted[middleIndex]) / 2 : sorted[middleIndex];
+
+    return Math.max(1, Math.round(medianMs / (60 * 1000)));
+  }, [chatThreads]);
+  const chatMessagesDaily = useMemo(
+    () => toDailySeries(chatThreads.flatMap((thread) => thread.messages.map((message) => message.createdAt))),
+    [chatThreads]
+  );
+  const ordersChartOptions = useMemo(() => getOrdersChartOptions(ordersDaily), [ordersDaily]);
+  const usersChartOptions = useMemo(() => getUsersChartOptions(usersDaily), [usersDaily]);
+  const statusChartOptions = useMemo(() => getStatusChartOptions(statusCounts), [statusCounts]);
+  const chatMessagesChartOptions = useMemo(
+    () => getChatMessagesChartOptions(chatMessagesDaily),
+    [chatMessagesDaily]
+  );
 
   return (
     <S.Panel>
@@ -165,10 +161,39 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
 
       <L.Section>
         <L.SectionTitle>Chat activity</L.SectionTitle>
-        <L.PlaceholderText>
-          Real-time chat metrics are planned next. This block will show message volume, active conversations,
-          and median response time.
-        </L.PlaceholderText>
+        {isChatLoading ? <L.PlaceholderText>Loading chat metrics...</L.PlaceholderText> : null}
+        {chatLoadError ? <L.ErrorText>{chatLoadError}</L.ErrorText> : null}
+        {!isChatLoading && !chatLoadError ? (
+          <>
+            <L.MetricsGrid>
+              <L.MetricCard>
+                <L.MetricLabel>Total chat messages</L.MetricLabel>
+                <L.MetricValue>{totalChatMessages}</L.MetricValue>
+              </L.MetricCard>
+              <L.MetricCard>
+                <L.MetricLabel>Active conversations</L.MetricLabel>
+                <L.MetricValue>{activeConversations}</L.MetricValue>
+              </L.MetricCard>
+              <L.MetricCard>
+                <L.MetricLabel>Conversations today</L.MetricLabel>
+                <L.MetricValue>{conversationsToday}</L.MetricValue>
+              </L.MetricCard>
+              <L.MetricCard>
+                <L.MetricLabel>Median response time</L.MetricLabel>
+                <L.MetricValue>
+                  {medianResponseTimeMinutes !== null ? `${medianResponseTimeMinutes} min` : 'No replies yet'}
+                </L.MetricValue>
+              </L.MetricCard>
+            </L.MetricsGrid>
+
+            <L.NestedSection>
+              <L.SectionTitle>Messages activity (last 7 days)</L.SectionTitle>
+              <L.ChartBox>
+                <HighchartsReact highcharts={Highcharts} options={chatMessagesChartOptions} />
+              </L.ChartBox>
+            </L.NestedSection>
+          </>
+        ) : null}
       </L.Section>
     </S.Panel>
   );

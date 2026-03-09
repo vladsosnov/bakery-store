@@ -6,6 +6,19 @@
 
 Bakery Store is a full-stack e-commerce project built to demonstrate production-style frontend and backend development with testing, CI, API docs, and deployment.
 
+## Project Demo
+
+Live links:
+
+- Frontend (GitHub Pages): `https://vladsosnov.github.io/bakery-store/`
+- Backend API (Render): `https://bakery-store-7z31.onrender.com`
+- Swagger docs: `https://bakery-store-7z31.onrender.com/api/docs`
+
+- - - - - - - - - - - - - - - - -
+
+- Admin dashboard (MP4): [docs/demo/admin-dashboard.mp4](docs/demo/admin-dashboard.mp4)
+- Moderator chat flow (MP4): [docs/demo/chat.mp4](docs/demo/chat.mp4)
+
 ## What Is Implemented
 
 - Authentication and authorization (customer, moderator, admin)
@@ -65,5 +78,5 @@ Local URLs:
 
 - Frontend is deployed to GitHub Pages.
 - Backend is configured for Render Web Service deployment.
-- Note: on Render free tier, the backend sleeps after inactivity and may need a cold start.
+- Note: on Render free tier, the backend sleeps after inactivity and cold start can take up to ~3 minutes before the first API response.
 - Frontend build uses `VITE_API_URL` to call the backend API.

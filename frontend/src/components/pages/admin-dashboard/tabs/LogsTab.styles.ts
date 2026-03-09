@@ -38,6 +38,13 @@ export const Section = styled.section`
   padding: 12px;
 `;
 
+export const NestedSection = styled.section`
+  margin-top: 12px;
+  border: 1px solid ${colors.border};
+  border-radius: 12px;
+  padding: 12px;
+`;
+
 export const ChartBox = styled.div`
   min-height: 230px;
 `;
@@ -67,5 +74,10 @@ export const StatusCount = styled.strong`
 
 export const PlaceholderText = styled.p`
   color: ${colors.brownLight};
+  margin: 0;
+`;
+
+export const ErrorText = styled.p`
+  color: ${colors.errorRed};
   margin: 0;
 `;
