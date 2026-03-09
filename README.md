@@ -10,9 +10,9 @@ Bakery Store is a full-stack e-commerce project built to demonstrate production-
 
 Live links:
 
-- Frontend (GitHub Pages): `https://vladsosnov.github.io/bakery-store/`
-- Backend API (Render): `https://bakery-store-7z31.onrender.com`
-- Swagger docs: `https://bakery-store-7z31.onrender.com/api/docs`
+- Frontend (GitHub Pages): [https://vladsosnov.github.io/bakery-store/](https://vladsosnov.github.io/bakery-store/)
+- Backend API (Render): [https://bakery-store-7z31.onrender.com](https://bakery-store-7z31.onrender.com)
+- Swagger docs: [https://bakery-store-7z31.onrender.com/api/docs](https://bakery-store-7z31.onrender.com/api/docs)
 
 - - - - - - - - - - - - - - - - -
 

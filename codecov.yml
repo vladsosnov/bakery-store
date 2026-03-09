@@ -1,0 +1,26 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+      frontend:
+        flags:
+          - frontend
+        target: auto
+      backend:
+        flags:
+          - backend
+        target: auto
+
+flags:
+  frontend:
+    paths:
+      - frontend/
+    carryforward: true
+  backend:
+    paths:
+      - backend/
+    carryforward: true
