@@ -10,13 +10,21 @@ type PlaceOrderResponse = {
     cart: CartResponse['data'];
   };
 };
+type PlaceOrderRequest = {
+  useProfileAddress: boolean;
+  deliveryAddress?: {
+    zip: string;
+    street: string;
+    city: string;
+  };
+};
 
 type MyOrdersResponse = {
   data: MyOrder[];
 };
 
-export const placeOrder = async () => {
-  const response = await apiAuthClient.post<PlaceOrderResponse>('/api/orders');
+export const placeOrder = async (payload: PlaceOrderRequest = { useProfileAddress: true }) => {
+  const response = await apiAuthClient.post<PlaceOrderResponse>('/api/orders', payload);
   return response.data;
 };
 

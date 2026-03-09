@@ -22,6 +22,18 @@ export class OrderError extends Error {
 const updateOrderStatusSchema = z.object({
   status: z.enum(ORDER_STATUS_VALUES as [OrderStatus, ...OrderStatus[]])
 });
+const orderDeliveryAddressSchema = z.object({
+  zip: z.string().trim().min(1),
+  street: z.string().trim().min(1),
+  city: z.string().trim().min(1)
+});
+const placeOrderSchema = z.object({
+  useProfileAddress: z.boolean().default(true),
+  deliveryAddress: orderDeliveryAddressSchema.optional()
+});
+const isAddressIncomplete = (address: { zip: string; street: string; city: string }) => {
+  return address.zip.trim() === '' || address.street.trim() === '' || address.city.trim() === '';
+};
 
 const ORDER_STATUS_INDEX: Record<OrderStatus, number> = {
   [ORDER_STATUSES.placed]: 0,
@@ -43,6 +55,11 @@ const buildOrderView = (order: {
     quantity: number;
     lineTotal: number;
   }>;
+  deliveryAddress?: {
+    zip: string;
+    street: string;
+    city: string;
+  };
 }) => ({
   id: order.id ?? String(order._id),
   status: order.status,
@@ -55,13 +72,74 @@ const buildOrderView = (order: {
     price: item.price,
     quantity: item.quantity,
     lineTotal: item.lineTotal
-  }))
+  })),
+  deliveryAddress: {
+    zip: order.deliveryAddress?.zip ?? '',
+    street: order.deliveryAddress?.street ?? '',
+    city: order.deliveryAddress?.city ?? ''
+  }
 });
 
-export const placeOrderFromCart = async (userId: string) => {
+export const placeOrderFromCart = async (userId: string, payload: unknown = { useProfileAddress: true }) => {
+  let data: {
+    useProfileAddress: boolean;
+    deliveryAddress?: {
+      zip: string;
+      street: string;
+      city: string;
+    };
+  };
+
+  try {
+    data = placeOrderSchema.parse(payload);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new OrderError(error.issues[0]?.message ?? 'Invalid request body', 400, 'VALIDATION_ERROR');
+    }
+
+    throw error;
+  }
+
   const cart = await CartModel.findOne({ userId });
   if (!cart || cart.items.length === 0) {
     throw new OrderError('Cart is empty', 400, 'EMPTY_CART');
+  }
+
+  let deliveryAddress = {
+    zip: '',
+    street: '',
+    city: ''
+  };
+
+  if (data.useProfileAddress) {
+    const user = await UserModel.findById(userId).lean();
+    if (!user) {
+      throw new OrderError('User not found', 404, 'USER_NOT_FOUND');
+    }
+
+    deliveryAddress = {
+      zip: user.address?.zip ?? '',
+      street: user.address?.street ?? '',
+      city: user.address?.city ?? ''
+    };
+
+    if (isAddressIncomplete(deliveryAddress)) {
+      throw new OrderError(
+        'Address is not set in your profile. Add it in Profile page.',
+        400,
+        'PROFILE_ADDRESS_REQUIRED'
+      );
+    }
+  } else {
+    if (!data.deliveryAddress) {
+      throw new OrderError('Delivery address is required', 400, 'VALIDATION_ERROR');
+    }
+
+    deliveryAddress = {
+      zip: data.deliveryAddress.zip.trim(),
+      street: data.deliveryAddress.street.trim(),
+      city: data.deliveryAddress.city.trim()
+    };
   }
 
   const productIds = cart.items.map((item) => item.productId);
@@ -110,7 +188,8 @@ export const placeOrderFromCart = async (userId: string) => {
     status: ORDER_STATUSES.placed,
     items: orderItems,
     totalItems,
-    totalPrice
+    totalPrice,
+    deliveryAddress
   });
 
   cart.items.splice(0, cart.items.length);
@@ -158,7 +237,7 @@ export const listAllOrdersForDashboard = async () => {
       ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || 'Unknown customer'
       : 'Unknown customer';
     const customerPhone = isUserPopulated ? user.phoneNumber ?? '' : '';
-    const address = isUserPopulated ? user.address : undefined;
+    const address = order.deliveryAddress ?? (isUserPopulated ? user.address : undefined);
 
     return {
       id: String(order._id),

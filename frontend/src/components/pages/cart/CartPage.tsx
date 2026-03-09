@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { ChangeEvent, FC } from 'react';
 
 import { useCart } from '@src/components/pages/cart/useCart';
 import * as S from '@src/components/pages/cart/CartPage.styles';
@@ -13,6 +13,10 @@ export const CartPage: FC = () => {
     pendingByProduct,
     isOrdering,
     isAnyItemPending,
+    useProfileAddress,
+    deliveryAddress,
+    handleUseProfileAddressChange,
+    handleDeliveryAddressChange,
     handleIncreaseClick,
     handleDecreaseClick,
     handleRemoveClick,
@@ -123,6 +127,53 @@ export const CartPage: FC = () => {
               ))}
             </S.ItemList>
             <S.Total>Total: ${totalPrice.toFixed(2)}</S.Total>
+            <S.DeliveryCard>
+              <S.DeliveryTitle>Delivery address</S.DeliveryTitle>
+              <S.CheckboxLabel>
+                <input
+                  type="checkbox"
+                  checked={useProfileAddress}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    handleUseProfileAddressChange(event.target.checked)
+                  }
+                />
+                Use address from profile
+              </S.CheckboxLabel>
+              {useProfileAddress ? (
+                <S.Subtitle>
+                  {deliveryAddress.street || deliveryAddress.city || deliveryAddress.zip
+                    ? `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.zip}`
+                    : 'Address is not set in your profile. Add it in Profile page.'}
+                </S.Subtitle>
+              ) : (
+                <S.AddressGrid>
+                  <S.AddressInput
+                    value={deliveryAddress.zip}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      handleDeliveryAddressChange('zip', event.target.value)
+                    }
+                    placeholder="ZIP"
+                    aria-label="Delivery ZIP"
+                  />
+                  <S.AddressInput
+                    value={deliveryAddress.city}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      handleDeliveryAddressChange('city', event.target.value)
+                    }
+                    placeholder="City"
+                    aria-label="Delivery city"
+                  />
+                  <S.AddressInput
+                    value={deliveryAddress.street}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      handleDeliveryAddressChange('street', event.target.value)
+                    }
+                    placeholder="Street address"
+                    aria-label="Delivery street"
+                  />
+                </S.AddressGrid>
+              )}
+            </S.DeliveryCard>
             <S.CheckoutBar>
               <S.CheckoutButton
                 type="button"

@@ -4,12 +4,16 @@ import type { MouseEvent } from 'react';
 
 import { useCart } from '@src/components/pages/cart/useCart';
 import { getAuthSession } from '@src/services/auth-session';
+import { getMyProfile } from '@src/services/auth-api';
 import { fetchCart, removeCartItem, updateCartItemQuantity } from '@src/services/cart-api';
 import { placeOrder } from '@src/services/order-api';
 import type { CartResponse } from '@src/services/cart-api';
 
 jest.mock('@src/services/auth-session', () => ({
   getAuthSession: jest.fn()
+}));
+jest.mock('@src/services/auth-api', () => ({
+  getMyProfile: jest.fn()
 }));
 
 jest.mock('@src/services/cart-api', () => ({
@@ -30,6 +34,7 @@ jest.mock('sonner', () => ({
 }));
 
 const mockedGetAuthSession = jest.mocked(getAuthSession);
+const mockedGetMyProfile = jest.mocked(getMyProfile);
 const mockedFetchCart = jest.mocked(fetchCart);
 const mockedUpdateCartItemQuantity = jest.mocked(updateCartItemQuantity);
 const mockedRemoveCartItem = jest.mocked(removeCartItem);
@@ -76,16 +81,33 @@ const cartWithOneItem: CartResponse = {
     totalPrice: 16
   }
 };
+const profileFixture = {
+  data: {
+    id: 'u1',
+    firstName: 'Vlad',
+    lastName: 'Sosnov',
+    email: 'vlad@bakery.local',
+    role: 'customer' as const,
+    phoneNumber: '+123',
+    address: {
+      zip: '10001',
+      street: 'Main st 1',
+      city: 'New York'
+    }
+  }
+};
 
 describe('useCart', () => {
   afterEach(() => {
     mockedGetAuthSession.mockReset();
+    mockedGetMyProfile.mockReset();
     mockedFetchCart.mockReset();
     mockedUpdateCartItemQuantity.mockReset();
     mockedRemoveCartItem.mockReset();
     mockedPlaceOrder.mockReset();
     mockedToastError.mockReset();
     mockedToastSuccess.mockReset();
+    mockedGetMyProfile.mockResolvedValue(profileFixture);
   });
 
   it('does not load cart for guest session', () => {
@@ -416,6 +438,11 @@ describe('useCart', () => {
           totalItems: 2,
           totalPrice: 16,
           createdAt: new Date().toISOString(),
+          deliveryAddress: {
+            zip: '10001',
+            street: 'Main st 1',
+            city: 'New York'
+          },
           items: []
         },
         cart: {
