@@ -26,6 +26,11 @@ export const useCart = () => {
   const [pendingByProduct, setPendingByProduct] = useState<Record<string, boolean>>({});
   const [isOrdering, setIsOrdering] = useState(false);
   const [useProfileAddress, setUseProfileAddress] = useState(true);
+  const [profileAddress, setProfileAddress] = useState({
+    zip: '',
+    street: '',
+    city: ''
+  });
   const [deliveryAddress, setDeliveryAddress] = useState({
     zip: '',
     street: '',
@@ -46,11 +51,13 @@ export const useCart = () => {
         const [cartResponse, profileResponse] = await Promise.all([fetchCart(), getMyProfile()]);
         setItems(cartResponse.data.items);
         setTotalPrice(cartResponse.data.totalPrice);
-        setDeliveryAddress({
+        const nextProfileAddress = {
           zip: profileResponse.data.address.zip,
           street: profileResponse.data.address.street,
           city: profileResponse.data.address.city
-        });
+        };
+        setProfileAddress(nextProfileAddress);
+        setDeliveryAddress(nextProfileAddress);
       } catch {
         toast.error('Failed to load cart.');
         setErrorMessage('Failed to load cart.');
@@ -177,11 +184,9 @@ export const useCart = () => {
     }
 
     const placeOrderRequest = async () => {
-      if (
-        deliveryAddress.zip.trim() === '' ||
-        deliveryAddress.street.trim() === '' ||
-        deliveryAddress.city.trim() === ''
-      ) {
+      const selectedAddress = useProfileAddress ? profileAddress : deliveryAddress;
+
+      if (selectedAddress.zip.trim() === '' || selectedAddress.street.trim() === '' || selectedAddress.city.trim() === '') {
         if (useProfileAddress) {
           toast.error('Address is not set in your profile. Add it in Profile page.');
           return;
@@ -199,9 +204,9 @@ export const useCart = () => {
             : {
                 useProfileAddress: false,
                 deliveryAddress: {
-                  zip: deliveryAddress.zip.trim(),
-                  street: deliveryAddress.street.trim(),
-                  city: deliveryAddress.city.trim()
+                  zip: selectedAddress.zip.trim(),
+                  street: selectedAddress.street.trim(),
+                  city: selectedAddress.city.trim()
                 }
               }
         );
@@ -235,7 +240,7 @@ export const useCart = () => {
     isOrdering,
     isAnyItemPending: Object.values(pendingByProduct).some(Boolean),
     useProfileAddress,
-    deliveryAddress,
+    deliveryAddress: useProfileAddress ? profileAddress : deliveryAddress,
     handleUseProfileAddressChange: setUseProfileAddress,
     handleDeliveryAddressChange,
     handleIncreaseClick,

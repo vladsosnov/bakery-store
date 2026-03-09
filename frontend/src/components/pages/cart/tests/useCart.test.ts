@@ -526,4 +526,28 @@ describe('useCart', () => {
       expect(mockedToastError).toHaveBeenCalledWith('Failed to place order.');
     });
   });
+
+  it('keeps profile address when toggling back from custom address mode', async () => {
+    mockedGetAuthSession.mockReturnValue(authenticatedSession);
+    mockedFetchCart.mockResolvedValue(cartWithOneItem);
+
+    const { result } = renderHook(() => useCart());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.deliveryAddress.street).toBe('Main st 1');
+
+    act(() => {
+      result.current.handleUseProfileAddressChange(false);
+      result.current.handleDeliveryAddressChange('street', 'Custom street 44');
+    });
+    expect(result.current.deliveryAddress.street).toBe('Custom street 44');
+
+    act(() => {
+      result.current.handleUseProfileAddressChange(true);
+    });
+    expect(result.current.deliveryAddress.street).toBe('Main st 1');
+  });
 });
