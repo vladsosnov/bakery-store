@@ -1,4 +1,4 @@
-import { Server, type Server as HttpServerType } from 'http';
+import type { Server as HttpServerType } from 'http';
 import { Server as SocketServer, type Socket } from 'socket.io';
 
 import { verifyAccessToken } from '../utils/jwt.js';

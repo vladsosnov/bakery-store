@@ -75,6 +75,58 @@ describe('order service business flows', () => {
     });
   });
 
+  it('throws validation error for invalid place-order payload', async () => {
+    cartFindOneMock.mockResolvedValue({
+      items: [{ productId: new Types.ObjectId(), quantity: 1 }]
+    } as never);
+
+    await expect(placeOrderFromCart('user-1', { useProfileAddress: 'yes' })).rejects.toMatchObject({
+      code: 'VALIDATION_ERROR',
+      statusCode: 400
+    });
+  });
+
+  it('throws when profile address is missing or user is not found', async () => {
+    const productId = new Types.ObjectId();
+    cartFindOneMock.mockResolvedValue({
+      items: [{ productId, quantity: 1 }]
+    } as never);
+
+    userFindByIdMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue(null)
+    } as never);
+    await expect(placeOrderFromCart('user-1')).rejects.toMatchObject({
+      code: 'USER_NOT_FOUND',
+      statusCode: 404
+    });
+
+    userFindByIdMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        address: {
+          zip: '',
+          street: '5th Avenue 10',
+          city: 'New York'
+        }
+      })
+    } as never);
+    await expect(placeOrderFromCart('user-1')).rejects.toMatchObject({
+      code: 'PROFILE_ADDRESS_REQUIRED',
+      statusCode: 400
+    });
+  });
+
+  it('requires manual delivery address when profile address is disabled', async () => {
+    const productId = new Types.ObjectId();
+    cartFindOneMock.mockResolvedValue({
+      items: [{ productId, quantity: 1 }]
+    } as never);
+
+    await expect(placeOrderFromCart('user-1', { useProfileAddress: false })).rejects.toMatchObject({
+      code: 'VALIDATION_ERROR',
+      statusCode: 400
+    });
+  });
+
   it('places order from cart and clears cart', async () => {
     const productId = new Types.ObjectId();
     const cartSave = jest.fn().mockResolvedValue(undefined);
@@ -125,6 +177,63 @@ describe('order service business flows', () => {
     expect(result.order.totalItems).toBe(2);
   });
 
+  it('places order with manual delivery address and marks product unavailable at zero stock', async () => {
+    const productId = new Types.ObjectId();
+    const cartSave = jest.fn().mockResolvedValue(undefined);
+    const productSave = jest.fn().mockResolvedValue(undefined);
+    const cart = {
+      items: [{ productId, quantity: 2 }],
+      save: cartSave
+    };
+    const product = {
+      _id: productId,
+      name: 'Butter croissant',
+      price: 6,
+      stock: 2,
+      isAvailable: true,
+      save: productSave
+    };
+
+    cartFindOneMock.mockResolvedValue(cart as never);
+    productFindMock.mockResolvedValue([product] as never);
+    orderCreateMock.mockResolvedValue({
+      id: 'order-2',
+      status: ORDER_STATUSES.placed,
+      totalItems: 2,
+      totalPrice: 12,
+      createdAt: new Date('2026-01-01T10:00:00.000Z'),
+      items: [{ productId, name: 'Butter croissant', price: 6, quantity: 2, lineTotal: 12 }],
+      deliveryAddress: {
+        zip: ' 10001 ',
+        street: ' Main street 1 ',
+        city: ' New York '
+      }
+    } as never);
+
+    await placeOrderFromCart('user-1', {
+      useProfileAddress: false,
+      deliveryAddress: {
+        zip: ' 10001 ',
+        street: ' Main street 1 ',
+        city: ' New York '
+      }
+    });
+
+    expect(orderCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deliveryAddress: {
+          zip: '10001',
+          street: 'Main street 1',
+          city: 'New York'
+        }
+      })
+    );
+    expect(product.stock).toBe(0);
+    expect(product.isAvailable).toBe(false);
+    expect(productSave).toHaveBeenCalledTimes(1);
+    expect(cartSave).toHaveBeenCalledTimes(1);
+  });
+
   it('throws PRODUCT_UNAVAILABLE for unavailable product', async () => {
     const productId = new Types.ObjectId();
     cartFindOneMock.mockResolvedValue({
@@ -137,6 +246,19 @@ describe('order service business flows', () => {
         stock: 10
       }
     ] as never);
+
+    await expect(placeOrderFromCart('user-1')).rejects.toMatchObject({
+      code: 'PRODUCT_UNAVAILABLE',
+      statusCode: 409
+    });
+  });
+
+  it('throws PRODUCT_UNAVAILABLE when product is missing in DB response', async () => {
+    const productId = new Types.ObjectId();
+    cartFindOneMock.mockResolvedValue({
+      items: [{ productId, quantity: 1 }]
+    } as never);
+    productFindMock.mockResolvedValue([] as never);
 
     await expect(placeOrderFromCart('user-1')).rejects.toMatchObject({
       code: 'PRODUCT_UNAVAILABLE',

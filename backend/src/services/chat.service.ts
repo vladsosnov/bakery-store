@@ -24,17 +24,6 @@ type ChatMessageView = {
   createdAt: string;
 };
 
-type ChatThreadView = {
-  id: string;
-  customerId: string;
-  customerName: string;
-  customerEmail: string;
-  lastMessageAt: string;
-  lastMessageText: string;
-  unreadForSupport: boolean;
-  messages: ChatMessageView[];
-};
-
 const WORK_START_HOUR = 9;
 const WORK_END_HOUR = 18;
 

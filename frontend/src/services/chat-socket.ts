@@ -47,7 +47,7 @@ const ensureSocket = () => {
 };
 
 export const subscribeToChatThreadUpdates = (handler: (thread: ChatThread) => void) => {
-  if (process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test' && process.env.ENABLE_CHAT_SOCKET_TESTS !== 'true') {
     return () => undefined;
   }
 

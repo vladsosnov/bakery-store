@@ -229,6 +229,60 @@ describe('cart service business flows', () => {
     });
   });
 
+  it('throws when updating quantity and product is not found', async () => {
+    const productId = new Types.ObjectId();
+
+    productFindOneMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue(null)
+    } as never);
+
+    await expect(updateCartItemQuantity('user-1', String(productId), { quantity: 2 })).rejects.toMatchObject({
+      code: 'PRODUCT_NOT_FOUND',
+      statusCode: 404
+    });
+  });
+
+  it('throws when updating quantity above available stock', async () => {
+    const productId = new Types.ObjectId();
+
+    productFindOneMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        _id: productId,
+        name: 'Sourdough loaf',
+        imageUrl: 'https://example.com/sourdough.jpg',
+        price: 8,
+        stock: 2,
+        isAvailable: true
+      })
+    } as never);
+
+    await expect(updateCartItemQuantity('user-1', String(productId), { quantity: 3 })).rejects.toMatchObject({
+      code: 'OUT_OF_STOCK',
+      statusCode: 409
+    });
+  });
+
+  it('throws when updating quantity and cart is missing', async () => {
+    const productId = new Types.ObjectId();
+
+    productFindOneMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        _id: productId,
+        name: 'Sourdough loaf',
+        imageUrl: 'https://example.com/sourdough.jpg',
+        price: 8,
+        stock: 6,
+        isAvailable: true
+      })
+    } as never);
+    findOneMock.mockResolvedValue(null as never);
+
+    await expect(updateCartItemQuantity('user-1', String(productId), { quantity: 2 })).rejects.toMatchObject({
+      code: 'CART_ITEM_NOT_FOUND',
+      statusCode: 404
+    });
+  });
+
   it('removes item from cart and returns empty cart if cart missing', async () => {
     findOneMock.mockResolvedValue(null as never);
 
@@ -237,5 +291,40 @@ describe('cart service business flows', () => {
       totalItems: 0,
       totalPrice: 0
     });
+  });
+
+  it('removes matching item from existing cart and saves cart', async () => {
+    const userId = 'user-1';
+    const productId = new Types.ObjectId();
+    const otherProductId = new Types.ObjectId();
+    const cartSave = jest.fn().mockResolvedValue(undefined);
+    const cart = {
+      items: [
+        { productId, quantity: 2 },
+        { productId: otherProductId, quantity: 1 }
+      ],
+      save: cartSave
+    };
+
+    findOneMock.mockResolvedValue(cart as never);
+    productFindMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue([
+        {
+          _id: otherProductId,
+          name: 'Butter croissant',
+          imageUrl: 'https://example.com/croissant.jpg',
+          price: 5,
+          stock: 4
+        }
+      ])
+    } as never);
+
+    const result = await removeCartItem(userId, String(productId));
+
+    expect(cartSave).toHaveBeenCalledTimes(1);
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]?.productId).toBe(String(otherProductId));
+    expect(result.totalItems).toBe(1);
+    expect(result.totalPrice).toBe(5);
   });
 });
