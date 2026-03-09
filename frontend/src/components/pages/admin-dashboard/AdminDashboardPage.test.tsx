@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { AUTH_STORAGE_KEY } from '@src/services/auth-session';
 import * as adminApi from '@src/services/admin-api';
+import * as chatApi from '@src/services/chat-api';
 import { AdminDashboardPage } from './AdminDashboardPage';
 
 jest.mock('@src/services/admin-api', () => ({
@@ -15,6 +16,11 @@ jest.mock('@src/services/admin-api', () => ({
   deleteAdminModerator: jest.fn(),
   ORDER_STATUS_OPTIONS: ['placed', 'in progress', 'in delivery'],
   updateAdminOrderStatus: jest.fn()
+}));
+jest.mock('@src/services/chat-api', () => ({
+  getModeratorChatThreads: jest.fn().mockResolvedValue({ data: [] }),
+  getModeratorChatThread: jest.fn(),
+  postModeratorChatMessage: jest.fn()
 }));
 
 jest.mock('sonner', () => ({
@@ -29,6 +35,9 @@ describe('AdminDashboardPage', () => {
   const getAdminOrdersMock = adminApi.getAdminOrders as jest.MockedFunction<typeof adminApi.getAdminOrders>;
   const updateAdminOrderStatusMock = adminApi.updateAdminOrderStatus as jest.MockedFunction<
     typeof adminApi.updateAdminOrderStatus
+  >;
+  const getModeratorChatThreadsMock = chatApi.getModeratorChatThreads as jest.MockedFunction<
+    typeof chatApi.getModeratorChatThreads
   >;
   const toastErrorMock = jest.mocked(toast.error);
 
@@ -65,6 +74,8 @@ describe('AdminDashboardPage', () => {
     });
     getAdminOrdersMock.mockResolvedValue({ data: [] });
     updateAdminOrderStatusMock.mockReset();
+    getModeratorChatThreadsMock.mockReset();
+    getModeratorChatThreadsMock.mockResolvedValue({ data: [] });
     toastErrorMock.mockReset();
 
     setSession('admin');
@@ -145,7 +156,7 @@ describe('AdminDashboardPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows only orders tab for moderator', async () => {
+  it('shows orders and chats tabs for moderator', async () => {
     setSession('moderator');
 
     render(
@@ -155,7 +166,8 @@ describe('AdminDashboardPage', () => {
     );
 
     expect(await screen.findByRole('button', { name: /all orders/i })).toBeInTheDocument();
-    expect(screen.getByText(/inspect and manage customer orders\./i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /chats/i })).toBeInTheDocument();
+    expect(screen.getByText(/inspect customer orders and answer customer chats\./i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /all users/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /log usage/i })).not.toBeInTheDocument();
   });

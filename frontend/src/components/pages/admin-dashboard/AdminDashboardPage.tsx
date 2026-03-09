@@ -22,13 +22,14 @@ import { RemoveModeratorModal } from '@src/components/modals/RemoveModeratorModa
 import { LogsTab } from '@src/components/pages/admin-dashboard/tabs/LogsTab';
 import { OrdersTab } from '@src/components/pages/admin-dashboard/tabs/OrdersTab';
 import { UsersTab } from '@src/components/pages/admin-dashboard/tabs/UsersTab';
+import { ChatsTab } from '@src/components/pages/admin-dashboard/tabs/ChatsTab';
 import { getAuthSession } from '@src/services/auth-session';
 import { USER_ROLES } from '@src/types/user-role';
 import type { AdminOrder, AdminOrderStatus, AdminUser } from '@src/types/admin';
 import { toErrorMessage } from '@src/utils/error';
 import * as S from './AdminDashboardPage.styles';
 
-type AdminTab = 'users' | 'orders' | 'logs';
+type AdminTab = 'users' | 'orders' | 'chats' | 'logs';
 const ORDER_STATUS_FLOW: readonly AdminOrderStatus[] = ['placed', 'in progress', 'in delivery'];
 
 export const AdminDashboardPage: FC = () => {
@@ -37,7 +38,7 @@ export const AdminDashboardPage: FC = () => {
   const isModerator = session?.user.role === USER_ROLES.moderator;
   const dashboardSubtitle = isAdmin
     ? 'Manage users and moderators, inspect orders, and prepare usage logs.'
-    : 'Inspect and manage customer orders.';
+    : 'Inspect customer orders and answer customer chats.';
   
   const [activeTab, setActiveTab] = useState<AdminTab>(() =>
     session?.user.role === USER_ROLES.moderator ? 'orders' : 'users'
@@ -141,10 +142,6 @@ export const AdminDashboardPage: FC = () => {
     }
 
     setActiveTab('users');
-  };
-
-  const handleOrdersTabClick = () => {
-    setActiveTab('orders');
   };
 
   const handleOrderStatusChange = async (event: ChangeEvent<HTMLSelectElement>) => {
@@ -271,8 +268,11 @@ export const AdminDashboardPage: FC = () => {
               All users
             </S.TabButton>
           ) : null}
-          <S.TabButton type="button" $active={activeTab === 'orders'} onClick={handleOrdersTabClick}>
+          <S.TabButton type="button" $active={activeTab === 'orders'} onClick={() => setActiveTab('orders')}>
             All orders
+          </S.TabButton>
+          <S.TabButton type="button" $active={activeTab === 'chats'} onClick={() => setActiveTab('chats')}>
+            Chats
           </S.TabButton>
           {isAdmin ? (
             <S.TabButton type="button" $active={activeTab === 'logs'} onClick={handleLogsTabClick}>
@@ -307,6 +307,8 @@ export const AdminDashboardPage: FC = () => {
           getDeliveryAddressText={getDeliveryAddressText}
         />
       ) : null}
+
+      {activeTab === 'chats' ? <ChatsTab /> : null}
 
       {isAdmin && activeTab === 'logs' ? (
         <LogsTab

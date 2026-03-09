@@ -126,4 +126,10 @@ export const SendButton = styled.button`
   padding: 0 13px;
   font-weight: 700;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 `;
