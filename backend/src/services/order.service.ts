@@ -59,7 +59,7 @@ const buildOrderView = (order: {
     zip: string;
     street: string;
     city: string;
-  };
+  } | null;
 }) => ({
   id: order.id ?? String(order._id),
   status: order.status,
