@@ -143,5 +143,6 @@ describe('SiteLayout chat', () => {
     );
 
     expect(screen.getByRole('link', { name: /admin dashboard/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open chat/i })).not.toBeInTheDocument();
   });
 });

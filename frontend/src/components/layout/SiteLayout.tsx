@@ -24,6 +24,7 @@ export const SiteLayout: FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [session, setSession] = useState(() => getAuthSession());
+  const isModerator = session?.user.role === 'moderator';
 
   useEffect(() => {
     const syncSession = () => {
@@ -79,6 +80,12 @@ export const SiteLayout: FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (isModerator) {
+      setIsChatOpen(false);
+    }
+  }, [isModerator]);
 
   return (
     <S.Wrapper>
@@ -185,16 +192,18 @@ export const SiteLayout: FC = () => {
           firstName={session?.user.firstName}
         />
       ) : null}
-      {isChatOpen ? <ChatWidget onClose={handleChatPanelClose} /> : null}
+      {!isModerator && isChatOpen ? <ChatWidget onClose={handleChatPanelClose} /> : null}
 
-      <S.ChatButton
-        type="button"
-        $open={isChatOpen}
-        aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
-        onClick={handleChatButtonClick}
-      >
-        {isChatOpen ? 'Hide chat' : 'Chat'}
-      </S.ChatButton>
+      {!isModerator ? (
+        <S.ChatButton
+          type="button"
+          $open={isChatOpen}
+          aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
+          onClick={handleChatButtonClick}
+        >
+          {isChatOpen ? 'Hide chat' : 'Chat'}
+        </S.ChatButton>
+      ) : null}
     </S.Wrapper>
   );
 };

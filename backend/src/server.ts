@@ -1,20 +1,26 @@
+import { createServer } from 'http';
+
 import { app } from './app.js';
 import { env } from './config/env.js';
 import { connectToDatabase, disconnectFromDatabase } from './db/mongodb.js';
 import { seedAdminUser } from './services/auth.service.js';
 import { seedProductsCatalog } from './services/product.service.js';
+import { initChatSocketServer } from './sockets/chat.socket.js';
 
 const startServer = async () => {
   await connectToDatabase();
   await seedAdminUser();
   await seedProductsCatalog();
 
-  const server = app.listen(env.PORT, () => {
+  const httpServer = createServer(app);
+  initChatSocketServer(httpServer);
+
+  httpServer.listen(env.PORT, () => {
     console.log(`Backend is running on port ${env.PORT}`);
   });
 
   const shutdown = async () => {
-    server.close(async () => {
+    httpServer.close(async () => {
       await disconnectFromDatabase();
       process.exit(0);
     });
