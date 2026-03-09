@@ -192,8 +192,8 @@ export const useCart = () => {
           return;
         }
 
-          toast.error('Please fill zip, street, and city for delivery.');
-          return;
+        toast.error('Please fill zip, street, and city for delivery.');
+        return;
       }
 
       try {
@@ -202,13 +202,13 @@ export const useCart = () => {
           useProfileAddress
             ? { useProfileAddress: true }
             : {
-                useProfileAddress: false,
-                deliveryAddress: {
-                  zip: selectedAddress.zip.trim(),
-                  street: selectedAddress.street.trim(),
-                  city: selectedAddress.city.trim()
-                }
+              useProfileAddress: false,
+              deliveryAddress: {
+                zip: selectedAddress.zip.trim(),
+                street: selectedAddress.street.trim(),
+                city: selectedAddress.city.trim()
               }
+            }
         );
         setItems(response.data.cart.items);
         setTotalPrice(response.data.cart.totalPrice);
