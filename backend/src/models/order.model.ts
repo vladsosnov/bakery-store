@@ -55,6 +55,23 @@ const orderSchema = new Schema(
     totalPrice: {
       type: Number,
       required: true
+    },
+    deliveryAddress: {
+      zip: {
+        type: String,
+        required: true,
+        default: ''
+      },
+      street: {
+        type: String,
+        required: true,
+        default: ''
+      },
+      city: {
+        type: String,
+        required: true,
+        default: ''
+      }
     }
   },
   {

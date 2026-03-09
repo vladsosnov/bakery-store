@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import { fetchCart, removeCartItem, updateCartItemQuantity } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
+import { getMyProfile } from '@src/services/auth-api';
 import { placeOrder } from '@src/services/order-api';
 import { toErrorMessage } from '@src/utils/error';
 
@@ -24,6 +25,17 @@ export const useCart = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [pendingByProduct, setPendingByProduct] = useState<Record<string, boolean>>({});
   const [isOrdering, setIsOrdering] = useState(false);
+  const [useProfileAddress, setUseProfileAddress] = useState(true);
+  const [profileAddress, setProfileAddress] = useState({
+    zip: '',
+    street: '',
+    city: ''
+  });
+  const [deliveryAddress, setDeliveryAddress] = useState({
+    zip: '',
+    street: '',
+    city: ''
+  });
 
   useEffect(() => {
     if (!session || !isCustomer) {
@@ -36,9 +48,16 @@ export const useCart = () => {
       setErrorMessage(null);
 
       try {
-        const response = await fetchCart();
-        setItems(response.data.items);
-        setTotalPrice(response.data.totalPrice);
+        const [cartResponse, profileResponse] = await Promise.all([fetchCart(), getMyProfile()]);
+        setItems(cartResponse.data.items);
+        setTotalPrice(cartResponse.data.totalPrice);
+        const nextProfileAddress = {
+          zip: profileResponse.data.address.zip,
+          street: profileResponse.data.address.street,
+          city: profileResponse.data.address.city
+        };
+        setProfileAddress(nextProfileAddress);
+        setDeliveryAddress(nextProfileAddress);
       } catch {
         toast.error('Failed to load cart.');
         setErrorMessage('Failed to load cart.');
@@ -165,9 +184,32 @@ export const useCart = () => {
     }
 
     const placeOrderRequest = async () => {
+      const selectedAddress = useProfileAddress ? profileAddress : deliveryAddress;
+
+      if (selectedAddress.zip.trim() === '' || selectedAddress.street.trim() === '' || selectedAddress.city.trim() === '') {
+        if (useProfileAddress) {
+          toast.error('Address is not set in your profile. Add it in Profile page.');
+          return;
+        }
+
+        toast.error('Please fill zip, street, and city for delivery.');
+        return;
+      }
+
       try {
         setIsOrdering(true);
-        const response = await placeOrder();
+        const response = await placeOrder(
+          useProfileAddress
+            ? { useProfileAddress: true }
+            : {
+              useProfileAddress: false,
+              deliveryAddress: {
+                zip: selectedAddress.zip.trim(),
+                street: selectedAddress.street.trim(),
+                city: selectedAddress.city.trim()
+              }
+            }
+        );
         setItems(response.data.cart.items);
         setTotalPrice(response.data.cart.totalPrice);
         toast.success('Order placed successfully.');
@@ -181,6 +223,13 @@ export const useCart = () => {
     placeOrderRequest();
   };
 
+  const handleDeliveryAddressChange = (field: 'zip' | 'street' | 'city', value: string) => {
+    setDeliveryAddress((prev) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return {
     session,
     isLoading,
@@ -190,6 +239,10 @@ export const useCart = () => {
     pendingByProduct,
     isOrdering,
     isAnyItemPending: Object.values(pendingByProduct).some(Boolean),
+    useProfileAddress,
+    deliveryAddress: useProfileAddress ? profileAddress : deliveryAddress,
+    handleUseProfileAddressChange: setUseProfileAddress,
+    handleDeliveryAddressChange,
     handleIncreaseClick,
     handleDecreaseClick,
     handleRemoveClick,

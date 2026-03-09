@@ -45,6 +45,11 @@ describe('MyOrdersPage', () => {
           totalItems: 2,
           totalPrice: 16,
           createdAt: new Date().toISOString(),
+          deliveryAddress: {
+            zip: '10001',
+            street: 'Main st 1',
+            city: 'New York'
+          },
           items: [
             {
               productId: 'p1',

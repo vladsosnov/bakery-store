@@ -55,6 +55,15 @@ describe('order service business flows', () => {
     orderFindByIdMock.mockReset();
     productFindMock.mockReset();
     userFindByIdMock.mockReset();
+    userFindByIdMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        address: {
+          zip: '10001',
+          street: '5th Avenue 10',
+          city: 'New York'
+        }
+      })
+    } as never);
   });
 
   it('throws EMPTY_CART when cart is missing', async () => {
@@ -101,7 +110,12 @@ describe('order service business flows', () => {
         userId: 'user-1',
         status: ORDER_STATUSES.placed,
         totalItems: 2,
-        totalPrice: 16
+        totalPrice: 16,
+        deliveryAddress: {
+          zip: '10001',
+          street: '5th Avenue 10',
+          city: 'New York'
+        }
       })
     );
     expect(product.stock).toBe(3);

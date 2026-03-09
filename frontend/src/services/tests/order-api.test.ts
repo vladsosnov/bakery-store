@@ -21,7 +21,7 @@ describe('order-api service', () => {
 
     await placeOrder();
 
-    expect(mockedApiAuthClient.post).toHaveBeenCalledWith('/api/orders');
+    expect(mockedApiAuthClient.post).toHaveBeenCalledWith('/api/orders', { useProfileAddress: true });
   });
 
   it('loads my orders', async () => {

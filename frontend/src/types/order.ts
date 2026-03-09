@@ -12,5 +12,10 @@ export type MyOrder = {
   totalItems: number;
   totalPrice: number;
   createdAt: string | null;
+  deliveryAddress: {
+    zip: string;
+    street: string;
+    city: string;
+  };
   items: OrderItem[];
 };

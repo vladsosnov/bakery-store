@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import { CardSurface } from '@src/components/common/CardSurface';
+import { Input } from '@src/components/common/Input';
 import { colors } from '@src/styles/colors';
 import { pageContainer } from '@src/styles/layout';
 
@@ -103,6 +104,34 @@ export const Total = styled.p`
   font-weight: 700;
   color: ${colors.brown};
 `;
+
+export const DeliveryCard = styled.div`
+  margin-top: 14px;
+  border: 1px solid ${colors.border};
+  border-radius: 12px;
+  padding: 12px;
+`;
+
+export const DeliveryTitle = styled.h3`
+  margin-top: 0;
+  margin-bottom: 8px;
+`;
+
+export const CheckboxLabel = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+`;
+
+export const AddressGrid = styled.div`
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+`;
+
+export const AddressInput = styled(Input)``;
 
 export const CheckoutBar = styled.div`
   margin-top: 12px;

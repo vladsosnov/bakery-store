@@ -4,7 +4,7 @@ import { ensureCustomerRole, listMyOrders, placeOrderFromCart } from '../service
 
 export const placeOrderController = async (req: Request, res: Response) => {
   await ensureCustomerRole(req.auth!.userId);
-  const result = await placeOrderFromCart(req.auth!.userId);
+  const result = await placeOrderFromCart(req.auth!.userId, req.body);
 
   return res.status(201).json({
     data: result

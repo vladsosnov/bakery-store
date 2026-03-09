@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { AUTH_STORAGE_KEY } from '@src/services/auth-session';
+import { getMyProfile } from '@src/services/auth-api';
 import { fetchCart, removeCartItem, updateCartItemQuantity } from '@src/services/cart-api';
 import { placeOrder } from '@src/services/order-api';
 import { CartPage } from '../CartPage';
@@ -11,12 +12,16 @@ jest.mock('@src/services/cart-api', () => ({
   updateCartItemQuantity: jest.fn(),
   removeCartItem: jest.fn()
 }));
+jest.mock('@src/services/auth-api', () => ({
+  getMyProfile: jest.fn()
+}));
 
 jest.mock('@src/services/order-api', () => ({
   placeOrder: jest.fn()
 }));
 
 const mockedFetchCart = jest.mocked(fetchCart);
+const mockedGetMyProfile = jest.mocked(getMyProfile);
 const mockedUpdateCartItemQuantity = jest.mocked(updateCartItemQuantity);
 const mockedRemoveCartItem = jest.mocked(removeCartItem);
 const mockedPlaceOrder = jest.mocked(placeOrder);
@@ -25,9 +30,25 @@ describe('CartPage', () => {
   afterEach(() => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     mockedFetchCart.mockReset();
+    mockedGetMyProfile.mockReset();
     mockedUpdateCartItemQuantity.mockReset();
     mockedRemoveCartItem.mockReset();
     mockedPlaceOrder.mockReset();
+    mockedGetMyProfile.mockResolvedValue({
+      data: {
+        id: 'u1',
+        firstName: 'Vlad',
+        lastName: 'Sosnov',
+        email: 'vlad@bakery.local',
+        role: 'customer',
+        phoneNumber: '+123',
+        address: {
+          zip: '10001',
+          street: 'Main st 1',
+          city: 'New York'
+        }
+      }
+    });
   });
 
   it('asks guest to sign in', () => {
@@ -103,6 +124,50 @@ describe('CartPage', () => {
     expect(screen.getByRole('button', { name: /increase quantity/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /remove/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /place order/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/use address from profile/i)).toBeChecked();
+  });
+
+  it('shows custom delivery address fields when profile-address checkbox is unchecked', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token',
+        user: {
+          id: 'u1',
+          firstName: 'Vlad',
+          lastName: 'Sosnov',
+          email: 'vlad@bakery.local',
+          role: 'customer'
+        }
+      })
+    );
+    mockedFetchCart.mockResolvedValue({
+      data: {
+        items: [
+          {
+            productId: 'p1',
+            name: 'Sourdough loaf',
+            imageUrl: 'https://example.com/sourdough.jpg',
+            price: 8,
+            quantity: 1,
+            availableStock: 6,
+            lineTotal: 8
+          }
+        ],
+        totalItems: 1,
+        totalPrice: 8
+      }
+    });
+
+    render(<CartPage />);
+
+    const checkbox = await screen.findByLabelText(/use address from profile/i);
+    await user.click(checkbox);
+
+    expect(screen.getByLabelText(/delivery zip/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/delivery city/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/delivery street/i)).toBeInTheDocument();
   });
 
   it('places order from cart', async () => {
@@ -146,6 +211,11 @@ describe('CartPage', () => {
           totalItems: 1,
           totalPrice: 8,
           createdAt: new Date().toISOString(),
+          deliveryAddress: {
+            zip: '10001',
+            street: 'Main st 1',
+            city: 'New York'
+          },
           items: []
         },
         cart: {
