@@ -1,17 +1,23 @@
 import { apiAuthClient } from '@src/services/api-client';
 import {
+  type AdminProduct,
   type AdminOrder,
   type AdminOrderStatus,
   type AdminUser,
+  type CreateAdminProductRequest,
   type CreateModeratorRequest,
+  type UpdateAdminProductRequest,
   type UpdateModeratorRequest
 } from '@src/types/admin';
 export {
   ORDER_STATUS_OPTIONS,
   type AdminOrder,
   type AdminOrderStatus,
+  type AdminProduct,
   type AdminUser,
+  type CreateAdminProductRequest,
   type CreateModeratorRequest,
+  type UpdateAdminProductRequest,
   type UpdateModeratorRequest
 } from '@src/types/admin';
 
@@ -32,6 +38,14 @@ type OrderStatusResponse = {
     id: string;
     status: AdminOrderStatus;
   };
+};
+
+type ProductsResponse = {
+  data: AdminProduct[];
+};
+
+type ProductResponse = {
+  data: AdminProduct;
 };
 
 export const getAdminUsers = async () => {
@@ -63,4 +77,23 @@ export const updateAdminOrderStatus = async (orderId: string, status: AdminOrder
     status
   });
   return response.data;
+};
+
+export const getAdminProducts = async () => {
+  const response = await apiAuthClient.get<ProductsResponse>('/api/admin/products');
+  return response.data;
+};
+
+export const createAdminProduct = async (payload: CreateAdminProductRequest) => {
+  const response = await apiAuthClient.post<ProductResponse>('/api/admin/products', payload);
+  return response.data;
+};
+
+export const updateAdminProduct = async (productId: string, payload: UpdateAdminProductRequest) => {
+  const response = await apiAuthClient.patch<ProductResponse>(`/api/admin/products/${productId}`, payload);
+  return response.data;
+};
+
+export const deleteAdminProduct = async (productId: string) => {
+  await apiAuthClient.delete(`/api/admin/products/${productId}`);
 };

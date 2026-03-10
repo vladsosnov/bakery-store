@@ -299,7 +299,11 @@ export const ShopPage: FC = () => {
                   })}
                 </S.ProductsGrid>
               ) : (
-                <S.EmptyState>No results. Try changing filters or search query.</S.EmptyState>
+                <S.EmptyState>
+                  {products.length === 0
+                    ? 'No products yet. A moderator will add items soon.'
+                    : 'No results. Try changing filters or search query.'}
+                </S.EmptyState>
               )}
             </S.ResultTransition>
           )}

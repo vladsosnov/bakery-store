@@ -61,7 +61,23 @@ export const Form = styled.form`
   margin-bottom: 18px;
 `;
 
+export const FormRow = styled.div`
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+`;
+
 export const Label = styled(FormLabel)``;
+
+export const TextArea = styled.textarea`
+  border-radius: 12px;
+  border: 1px solid ${colors.border};
+  background: ${colors.white};
+  color: ${colors.brown};
+  padding: 10px 12px;
+  resize: vertical;
+  min-height: 88px;
+`;
 
 export const InlineCheckboxLabel = styled.label`
   display: inline-flex;
@@ -267,4 +283,40 @@ export const Subsection = styled.section`
   border: 1px solid ${colors.border};
   border-radius: 14px;
   padding: 12px;
+`;
+
+export const ProductList = styled.div`
+  display: grid;
+  gap: 12px;
+`;
+
+export const ProductItem = styled.article`
+  border: 1px solid ${colors.border};
+  border-radius: 14px;
+  padding: 12px;
+`;
+
+export const ProductItemHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+`;
+
+export const ProductTitle = styled.h3`
+  margin-top: 0;
+  margin-bottom: 4px;
+  color: ${colors.brown};
+`;
+
+export const ProductMeta = styled.p`
+  margin: 0;
+  color: ${colors.brownLight};
+`;
+
+export const ProductActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 `;

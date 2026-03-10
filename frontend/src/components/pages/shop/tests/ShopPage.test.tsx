@@ -176,6 +176,18 @@ describe('ShopPage', () => {
     expect(screen.getByText(/no results\. try changing filters or search query\./i)).toBeInTheDocument();
   });
 
+  it('shows no products state when catalog is empty', async () => {
+    mockedListProducts.mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText(/no products yet\. a moderator will add items soon\./i)).toBeInTheDocument();
+  });
+
   it('increments item quantity near add to cart button', async () => {
     const user = userEvent.setup();
     render(

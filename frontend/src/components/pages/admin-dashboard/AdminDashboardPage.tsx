@@ -12,8 +12,12 @@ import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
 import {
+  createAdminProduct,
+  deleteAdminProduct,
   getAdminOrders,
+  getAdminProducts,
   getAdminUsers,
+  updateAdminProduct,
   updateAdminOrderStatus
 } from '@src/services/admin-api';
 import { CreateModeratorModal } from '@src/components/modals/CreateModeratorModal';
@@ -23,13 +27,21 @@ import { LogsTab } from '@src/components/pages/admin-dashboard/tabs/LogsTab';
 import { OrdersTab } from '@src/components/pages/admin-dashboard/tabs/OrdersTab';
 import { UsersTab } from '@src/components/pages/admin-dashboard/tabs/UsersTab';
 import { ChatsTab } from '@src/components/pages/admin-dashboard/tabs/ChatsTab';
+import { ShopTab } from '@src/components/pages/admin-dashboard/tabs/ShopTab';
 import { getAuthSession } from '@src/services/auth-session';
 import { USER_ROLES } from '@src/types/user-role';
-import type { AdminOrder, AdminOrderStatus, AdminUser } from '@src/types/admin';
+import type {
+  AdminOrder,
+  AdminOrderStatus,
+  AdminProduct,
+  AdminUser,
+  CreateAdminProductRequest,
+  UpdateAdminProductRequest
+} from '@src/types/admin';
 import { toErrorMessage } from '@src/utils/error';
 import * as S from './AdminDashboardPage.styles';
 
-type AdminTab = 'users' | 'orders' | 'chats' | 'logs';
+type AdminTab = 'users' | 'orders' | 'chats' | 'logs' | 'shop';
 const ORDER_STATUS_FLOW: readonly AdminOrderStatus[] = ['placed', 'in progress', 'in delivery'];
 
 export const AdminDashboardPage: FC = () => {
@@ -45,11 +57,13 @@ export const AdminDashboardPage: FC = () => {
   );
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [orders, setOrders] = useState<AdminOrder[]>([]);
+  const [products, setProducts] = useState<AdminProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedModeratorForEdit, setSelectedModeratorForEdit] = useState<AdminUser | null>(null);
   const [selectedModeratorForRemove, setSelectedModeratorForRemove] = useState<AdminUser | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [pendingProductId, setPendingProductId] = useState<string | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | AdminOrderStatus>('all');
   const [orderSearchTerm, setOrderSearchTerm] = useState('');
 
@@ -58,13 +72,19 @@ export const AdminDashboardPage: FC = () => {
 
     try {
       if (isAdmin) {
-        const [usersResponse, ordersResponse] = await Promise.all([getAdminUsers(), getAdminOrders()]);
+        const [usersResponse, ordersResponse, productsResponse] = await Promise.all([
+          getAdminUsers(),
+          getAdminOrders(),
+          getAdminProducts()
+        ]);
         setUsers(usersResponse.data);
         setOrders(ordersResponse.data);
+        setProducts(productsResponse.data);
       } else {
-        const ordersResponse = await getAdminOrders();
+        const [ordersResponse, productsResponse] = await Promise.all([getAdminOrders(), getAdminProducts()]);
         setUsers([]);
         setOrders(ordersResponse.data);
+        setProducts(productsResponse.data);
       }
     } catch (error) {
       toast.error(toErrorMessage(error, 'Failed to load admin dashboard.'));
@@ -248,6 +268,48 @@ export const AdminDashboardPage: FC = () => {
     setSelectedModeratorForRemove(null);
   };
 
+  const handleCreateProduct = async (payload: CreateAdminProductRequest) => {
+    setPendingProductId('new');
+    try {
+      const response = await createAdminProduct(payload);
+      setProducts((prev) => [response.data, ...prev]);
+      toast.success('Product created.');
+    } catch (error) {
+      toast.error(toErrorMessage(error, 'Failed to create product.'));
+      throw error;
+    } finally {
+      setPendingProductId(null);
+    }
+  };
+
+  const handleUpdateProduct = async (productId: string, payload: UpdateAdminProductRequest) => {
+    setPendingProductId(productId);
+    try {
+      const response = await updateAdminProduct(productId, payload);
+      setProducts((prev) => prev.map((item) => (item._id === productId ? response.data : item)));
+      toast.success('Product updated.');
+    } catch (error) {
+      toast.error(toErrorMessage(error, 'Failed to update product.'));
+      throw error;
+    } finally {
+      setPendingProductId(null);
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    setPendingProductId(productId);
+    try {
+      await deleteAdminProduct(productId);
+      setProducts((prev) => prev.filter((item) => item._id !== productId));
+      toast.success('Product deleted.');
+    } catch (error) {
+      toast.error(toErrorMessage(error, 'Failed to delete product.'));
+      throw error;
+    } finally {
+      setPendingProductId(null);
+    }
+  };
+
   if (!session) {
     return <Navigate to={ROUTES.signIn} replace />;
   }
@@ -273,6 +335,9 @@ export const AdminDashboardPage: FC = () => {
           </S.TabButton>
           <S.TabButton type="button" $active={activeTab === 'chats'} onClick={() => setActiveTab('chats')}>
             Chats
+          </S.TabButton>
+          <S.TabButton type="button" $active={activeTab === 'shop'} onClick={() => setActiveTab('shop')}>
+            Shop
           </S.TabButton>
           {isAdmin ? (
             <S.TabButton type="button" $active={activeTab === 'logs'} onClick={handleLogsTabClick}>
@@ -309,6 +374,17 @@ export const AdminDashboardPage: FC = () => {
       ) : null}
 
       {activeTab === 'chats' ? <ChatsTab /> : null}
+
+      {activeTab === 'shop' ? (
+        <ShopTab
+          isLoading={isLoading}
+          products={products}
+          pendingProductId={pendingProductId}
+          onCreateProduct={handleCreateProduct}
+          onUpdateProduct={handleUpdateProduct}
+          onDeleteProduct={handleDeleteProduct}
+        />
+      ) : null}
 
       {isAdmin && activeTab === 'logs' ? (
         <LogsTab

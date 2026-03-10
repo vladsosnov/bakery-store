@@ -11,9 +11,13 @@ import { AdminDashboardPage } from './AdminDashboardPage';
 jest.mock('@src/services/admin-api', () => ({
   getAdminUsers: jest.fn().mockResolvedValue({ data: [] }),
   getAdminOrders: jest.fn().mockResolvedValue({ data: [] }),
+  getAdminProducts: jest.fn().mockResolvedValue({ data: [] }),
   createAdminModerator: jest.fn(),
   updateAdminModerator: jest.fn(),
   deleteAdminModerator: jest.fn(),
+  createAdminProduct: jest.fn(),
+  updateAdminProduct: jest.fn(),
+  deleteAdminProduct: jest.fn(),
   ORDER_STATUS_OPTIONS: ['placed', 'in progress', 'in delivery'],
   updateAdminOrderStatus: jest.fn()
 }));
@@ -35,6 +39,9 @@ describe('AdminDashboardPage', () => {
   const getAdminOrdersMock = adminApi.getAdminOrders as jest.MockedFunction<typeof adminApi.getAdminOrders>;
   const updateAdminOrderStatusMock = adminApi.updateAdminOrderStatus as jest.MockedFunction<
     typeof adminApi.updateAdminOrderStatus
+  >;
+  const createAdminProductMock = adminApi.createAdminProduct as jest.MockedFunction<
+    typeof adminApi.createAdminProduct
   >;
   const getModeratorChatThreadsMock = chatApi.getModeratorChatThreads as jest.MockedFunction<
     typeof chatApi.getModeratorChatThreads
@@ -74,6 +81,21 @@ describe('AdminDashboardPage', () => {
     });
     getAdminOrdersMock.mockResolvedValue({ data: [] });
     updateAdminOrderStatusMock.mockReset();
+    createAdminProductMock.mockReset();
+    createAdminProductMock.mockResolvedValue({
+      data: {
+        _id: 'product-1',
+        name: 'Sourdough loaf',
+        slug: 'sourdough-loaf',
+        description: 'Fresh sourdough',
+        category: 'Bread',
+        price: 8,
+        imageUrl: 'https://example.com/sourdough.jpg',
+        tags: ['Bread'],
+        isAvailable: true,
+        stock: 5
+      }
+    });
     getModeratorChatThreadsMock.mockReset();
     getModeratorChatThreadsMock.mockResolvedValue({ data: [] });
     toastErrorMock.mockReset();
@@ -167,9 +189,39 @@ describe('AdminDashboardPage', () => {
 
     expect(await screen.findByRole('button', { name: /all orders/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /chats/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /shop/i })).toBeInTheDocument();
     expect(screen.getByText(/inspect customer orders and answer customer chats\./i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /all users/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /log usage/i })).not.toBeInTheDocument();
+  });
+
+  it('creates product from shop tab', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter>
+        <AdminDashboardPage />
+      </MemoryRouter>
+    );
+
+    await user.click(await screen.findByRole('button', { name: /shop/i }));
+    await user.type(screen.getByLabelText(/^name$/i), 'Sourdough loaf');
+    await user.type(screen.getByLabelText(/^category$/i), 'Bread');
+    await user.type(screen.getByLabelText(/^price$/i), '8');
+    await user.type(screen.getByLabelText(/^stock$/i), '5');
+    await user.type(screen.getByLabelText(/image url/i), 'https://example.com/sourdough.jpg');
+    await user.type(screen.getByLabelText(/description/i), 'Fresh sourdough');
+
+    await user.click(screen.getByRole('button', { name: /add product/i }));
+
+    await waitFor(() => {
+      expect(createAdminProductMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Sourdough loaf',
+          category: 'Bread'
+        })
+      );
+    });
   });
 
   it('opens logs tab for admin', async () => {
