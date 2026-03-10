@@ -1,10 +1,14 @@
 import { Router } from 'express';
 
 import {
+  createProductController,
   createModeratorController,
   getAllOrdersController,
+  getAllProductsController,
   getAllUsersController,
+  removeProductController,
   removeModeratorController,
+  updateProductController,
   updateOrderStatusController,
   updateModeratorController
 } from '../controllers/admin.controller.js';
@@ -29,4 +33,24 @@ adminRouter.patch(
   '/orders/:orderId/status',
   requireRole(USER_ROLES.admin, USER_ROLES.moderator),
   asyncHandler(updateOrderStatusController)
+);
+adminRouter.get(
+  '/products',
+  requireRole(USER_ROLES.admin, USER_ROLES.moderator),
+  asyncHandler(getAllProductsController)
+);
+adminRouter.post(
+  '/products',
+  requireRole(USER_ROLES.admin, USER_ROLES.moderator),
+  asyncHandler(createProductController)
+);
+adminRouter.patch(
+  '/products/:productId',
+  requireRole(USER_ROLES.admin, USER_ROLES.moderator),
+  asyncHandler(updateProductController)
+);
+adminRouter.delete(
+  '/products/:productId',
+  requireRole(USER_ROLES.admin, USER_ROLES.moderator),
+  asyncHandler(removeProductController)
 );

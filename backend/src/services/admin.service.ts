@@ -3,6 +3,12 @@ import { Types } from 'mongoose';
 
 import { UserModel } from '../models/user.model.js';
 import { listAllOrdersForDashboard, updateOrderStatusForDashboard } from './order.service.js';
+import {
+  createProduct as createCatalogProductItem,
+  deleteProduct as deleteCatalogProductItem,
+  listProductsForAdmin,
+  updateProduct as updateCatalogProductItem
+} from './product.service.js';
 import { USER_ROLES } from '../types/user-role.js';
 import { hashPassword } from '../utils/password.js';
 
@@ -172,4 +178,20 @@ export const listAllOrders = async () => {
 
 export const updateOrderStatus = async (orderId: string, payload: unknown) => {
   return updateOrderStatusForDashboard(orderId, payload);
+};
+
+export const listAllProducts = async () => {
+  return listProductsForAdmin();
+};
+
+export const createCatalogProduct = async (payload: unknown) => {
+  return createCatalogProductItem(payload);
+};
+
+export const updateCatalogProduct = async (productId: string, payload: unknown) => {
+  return updateCatalogProductItem(productId, payload);
+};
+
+export const removeCatalogProduct = async (productId: string) => {
+  await deleteCatalogProductItem(productId);
 };

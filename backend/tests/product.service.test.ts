@@ -1,4 +1,9 @@
-import { parseProductListQuery, ProductError } from '../src/services/product.service.js';
+import {
+  parseCreateProductInput,
+  parseProductListQuery,
+  parseUpdateProductInput,
+  ProductError
+} from '../src/services/product.service.js';
 
 describe('parseProductListQuery', () => {
   it('accepts empty query object', () => {
@@ -21,5 +26,63 @@ describe('parseProductListQuery', () => {
 
   it('throws ProductError for invalid query values', () => {
     expect(() => parseProductListQuery({ category: '' })).toThrow(ProductError);
+  });
+});
+
+describe('parseCreateProductInput', () => {
+  it('accepts valid payload', () => {
+    expect(
+      parseCreateProductInput({
+        name: 'Sourdough loaf',
+        description: 'Fresh loaf',
+        category: 'Bread',
+        price: 8,
+        imageUrl: 'https://example.com/image.jpg',
+        tags: ['Bread', 'Artisan'],
+        stock: 10,
+        isAvailable: true
+      })
+    ).toEqual({
+      name: 'Sourdough loaf',
+      description: 'Fresh loaf',
+      category: 'Bread',
+      price: 8,
+      imageUrl: 'https://example.com/image.jpg',
+      tags: ['Bread', 'Artisan'],
+      stock: 10,
+      isAvailable: true
+    });
+  });
+
+  it('throws ProductError for invalid payload', () => {
+    expect(() =>
+      parseCreateProductInput({
+        name: '',
+        description: 'Fresh loaf',
+        category: 'Bread',
+        price: -1,
+        imageUrl: 'wrong',
+        tags: ['Bread'],
+        stock: -5
+      })
+    ).toThrow(ProductError);
+  });
+});
+
+describe('parseUpdateProductInput', () => {
+  it('accepts partial payload', () => {
+    expect(
+      parseUpdateProductInput({
+        isAvailable: false,
+        stock: 0
+      })
+    ).toEqual({
+      isAvailable: false,
+      stock: 0
+    });
+  });
+
+  it('throws ProductError for empty payload', () => {
+    expect(() => parseUpdateProductInput({})).toThrow(ProductError);
   });
 });

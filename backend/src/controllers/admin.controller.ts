@@ -1,10 +1,14 @@
 import type { Request, Response } from 'express';
 
 import {
+  createCatalogProduct,
   createModerator,
   listAllOrders,
+  listAllProducts,
   listAllUsers,
+  removeCatalogProduct,
   removeModerator,
+  updateCatalogProduct,
   updateOrderStatus,
   updateModerator
 } from '../services/admin.service.js';
@@ -53,4 +57,34 @@ export const updateOrderStatusController = async (req: Request, res: Response) =
   return res.status(200).json({
     data: order
   });
+};
+
+export const getAllProductsController = async (_req: Request, res: Response) => {
+  const products = await listAllProducts();
+
+  return res.status(200).json({
+    data: products
+  });
+};
+
+export const createProductController = async (req: Request, res: Response) => {
+  const product = await createCatalogProduct(req.body);
+
+  return res.status(201).json({
+    data: product
+  });
+};
+
+export const updateProductController = async (req: Request, res: Response) => {
+  const product = await updateCatalogProduct(req.params.productId, req.body);
+
+  return res.status(200).json({
+    data: product
+  });
+};
+
+export const removeProductController = async (req: Request, res: Response) => {
+  await removeCatalogProduct(req.params.productId);
+
+  return res.status(204).send();
 };
