@@ -93,15 +93,45 @@ describe('cart service business flows', () => {
   });
 
   it('returns empty cart when user has no cart', async () => {
-    findOneMock.mockReturnValue({
-      lean: jest.fn().mockResolvedValue(null)
-    } as never);
+    findOneMock.mockResolvedValue(null as never);
 
     await expect(getCart('user-1')).resolves.toEqual({
       items: [],
       totalItems: 0,
       totalPrice: 0
     });
+  });
+
+  it('removes stale cart items that point to missing products', async () => {
+    const existingProductId = new Types.ObjectId();
+    const missingProductId = new Types.ObjectId();
+    const cartSave = jest.fn().mockResolvedValue(undefined);
+    const cart = {
+      items: [
+        { productId: existingProductId, quantity: 1 },
+        { productId: missingProductId, quantity: 2 }
+      ],
+      save: cartSave
+    };
+
+    findOneMock.mockResolvedValue(cart as never);
+    productFindMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue([
+        {
+          _id: existingProductId,
+          name: 'Sourdough loaf',
+          imageUrl: 'https://example.com/sourdough.jpg',
+          price: 8,
+          stock: 6
+        }
+      ])
+    } as never);
+
+    const result = await getCart('user-1');
+
+    expect(cartSave).toHaveBeenCalledTimes(1);
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]?.productId).toBe(String(existingProductId));
   });
 
   it('adds item to cart and returns resolved cart view', async () => {

@@ -148,12 +148,16 @@ export const placeOrderFromCart = async (userId: string, payload: unknown = { us
 
   for (const item of cart.items) {
     const product = productById.get(String(item.productId));
-    if (!product || !product.isAvailable) {
+    if (!product) {
       throw new OrderError('One or more products are unavailable', 409, 'PRODUCT_UNAVAILABLE');
     }
 
     if (item.quantity > product.stock) {
-      throw new OrderError('Not enough stock available', 409, 'OUT_OF_STOCK');
+      throw new OrderError(
+        `${product.name} has only ${product.stock} left in stock. Reduce quantity in cart.`,
+        409,
+        'OUT_OF_STOCK'
+      );
     }
   }
 

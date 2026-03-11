@@ -234,22 +234,37 @@ describe('order service business flows', () => {
     expect(cartSave).toHaveBeenCalledTimes(1);
   });
 
-  it('throws PRODUCT_UNAVAILABLE for unavailable product', async () => {
+  it('allows checkout when product exists but is hidden from shop', async () => {
     const productId = new Types.ObjectId();
+    const cartSave = jest.fn().mockResolvedValue(undefined);
+    const productSave = jest.fn().mockResolvedValue(undefined);
     cartFindOneMock.mockResolvedValue({
-      items: [{ productId, quantity: 1 }]
+      items: [{ productId, quantity: 1 }],
+      save: cartSave
     } as never);
     productFindMock.mockResolvedValue([
       {
         _id: productId,
+        name: 'Hidden item',
+        price: 9,
         isAvailable: false,
-        stock: 10
+        stock: 10,
+        save: productSave
       }
     ] as never);
+    orderCreateMock.mockResolvedValue({
+      id: 'order-hidden',
+      status: ORDER_STATUSES.placed,
+      totalItems: 1,
+      totalPrice: 9,
+      createdAt: new Date('2026-01-01T10:00:00.000Z'),
+      items: [{ productId, name: 'Hidden item', price: 9, quantity: 1, lineTotal: 9 }]
+    } as never);
 
-    await expect(placeOrderFromCart('user-1')).rejects.toMatchObject({
-      code: 'PRODUCT_UNAVAILABLE',
-      statusCode: 409
+    await expect(placeOrderFromCart('user-1')).resolves.toMatchObject({
+      order: {
+        totalItems: 1
+      }
     });
   });
 

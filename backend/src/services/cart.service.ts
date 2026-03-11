@@ -20,6 +20,12 @@ type CartView = {
   totalPrice: number;
 };
 
+const getEmptyCartView = (): CartView => ({
+  items: [],
+  totalItems: 0,
+  totalPrice: 0
+});
+
 const addCartItemSchema = z.object({
   productId: z.string().min(1, 'productId is required'),
   quantity: z.coerce.number().int().positive().default(1)
@@ -82,11 +88,7 @@ const buildCartView = async (
   items: Array<{ productId: Types.ObjectId; quantity: number }>
 ): Promise<CartView> => {
   if (items.length === 0) {
-    return {
-      items: [],
-      totalItems: 0,
-      totalPrice: 0
-    };
+    return getEmptyCartView();
   }
 
   const productIds = items.map((item) => item.productId);
@@ -124,8 +126,36 @@ const buildCartView = async (
 };
 
 export const getCart = async (userId: string) => {
-  const cart = await CartModel.findOne({ userId }).lean();
-  return buildCartView((cart?.items ?? []) as Array<{ productId: Types.ObjectId; quantity: number }>);
+  const cart = await CartModel.findOne({ userId });
+  if (!cart) {
+    return getEmptyCartView();
+  }
+
+  if (cart.items.length === 0) {
+    return getEmptyCartView();
+  }
+
+  const productIds = cart.items.map((item) => item.productId);
+  const products = await ProductModel.find({ _id: { $in: productIds } }).lean();
+  const productById = new Map(products.map((product) => [String(product._id), product]));
+
+  const initialCount = cart.items.length;
+  for (let index = cart.items.length - 1; index >= 0; index -= 1) {
+    if (!productById.has(String(cart.items[index]!.productId))) {
+      cart.items.splice(index, 1);
+    }
+  }
+
+  if (cart.items.length !== initialCount) {
+    await cart.save();
+  }
+
+  return buildCartView(
+    cart.items as unknown as Array<{
+      productId: Types.ObjectId;
+      quantity: number;
+    }>
+  );
 };
 
 export const addItemToCart = async (userId: string, payload: unknown) => {
@@ -213,11 +243,7 @@ export const removeCartItem = async (userId: string, productId: string) => {
   const cart = await CartModel.findOne({ userId });
 
   if (!cart) {
-    return {
-      items: [],
-      totalItems: 0,
-      totalPrice: 0
-    };
+    return getEmptyCartView();
   }
 
   for (let index = cart.items.length - 1; index >= 0; index -= 1) {
