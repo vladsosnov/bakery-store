@@ -39,6 +39,7 @@ export const ShopPage: FC = () => {
   const [underTwenty, setUnderTwenty] = useState(false);
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [cartByProduct, setCartByProduct] = useState<Record<string, number>>({});
+  const [imageLoadFailedByProduct, setImageLoadFailedByProduct] = useState<Record<string, boolean>>({});
   const availableTags = useMemo(() => getAvailableTags(products), [products]);
   const isResetDisabled =
     search.trim() === '' &&
@@ -216,6 +217,19 @@ export const ShopPage: FC = () => {
     });
   }, [activeCategory, activeTag, glutenFreeOnly, products, search, underTwenty, veganOnly]);
 
+  const markProductImageAsFailed = (productId: string) => {
+    setImageLoadFailedByProduct((previous) => {
+      if (previous[productId]) {
+        return previous;
+      }
+
+      return {
+        ...previous,
+        [productId]: true
+      };
+    });
+  };
+
   return (
     <S.Main>
       <S.Header>
@@ -252,10 +266,23 @@ export const ShopPage: FC = () => {
                 <S.ProductsGrid>
                   {filteredProducts.map((product) => {
                     const quantityInCart = cartByProduct[product.id] ?? 0;
+                    const hasImageSource = product.image.trim().length > 0;
+                    const hasImageFailed = imageLoadFailedByProduct[product.id] ?? false;
+                    const shouldShowImage = hasImageSource && !hasImageFailed;
 
                     return (
                       <S.ProductCard key={product.id}>
-                        <S.ProductImage src={product.image} alt={product.name} />
+                        {shouldShowImage ? (
+                          <S.ProductImage
+                            src={product.image}
+                            alt={product.name}
+                            onError={() => markProductImageAsFailed(product.id)}
+                          />
+                        ) : (
+                          <S.ProductImageFallback aria-label={`Image unavailable for ${product.name}`}>
+                            No image available
+                          </S.ProductImageFallback>
+                        )}
                         <S.ProductBody>
                           <S.ProductTitle>{product.name}</S.ProductTitle>
                           <S.ProductMeta>{product.description}</S.ProductMeta>

@@ -204,6 +204,19 @@ export const ProductImage = styled.img`
   object-fit: cover;
 `;
 
+export const ProductImageFallback = styled.div`
+  width: 100%;
+  height: 148px;
+  display: grid;
+  place-items: center;
+  background: ${colors.surface};
+  color: ${colors.brownLight};
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 10px;
+`;
+
 export const ProductBody = styled.div`
   padding: 12px;
 `;

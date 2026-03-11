@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -186,6 +186,41 @@ describe('ShopPage', () => {
     );
 
     expect(await screen.findByText(/no products yet\. a moderator will add items soon\./i)).toBeInTheDocument();
+  });
+
+  it('shows image empty state when product image url is missing', async () => {
+    mockedListProducts.mockResolvedValue([
+      {
+        ...PRODUCTS_FIXTURE[0],
+        _id: 'empty-image-product',
+        imageUrl: ''
+      }
+    ]);
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    expect(
+      await screen.findByLabelText(/image unavailable for butter croissant/i)
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: /butter croissant/i })).not.toBeInTheDocument();
+  });
+
+  it('shows image empty state when product image fails to load', async () => {
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    const productImage = await screen.findByRole('img', { name: /butter croissant/i });
+    fireEvent.error(productImage);
+
+    expect(await screen.findByLabelText(/image unavailable for butter croissant/i)).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: /butter croissant/i })).not.toBeInTheDocument();
   });
 
   it('increments item quantity near add to cart button', async () => {
