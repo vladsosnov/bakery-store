@@ -192,6 +192,7 @@ const openApiDefinition = {
         properties: {
           id: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
           status: { type: 'string', enum: ['placed', 'in progress', 'in delivery'], example: 'placed' },
+          note: { type: 'string', example: 'Please leave at the side door.' },
           totalItems: { type: 'number', example: 2 },
           totalPrice: { type: 'number', example: 16 },
           createdAt: { type: 'string', format: 'date-time' },
@@ -200,7 +201,7 @@ const openApiDefinition = {
             items: { $ref: '#/components/schemas/OrderItem' }
           }
         },
-        required: ['id', 'status', 'totalItems', 'totalPrice', 'createdAt', 'items']
+        required: ['id', 'status', 'note', 'totalItems', 'totalPrice', 'createdAt', 'items']
       },
       AddCartItemRequest: {
         type: 'object',
@@ -819,6 +820,28 @@ const openApiDefinition = {
         tags: ['Orders'],
         summary: 'Place order from current customer cart',
         security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: false,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  useProfileAddress: { type: 'boolean', example: true },
+                  note: { type: 'string', maxLength: 500, example: 'Call me when arriving.' },
+                  deliveryAddress: {
+                    type: 'object',
+                    properties: {
+                      zip: { type: 'string', example: '10001' },
+                      street: { type: 'string', example: '5th Avenue 10' },
+                      city: { type: 'string', example: 'New York' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         responses: {
           201: {
             description: 'Order placed and cart cleared'

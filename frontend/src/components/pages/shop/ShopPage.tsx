@@ -15,6 +15,7 @@ import {
   isAddToCartDisabled,
   mapApiProduct
 } from '@src/components/pages/shop/ShopPage.utils';
+import { getDescriptionPreview } from '@src/utils/description-preview';
 import {
   type Category,
   type Product,
@@ -269,6 +270,7 @@ export const ShopPage: FC = () => {
                     const hasImageSource = product.image.trim().length > 0;
                     const hasImageFailed = imageLoadFailedByProduct[product.id] ?? false;
                     const shouldShowImage = hasImageSource && !hasImageFailed;
+                    const descriptionPreview = getDescriptionPreview(product.description);
 
                     return (
                       <S.ProductCard key={product.id}>
@@ -285,7 +287,9 @@ export const ShopPage: FC = () => {
                         )}
                         <S.ProductBody>
                           <S.ProductTitle>{product.name}</S.ProductTitle>
-                          <S.ProductMeta>{product.description}</S.ProductMeta>
+                          <S.ProductMeta title={descriptionPreview.isTruncated ? product.description : undefined}>
+                            {descriptionPreview.text}
+                          </S.ProductMeta>
                           <S.ProductPrice>${product.price.toFixed(2)}</S.ProductPrice>
                           <S.ProductTags>
                             <S.ProductTag>{product.category}</S.ProductTag>

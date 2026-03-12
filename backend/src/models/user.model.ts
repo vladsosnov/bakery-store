@@ -1,5 +1,6 @@
 import { Schema, model, type InferSchemaType } from 'mongoose';
 
+import { NAME_MAX_LENGTH } from '../constants/validation.js';
 import { USER_ROLES } from '../types/user-role.js';
 
 const userSchema = new Schema(
@@ -7,12 +8,14 @@ const userSchema = new Schema(
     firstName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: NAME_MAX_LENGTH
     },
     lastName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: NAME_MAX_LENGTH
     },
     email: {
       type: String,

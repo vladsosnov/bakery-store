@@ -1,7 +1,9 @@
 import { useState, type ChangeEvent, type FC, type FormEvent } from 'react';
 
 import { Input } from '@src/components/common/Input';
+import { PRODUCT_DESCRIPTION_MAX_LENGTH } from '@src/constants/validation';
 import type { AdminProduct, CreateAdminProductRequest, UpdateAdminProductRequest } from '@src/types/admin';
+import { getDescriptionPreview } from '@src/utils/description-preview';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
 
 type ShopFormState = {
@@ -71,9 +73,11 @@ export const ShopTab: FC<ShopTabProps> = ({
     (field: keyof ShopFormState) =>
       (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const fieldValue =
-        field === 'isAvailable' && event.target instanceof HTMLInputElement
-          ? event.target.checked
-          : event.target.value;
+          field === 'isAvailable' && event.target instanceof HTMLInputElement
+            ? event.target.checked
+            : field === 'description'
+              ? event.target.value.slice(0, PRODUCT_DESCRIPTION_MAX_LENGTH)
+              : event.target.value;
 
         setForm((prev) => ({
           ...prev,
@@ -85,9 +89,11 @@ export const ShopTab: FC<ShopTabProps> = ({
     (field: keyof ShopFormState) =>
       (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const fieldValue =
-        field === 'isAvailable' && event.target instanceof HTMLInputElement
-          ? event.target.checked
-          : event.target.value;
+          field === 'isAvailable' && event.target instanceof HTMLInputElement
+            ? event.target.checked
+            : field === 'description'
+              ? event.target.value.slice(0, PRODUCT_DESCRIPTION_MAX_LENGTH)
+              : event.target.value;
 
         setEditForm((prev) => ({
           ...prev,
@@ -183,8 +189,14 @@ export const ShopTab: FC<ShopTabProps> = ({
 
         <S.Label>
           Description
-          <S.TextArea required value={form.description} onChange={handleFormChange('description')} />
+          <S.TextArea
+            required
+            maxLength={PRODUCT_DESCRIPTION_MAX_LENGTH}
+            value={form.description}
+            onChange={handleFormChange('description')}
+          />
         </S.Label>
+        <S.MutedText>{form.description.length}/{PRODUCT_DESCRIPTION_MAX_LENGTH} characters</S.MutedText>
 
         <S.InlineCheckboxLabel>
           <input type="checkbox" checked={form.isAvailable} onChange={handleFormChange('isAvailable')} />
@@ -205,6 +217,7 @@ export const ShopTab: FC<ShopTabProps> = ({
           {products.map((product) => {
             const isEditing = editingProductId === product._id;
             const isPending = pendingProductId === product._id;
+            const descriptionPreview = getDescriptionPreview(product.description);
 
             return (
               <S.ProductItem key={product._id}>
@@ -213,6 +226,9 @@ export const ShopTab: FC<ShopTabProps> = ({
                     <S.ProductTitle>{product.name}</S.ProductTitle>
                     <S.ProductMeta>
                       {product.category} | ${product.price.toFixed(2)} | stock: {product.stock}
+                    </S.ProductMeta>
+                    <S.ProductMeta title={descriptionPreview.isTruncated ? product.description : undefined}>
+                      Description: {descriptionPreview.text}
                     </S.ProductMeta>
                     <S.ProductMeta>{product.isAvailable ? 'visible in shop' : 'hidden from shop'}</S.ProductMeta>
                   </div>
@@ -283,8 +299,14 @@ export const ShopTab: FC<ShopTabProps> = ({
 
                     <S.Label>
                       Description
-                      <S.TextArea required value={editForm.description} onChange={handleEditFormChange('description')} />
+                      <S.TextArea
+                        required
+                        maxLength={PRODUCT_DESCRIPTION_MAX_LENGTH}
+                        value={editForm.description}
+                        onChange={handleEditFormChange('description')}
+                      />
                     </S.Label>
+                    <S.MutedText>{editForm.description.length}/{PRODUCT_DESCRIPTION_MAX_LENGTH} characters</S.MutedText>
 
                     <S.InlineCheckboxLabel>
                       <input type="checkbox" checked={editForm.isAvailable} onChange={handleEditFormChange('isAvailable')} />

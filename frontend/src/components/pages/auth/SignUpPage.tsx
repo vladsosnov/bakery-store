@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
 import { Input } from '@src/components/common/Input';
+import { NAME_MAX_LENGTH } from '@src/constants/validation';
 import { SubmitButton } from '@src/components/common/SubmitButton';
 import { registerUser } from '@src/services/auth-api';
 import { setAuthSession } from '@src/services/auth-session';
@@ -72,6 +73,7 @@ export const SignUpPage: FC = () => {
               placeholder="Vlad"
               value={firstName}
               onChange={(event) => setFirstName(event.target.value)}
+              maxLength={NAME_MAX_LENGTH}
               required
             />
           </S.Label>
@@ -83,6 +85,7 @@ export const SignUpPage: FC = () => {
               placeholder="Sosnov"
               value={lastName}
               onChange={(event) => setLastName(event.target.value)}
+              maxLength={NAME_MAX_LENGTH}
               required
             />
           </S.Label>

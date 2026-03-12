@@ -67,6 +67,21 @@ describe('parseCreateProductInput', () => {
       })
     ).toThrow(ProductError);
   });
+
+  it('throws ProductError when description is longer than 200 characters', () => {
+    expect(() =>
+      parseCreateProductInput({
+        name: 'Sourdough loaf',
+        description: 'x'.repeat(201),
+        category: 'Bread',
+        price: 8,
+        imageUrl: 'https://example.com/image.jpg',
+        tags: ['Bread'],
+        stock: 5,
+        isAvailable: true
+      })
+    ).toThrow(ProductError);
+  });
 });
 
 describe('parseUpdateProductInput', () => {
@@ -84,5 +99,13 @@ describe('parseUpdateProductInput', () => {
 
   it('throws ProductError for empty payload', () => {
     expect(() => parseUpdateProductInput({})).toThrow(ProductError);
+  });
+
+  it('throws ProductError when description is longer than 200 characters', () => {
+    expect(() =>
+      parseUpdateProductInput({
+        description: 'x'.repeat(201)
+      })
+    ).toThrow(ProductError);
   });
 });

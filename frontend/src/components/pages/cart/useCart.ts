@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type MouseEvent } from 'react';
 import { toast } from 'sonner';
 
 import { fetchCart, removeCartItem, updateCartItemQuantity } from '@src/services/cart-api';
+import { ORDER_NOTE_MAX_LENGTH } from '@src/constants/validation';
 import { getAuthSession } from '@src/services/auth-session';
 import { getMyProfile } from '@src/services/auth-api';
 import { placeOrder } from '@src/services/order-api';
@@ -36,6 +37,7 @@ export const useCart = () => {
     street: '',
     city: ''
   });
+  const [orderNote, setOrderNote] = useState('');
 
   useEffect(() => {
     if (!session || !isCustomer) {
@@ -198,11 +200,13 @@ export const useCart = () => {
 
       try {
         setIsOrdering(true);
+        const trimmedNote = orderNote.trim();
         const response = await placeOrder(
           useProfileAddress
-            ? { useProfileAddress: true }
+            ? { useProfileAddress: true, note: trimmedNote }
             : {
               useProfileAddress: false,
+              note: trimmedNote,
               deliveryAddress: {
                 zip: selectedAddress.zip.trim(),
                 street: selectedAddress.street.trim(),
@@ -212,6 +216,7 @@ export const useCart = () => {
         );
         setItems(response.data.cart.items);
         setTotalPrice(response.data.cart.totalPrice);
+        setOrderNote('');
         toast.success('Order placed successfully.');
       } catch (error) {
         toast.error(toErrorMessage(error, 'Failed to place order.'));
@@ -230,6 +235,10 @@ export const useCart = () => {
     }));
   };
 
+  const handleOrderNoteChange = (value: string) => {
+    setOrderNote(value.slice(0, ORDER_NOTE_MAX_LENGTH));
+  };
+
   return {
     session,
     isLoading,
@@ -240,9 +249,11 @@ export const useCart = () => {
     isOrdering,
     isAnyItemPending: Object.values(pendingByProduct).some(Boolean),
     useProfileAddress,
+    orderNote,
     deliveryAddress: useProfileAddress ? profileAddress : deliveryAddress,
     handleUseProfileAddressChange: setUseProfileAddress,
     handleDeliveryAddressChange,
+    handleOrderNoteChange,
     handleIncreaseClick,
     handleDecreaseClick,
     handleRemoveClick,

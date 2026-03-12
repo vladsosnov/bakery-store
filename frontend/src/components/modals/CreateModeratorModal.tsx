@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent, type FC, type FormEventHandler, 
 import { toast } from 'sonner';
 
 import { Input } from '@src/components/common/Input';
+import { NAME_MAX_LENGTH } from '@src/constants/validation';
 import { SubmitButton } from '@src/components/common/SubmitButton';
 import { createAdminModerator } from '@src/services/admin-api';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
@@ -93,11 +94,11 @@ export const CreateModeratorModal: FC<CreateModeratorModalProps> = ({
         <S.Form onSubmit={handleSubmit}>
           <S.Label>
             First name
-            <Input value={form.firstName} onChange={handleFormFieldChange('firstName')} required />
+            <Input value={form.firstName} onChange={handleFormFieldChange('firstName')} maxLength={NAME_MAX_LENGTH} required />
           </S.Label>
           <S.Label>
             Last name
-            <Input value={form.lastName} onChange={handleFormFieldChange('lastName')} required />
+            <Input value={form.lastName} onChange={handleFormFieldChange('lastName')} maxLength={NAME_MAX_LENGTH} required />
           </S.Label>
           <S.Label>
             Email

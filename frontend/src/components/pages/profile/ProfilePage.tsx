@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import { Input } from '@src/components/common/Input';
+import { NAME_MAX_LENGTH } from '@src/constants/validation';
 import { SubmitButton } from '@src/components/common/SubmitButton';
 import { useProfilePage } from '@src/components/pages/profile/useProfilePage';
 import * as S from './ProfilePage.styles';
@@ -80,6 +81,7 @@ export const ProfilePage: FC = () => {
               type="text"
               value={profileForm.firstName}
               onChange={updateProfileFormField('firstName')}
+              maxLength={NAME_MAX_LENGTH}
               disabled={isProfileSaving}
               required
             />
@@ -91,6 +93,7 @@ export const ProfilePage: FC = () => {
               type="text"
               value={profileForm.lastName}
               onChange={updateProfileFormField('lastName')}
+              maxLength={NAME_MAX_LENGTH}
               disabled={isProfileSaving}
               required
             />

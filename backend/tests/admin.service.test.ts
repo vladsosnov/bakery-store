@@ -27,6 +27,17 @@ describe('parseCreateModeratorInput', () => {
       })
     ).toThrow();
   });
+
+  it('throws when first or last name exceed max length', () => {
+    expect(() =>
+      parseCreateModeratorInput({
+        firstName: 'A'.repeat(61),
+        lastName: 'B'.repeat(61),
+        email: 'marta@bakery.com',
+        password: 'moderator123'
+      })
+    ).toThrow();
+  });
 });
 
 describe('parseUpdateModeratorInput', () => {
@@ -44,5 +55,13 @@ describe('parseUpdateModeratorInput', () => {
 
   it('throws for empty payload', () => {
     expect(() => parseUpdateModeratorInput({})).toThrow();
+  });
+
+  it('throws when first or last name exceed max length', () => {
+    expect(() =>
+      parseUpdateModeratorInput({
+        firstName: 'A'.repeat(61)
+      })
+    ).toThrow();
   });
 });

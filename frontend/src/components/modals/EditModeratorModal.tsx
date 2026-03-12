@@ -2,6 +2,7 @@ import { useEffect, useState, type FC } from 'react';
 import { toast } from 'sonner';
 
 import { Input } from '@src/components/common/Input';
+import { NAME_MAX_LENGTH } from '@src/constants/validation';
 import { SubmitButton } from '@src/components/common/SubmitButton';
 import { updateAdminModerator } from '@src/services/admin-api';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
@@ -83,11 +84,11 @@ export const EditModeratorModal: FC<EditModeratorModalProps> = ({
         <S.Form>
           <S.Label>
             First name
-            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={NAME_MAX_LENGTH} />
           </S.Label>
           <S.Label>
             Last name
-            <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <Input value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={NAME_MAX_LENGTH} />
           </S.Label>
           <S.Label>
             Email

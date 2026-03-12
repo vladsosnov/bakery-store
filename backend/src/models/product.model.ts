@@ -1,4 +1,5 @@
 import { Schema, model, type InferSchemaType } from 'mongoose';
+import { PRODUCT_DESCRIPTION_MAX_LENGTH } from '../constants/validation.js';
 
 const productSchema = new Schema(
   {
@@ -17,7 +18,8 @@ const productSchema = new Schema(
     description: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: PRODUCT_DESCRIPTION_MAX_LENGTH
     },
     category: {
       type: String,

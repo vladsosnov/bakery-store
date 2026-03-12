@@ -2,6 +2,7 @@ import { ZodError, z } from 'zod';
 import { Types } from 'mongoose';
 
 import { UserModel } from '../models/user.model.js';
+import { NAME_MAX_LENGTH } from '../constants/validation.js';
 import { listAllOrdersForDashboard, updateOrderStatusForDashboard } from './order.service.js';
 import {
   createProduct as createCatalogProductItem,
@@ -13,8 +14,8 @@ import { USER_ROLES } from '../types/user-role.js';
 import { hashPassword } from '../utils/password.js';
 
 const createModeratorSchema = z.object({
-  firstName: z.string().trim().min(1, 'firstName is required'),
-  lastName: z.string().trim().min(1, 'lastName is required'),
+  firstName: z.string().trim().min(1, 'firstName is required').max(NAME_MAX_LENGTH),
+  lastName: z.string().trim().min(1, 'lastName is required').max(NAME_MAX_LENGTH),
   email: z.string().trim().email('email must be valid'),
   password: z
     .string()
@@ -24,8 +25,8 @@ const createModeratorSchema = z.object({
 
 const updateModeratorSchema = z
   .object({
-    firstName: z.string().trim().min(1, 'firstName is required').optional(),
-    lastName: z.string().trim().min(1, 'lastName is required').optional(),
+    firstName: z.string().trim().min(1, 'firstName is required').max(NAME_MAX_LENGTH).optional(),
+    lastName: z.string().trim().min(1, 'lastName is required').max(NAME_MAX_LENGTH).optional(),
     email: z.string().trim().email('email must be valid').optional(),
     isActive: z.boolean().optional()
   })

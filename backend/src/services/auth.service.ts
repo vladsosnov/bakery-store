@@ -2,14 +2,15 @@ import { ZodError, z } from 'zod';
 import { Types } from 'mongoose';
 
 import { env } from '../config/env.js';
+import { NAME_MAX_LENGTH } from '../constants/validation.js';
 import { UserModel } from '../models/user.model.js';
 import { USER_ROLES, type UserRole } from '../types/user-role.js';
 import { signAccessToken } from '../utils/jwt.js';
 import { comparePassword, hashPassword } from '../utils/password.js';
 
 const registerSchema = z.object({
-  firstName: z.string().trim().min(1, 'firstName is required'),
-  lastName: z.string().trim().min(1, 'lastName is required'),
+  firstName: z.string().trim().min(1, 'firstName is required').max(NAME_MAX_LENGTH),
+  lastName: z.string().trim().min(1, 'lastName is required').max(NAME_MAX_LENGTH),
   email: z.string().trim().email('email must be valid'),
   password: z
     .string()
@@ -36,8 +37,8 @@ const setPasswordSchema = z.object({
 });
 
 const updateProfileSchema = z.object({
-  firstName: z.string().trim().min(1, 'firstName is required'),
-  lastName: z.string().trim().min(1, 'lastName is required'),
+  firstName: z.string().trim().min(1, 'firstName is required').max(NAME_MAX_LENGTH),
+  lastName: z.string().trim().min(1, 'lastName is required').max(NAME_MAX_LENGTH),
   phoneNumber: z.string().trim().optional(),
   address: z
     .object({

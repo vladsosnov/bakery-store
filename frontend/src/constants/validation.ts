@@ -1,0 +1,3 @@
+export const NAME_MAX_LENGTH = 60;
+export const PRODUCT_DESCRIPTION_MAX_LENGTH = 200;
+export const ORDER_NOTE_MAX_LENGTH = 500;

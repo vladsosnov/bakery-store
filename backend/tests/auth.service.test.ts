@@ -33,6 +33,17 @@ describe('parseRegisterInput', () => {
       })
     ).toThrow();
   });
+
+  it('throws when first or last name exceed max length', () => {
+    expect(() =>
+      parseRegisterInput({
+        firstName: 'A'.repeat(61),
+        lastName: 'B'.repeat(61),
+        email: 'vlad@bakery.com',
+        password: 'password123'
+      })
+    ).toThrow();
+  });
 });
 
 describe('parseLoginInput', () => {
@@ -139,6 +150,21 @@ describe('parseUpdateProfileInput', () => {
           zip: '',
           street: '',
           city: ''
+        }
+      })
+    ).toThrow();
+  });
+
+  it('throws when first or last name exceed max length', () => {
+    expect(() =>
+      parseUpdateProfileInput({
+        firstName: 'A'.repeat(61),
+        lastName: 'B'.repeat(61),
+        phoneNumber: '+15550001122',
+        address: {
+          zip: '10001',
+          street: '5th Avenue 10',
+          city: 'New York'
         }
       })
     ).toThrow();
