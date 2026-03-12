@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 
 import { getModeratorChatThreads } from '@src/services/chat-api';
 import { LogsTab } from './LogsTab';
@@ -71,13 +71,16 @@ describe('LogsTab', () => {
       />
     );
 
-    expect(screen.getByText(/total orders/i)).toBeInTheDocument();
-    expect(screen.getByText('1')).toBeInTheDocument();
+    const totalOrdersCard = screen.getByText(/total orders/i).closest('div');
+    expect(totalOrdersCard).not.toBeNull();
+    expect(within(totalOrdersCard as HTMLElement).getByText('1')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText(/total chat messages/i)).toBeInTheDocument();
     });
-    expect(screen.getByText('2')).toBeInTheDocument();
+    const totalChatMessagesCard = screen.getByText(/total chat messages/i).closest('div');
+    expect(totalChatMessagesCard).not.toBeNull();
+    expect(within(totalChatMessagesCard as HTMLElement).getByText('2')).toBeInTheDocument();
   });
 
   it('shows chat load error when chat metrics fail', async () => {

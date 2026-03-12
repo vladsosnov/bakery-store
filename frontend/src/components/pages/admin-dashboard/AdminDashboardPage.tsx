@@ -5,7 +5,7 @@ import {
   useState,
   type ChangeEvent,
   type FC,
-  type MouseEvent
+  type MouseEvent,
 } from 'react';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -18,16 +18,16 @@ import {
   getAdminProducts,
   getAdminUsers,
   updateAdminProduct,
-  updateAdminOrderStatus
+  updateAdminOrderStatus,
 } from '@src/services/admin-api';
 import { CreateModeratorModal } from '@src/components/modals/CreateModeratorModal';
 import { EditModeratorModal } from '@src/components/modals/EditModeratorModal';
 import { RemoveModeratorModal } from '@src/components/modals/RemoveModeratorModal';
-import { LogsTab } from '@src/components/pages/admin-dashboard/tabs/LogsTab';
-import { OrdersTab } from '@src/components/pages/admin-dashboard/tabs/OrdersTab';
-import { UsersTab } from '@src/components/pages/admin-dashboard/tabs/UsersTab';
-import { ChatsTab } from '@src/components/pages/admin-dashboard/tabs/ChatsTab';
-import { ShopTab } from '@src/components/pages/admin-dashboard/tabs/ShopTab';
+import { LogsTab } from '@src/components/pages/admin-dashboard/tabs/logs/LogsTab';
+import { OrdersTab } from '@src/components/pages/admin-dashboard/tabs/orders/OrdersTab';
+import { UsersTab } from '@src/components/pages/admin-dashboard/tabs/users/UsersTab';
+import { ChatsTab } from '@src/components/pages/admin-dashboard/tabs/chats/ChatsTab';
+import { ShopTab } from '@src/components/pages/admin-dashboard/tabs/shop/ShopTab';
 import { getAuthSession } from '@src/services/auth-session';
 import { USER_ROLES } from '@src/types/user-role';
 import type {
@@ -36,7 +36,7 @@ import type {
   AdminProduct,
   AdminUser,
   CreateAdminProductRequest,
-  UpdateAdminProductRequest
+  UpdateAdminProductRequest,
 } from '@src/types/admin';
 import { toErrorMessage } from '@src/utils/error';
 import * as S from './AdminDashboardPage.styles';
@@ -51,17 +51,21 @@ export const AdminDashboardPage: FC = () => {
   const dashboardSubtitle = isAdmin
     ? 'Manage users and moderators, inspect orders, and prepare usage logs.'
     : 'Inspect customer orders and answer customer chats.';
-  
+
   const [activeTab, setActiveTab] = useState<AdminTab>(() =>
-    session?.user.role === USER_ROLES.moderator ? 'orders' : 'users'
+    session?.user.role === USER_ROLES.moderator ? 'orders' : 'users',
   );
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedModeratorForEdit, setSelectedModeratorForEdit] = useState<AdminUser | null>(null);
-  const [selectedModeratorForRemove, setSelectedModeratorForRemove] = useState<AdminUser | null>(null);
+  const [selectedModeratorForEdit, setSelectedModeratorForEdit] = useState<AdminUser | null>(
+    null,
+  );
+  const [selectedModeratorForRemove, setSelectedModeratorForRemove] = useState<AdminUser | null>(
+    null,
+  );
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingProductId, setPendingProductId] = useState<string | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | AdminOrderStatus>('all');
@@ -75,13 +79,16 @@ export const AdminDashboardPage: FC = () => {
         const [usersResponse, ordersResponse, productsResponse] = await Promise.all([
           getAdminUsers(),
           getAdminOrders(),
-          getAdminProducts()
+          getAdminProducts(),
         ]);
         setUsers(usersResponse.data);
         setOrders(ordersResponse.data);
         setProducts(productsResponse.data);
       } else {
-        const [ordersResponse, productsResponse] = await Promise.all([getAdminOrders(), getAdminProducts()]);
+        const [ordersResponse, productsResponse] = await Promise.all([
+          getAdminOrders(),
+          getAdminProducts(),
+        ]);
         setUsers([]);
         setOrders(ordersResponse.data);
         setProducts(productsResponse.data);
@@ -191,7 +198,7 @@ export const AdminDashboardPage: FC = () => {
 
           return {
             ...order,
-            status: response.data.status
+            status: response.data.status,
           };
         });
       });
@@ -204,9 +211,11 @@ export const AdminDashboardPage: FC = () => {
   };
 
   const getDeliveryAddressText = (order: AdminOrder) => {
-    const parts = [order.deliveryAddress.street, order.deliveryAddress.city, order.deliveryAddress.zip].filter(
-      (value) => value.trim() !== ''
-    );
+    const parts = [
+      order.deliveryAddress.street,
+      order.deliveryAddress.city,
+      order.deliveryAddress.zip,
+    ].filter((value) => value.trim() !== '');
 
     return parts.length > 0 ? parts.join(', ') : 'Address is not set';
   };
@@ -233,8 +242,8 @@ export const AdminDashboardPage: FC = () => {
 
       return (
         customerName.includes(normalizedSearch) ||
-        orderNumber.includes(normalizedSearch) ||
-        fullOrderId.includes(normalizedSearch)
+                orderNumber.includes(normalizedSearch) ||
+                fullOrderId.includes(normalizedSearch)
       );
     });
   }, [orders, orderSearchTerm, orderStatusFilter]);
@@ -259,7 +268,9 @@ export const AdminDashboardPage: FC = () => {
   };
 
   const handleModeratorUpdated = (user: AdminUser) => {
-    setUsers((prev) => prev.map((existingUser) => (existingUser.id === user.id ? user : existingUser)));
+    setUsers((prev) =>
+      prev.map((existingUser) => (existingUser.id === user.id ? user : existingUser)),
+    );
     setSelectedModeratorForEdit(null);
   };
 
@@ -286,7 +297,9 @@ export const AdminDashboardPage: FC = () => {
     setPendingProductId(productId);
     try {
       const response = await updateAdminProduct(productId, payload);
-      setProducts((prev) => prev.map((item) => (item._id === productId ? response.data : item)));
+      setProducts((prev) =>
+        prev.map((item) => (item._id === productId ? response.data : item)),
+      );
       toast.success('Product updated.');
     } catch (error) {
       toast.error(toErrorMessage(error, 'Failed to update product.'));
@@ -326,22 +339,42 @@ export const AdminDashboardPage: FC = () => {
 
         <S.Tabs>
           {isAdmin ? (
-            <S.TabButton type="button" $active={activeTab === 'users'} onClick={handleUsersTabClick}>
-              All users
+            <S.TabButton
+              type="button"
+              $active={activeTab === 'users'}
+              onClick={handleUsersTabClick}
+            >
+                            All users
             </S.TabButton>
           ) : null}
-          <S.TabButton type="button" $active={activeTab === 'orders'} onClick={() => setActiveTab('orders')}>
-            All orders
+          <S.TabButton
+            type="button"
+            $active={activeTab === 'orders'}
+            onClick={() => setActiveTab('orders')}
+          >
+                        All orders
           </S.TabButton>
-          <S.TabButton type="button" $active={activeTab === 'chats'} onClick={() => setActiveTab('chats')}>
-            Chats
+          <S.TabButton
+            type="button"
+            $active={activeTab === 'chats'}
+            onClick={() => setActiveTab('chats')}
+          >
+                        Chats
           </S.TabButton>
-          <S.TabButton type="button" $active={activeTab === 'shop'} onClick={() => setActiveTab('shop')}>
-            Shop
+          <S.TabButton
+            type="button"
+            $active={activeTab === 'shop'}
+            onClick={() => setActiveTab('shop')}
+          >
+                        Shop
           </S.TabButton>
           {isAdmin ? (
-            <S.TabButton type="button" $active={activeTab === 'logs'} onClick={handleLogsTabClick}>
-              Log usage
+            <S.TabButton
+              type="button"
+              $active={activeTab === 'logs'}
+              onClick={handleLogsTabClick}
+            >
+                            Log usage
             </S.TabButton>
           ) : null}
         </S.Tabs>
@@ -365,7 +398,9 @@ export const AdminDashboardPage: FC = () => {
           pendingOrderId={pendingOrderId}
           orderStatusFilter={orderStatusFilter}
           orderSearchTerm={orderSearchTerm}
-          onOrderStatusFilterChange={(e) => setOrderStatusFilter(e.target.value as AdminOrderStatus)}
+          onOrderStatusFilterChange={(e) =>
+            setOrderStatusFilter(e.target.value as AdminOrderStatus)
+          }
           onOrderSearchChange={(e) => setOrderSearchTerm(e.target.value)}
           onOrderStatusSelectChange={(e) => handleOrderStatusChange(e)}
           getAllowedStatusOptions={getAllowedStatusOptions}
@@ -386,12 +421,7 @@ export const AdminDashboardPage: FC = () => {
         />
       ) : null}
 
-      {isAdmin && activeTab === 'logs' ? (
-        <LogsTab
-          orders={orders}
-          users={users}
-        />
-      ) : null}
+      {isAdmin && activeTab === 'logs' ? <LogsTab orders={orders} users={users} /> : null}
 
       <CreateModeratorModal
         isOpen={isAdmin && isCreateModalOpen}

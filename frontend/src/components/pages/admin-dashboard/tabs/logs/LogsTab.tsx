@@ -2,22 +2,27 @@ import { useEffect, useMemo, useState, type FC } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
-import { ORDER_STATUS_OPTIONS, type AdminOrder, type AdminOrderStatus, type AdminUser } from '@src/types/admin';
+import {
+  ORDER_STATUS_OPTIONS,
+  type AdminOrder,
+  type AdminOrderStatus,
+  type AdminUser,
+} from '@src/types/admin';
 import { getModeratorChatThreads } from '@src/services/chat-api';
 import type { ChatThread } from '@src/types/chat';
 import * as S from '@src/components/pages/admin-dashboard/AdminDashboardPage.styles';
-import * as L from '@src/components/pages/admin-dashboard/tabs/LogsTab.styles';
-import { toDailySeries, getDayKey } from './Tabs.utils';
+import * as L from '@src/components/pages/admin-dashboard/tabs/logs/LogsTab.styles';
+import { toDailySeries, getDayKey } from '../Tabs.utils';
 import {
   getChatMessagesChartOptions,
   getOrdersChartOptions,
   getStatusChartOptions,
-  getUsersChartOptions
+  getUsersChartOptions,
 } from './LogsTab.chart-options';
 
 type LogsTabProps = {
-  orders: AdminOrder[];
-  users: AdminUser[];
+    orders: AdminOrder[];
+    users: AdminUser[];
 };
 
 export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
@@ -25,10 +30,18 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
   const [isChatLoading, setIsChatLoading] = useState(true);
   const [chatLoadError, setChatLoadError] = useState<string | null>(null);
   const todayKey = new Date().toISOString().slice(0, 10);
-  const ordersDaily = useMemo(() => toDailySeries(orders.map((order) => order.createdAt)), [orders]);
+  const ordersDaily = useMemo(
+    () => toDailySeries(orders.map((order) => order.createdAt)),
+    [orders],
+  );
   const usersDaily = useMemo(
-    () => toDailySeries(users.map((user) => user.createdAt).filter((createdAt): createdAt is string => Boolean(createdAt))),
-    [users]
+    () =>
+      toDailySeries(
+        users
+          .map((user) => user.createdAt)
+          .filter((createdAt): createdAt is string => Boolean(createdAt)),
+      ),
+    [users],
   );
 
   useEffect(() => {
@@ -64,15 +77,22 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
 
   const totalRevenue = orders.reduce((acc, order) => acc + order.totalPrice, 0);
   const todayOrders = orders.filter((order) => getDayKey(order.createdAt) === todayKey).length;
-  const todayUsers = users.filter((user) => user.createdAt && getDayKey(user.createdAt) === todayKey).length;
-  const statusCounts = ORDER_STATUS_OPTIONS.reduce<Record<AdminOrderStatus, number>>((acc, status) => {
-    acc[status] = orders.filter((order) => order.status === status).length;
-    return acc;
-  }, { placed: 0, 'in progress': 0, 'in delivery': 0 });
+  const todayUsers = users.filter(
+    (user) => user.createdAt && getDayKey(user.createdAt) === todayKey,
+  ).length;
+  const statusCounts = ORDER_STATUS_OPTIONS.reduce<Record<AdminOrderStatus, number>>(
+    (acc, status) => {
+      acc[status] = orders.filter((order) => order.status === status).length;
+      return acc;
+    },
+    { placed: 0, 'in progress': 0, 'in delivery': 0 },
+  );
 
   const totalChatMessages = chatThreads.reduce((acc, thread) => acc + thread.messages.length, 0);
   const activeConversations = chatThreads.filter((thread) => thread.unreadForSupport).length;
-  const conversationsToday = chatThreads.filter((thread) => getDayKey(thread.lastMessageAt) === todayKey).length;
+  const conversationsToday = chatThreads.filter(
+    (thread) => getDayKey(thread.lastMessageAt) === todayKey,
+  ).length;
   const medianResponseTimeMinutes = useMemo(() => {
     const responseDurationsMs: number[] = [];
 
@@ -99,20 +119,27 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
     const sorted = responseDurationsMs.sort((left, right) => left - right);
     const middleIndex = Math.floor(sorted.length / 2);
     const medianMs =
-      sorted.length % 2 === 0 ? (sorted[middleIndex - 1] + sorted[middleIndex]) / 2 : sorted[middleIndex];
+            sorted.length % 2 === 0
+              ? (sorted[middleIndex - 1] + sorted[middleIndex]) / 2
+              : sorted[middleIndex];
 
     return Math.max(1, Math.round(medianMs / (60 * 1000)));
   }, [chatThreads]);
   const chatMessagesDaily = useMemo(
-    () => toDailySeries(chatThreads.flatMap((thread) => thread.messages.map((message) => message.createdAt))),
-    [chatThreads]
+    () =>
+      toDailySeries(
+        chatThreads.flatMap((thread) =>
+          thread.messages.map((message) => message.createdAt),
+        ),
+      ),
+    [chatThreads],
   );
   const ordersChartOptions = useMemo(() => getOrdersChartOptions(ordersDaily), [ordersDaily]);
   const usersChartOptions = useMemo(() => getUsersChartOptions(usersDaily), [usersDaily]);
   const statusChartOptions = useMemo(() => getStatusChartOptions(statusCounts), [statusCounts]);
   const chatMessagesChartOptions = useMemo(
     () => getChatMessagesChartOptions(chatMessagesDaily),
-    [chatMessagesDaily]
+    [chatMessagesDaily],
   );
 
   return (
@@ -161,7 +188,9 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
 
       <L.Section>
         <L.SectionTitle>Chat activity</L.SectionTitle>
-        {isChatLoading ? <L.PlaceholderText>Loading chat metrics...</L.PlaceholderText> : null}
+        {isChatLoading ? (
+          <L.PlaceholderText>Loading chat metrics...</L.PlaceholderText>
+        ) : null}
         {chatLoadError ? <L.ErrorText>{chatLoadError}</L.ErrorText> : null}
         {!isChatLoading && !chatLoadError ? (
           <>
@@ -181,7 +210,9 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
               <L.MetricCard>
                 <L.MetricLabel>Median response time</L.MetricLabel>
                 <L.MetricValue>
-                  {medianResponseTimeMinutes !== null ? `${medianResponseTimeMinutes} min` : 'No replies yet'}
+                  {medianResponseTimeMinutes !== null
+                    ? `${medianResponseTimeMinutes} min`
+                    : 'No replies yet'}
                 </L.MetricValue>
               </L.MetricCard>
             </L.MetricsGrid>
@@ -189,7 +220,10 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
             <L.NestedSection>
               <L.SectionTitle>Messages activity (last 7 days)</L.SectionTitle>
               <L.ChartBox>
-                <HighchartsReact highcharts={Highcharts} options={chatMessagesChartOptions} />
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={chatMessagesChartOptions}
+                />
               </L.ChartBox>
             </L.NestedSection>
           </>

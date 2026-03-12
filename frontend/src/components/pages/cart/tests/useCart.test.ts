@@ -509,6 +509,13 @@ describe('useCart', () => {
 
     act(() => {
       result.current.handleOrderNoteChange('  Please call when outside  ');
+    });
+
+    await waitFor(() => {
+      expect(result.current.orderNote).toBe('  Please call when outside  ');
+    });
+
+    act(() => {
       result.current.handlePlaceOrderClick();
     });
 
