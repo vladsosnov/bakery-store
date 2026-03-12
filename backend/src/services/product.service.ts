@@ -2,6 +2,7 @@ import { ZodError, z } from 'zod';
 import { Types } from 'mongoose';
 
 import { ProductModel } from '../models/product.model.js';
+import { PRODUCT_DESCRIPTION_MAX_LENGTH } from '../constants/validation.js';
 import { SHOP_TAGS } from '../types/shop-tag.js';
 
 const productListQuerySchema = z.object({
@@ -13,7 +14,14 @@ const productListQuerySchema = z.object({
 const productCreateSchema = z.object({
   name: z.string().trim().min(1, 'name is required'),
   slug: z.string().trim().min(1, 'slug can not be empty').optional(),
-  description: z.string().trim().min(1, 'description is required'),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'description is required')
+    .max(
+      PRODUCT_DESCRIPTION_MAX_LENGTH,
+      `description must be at most ${PRODUCT_DESCRIPTION_MAX_LENGTH} characters`
+    ),
   category: z.string().trim().min(1, 'category is required'),
   price: z.number().min(0, 'price must be greater than or equal to 0'),
   imageUrl: z.string().trim().url('imageUrl must be a valid URL'),
@@ -26,7 +34,15 @@ const productUpdateSchema = z
   .object({
     name: z.string().trim().min(1, 'name is required').optional(),
     slug: z.string().trim().min(1, 'slug can not be empty').optional(),
-    description: z.string().trim().min(1, 'description is required').optional(),
+    description: z
+      .string()
+      .trim()
+      .min(1, 'description is required')
+      .max(
+        PRODUCT_DESCRIPTION_MAX_LENGTH,
+        `description must be at most ${PRODUCT_DESCRIPTION_MAX_LENGTH} characters`
+      )
+      .optional(),
     category: z.string().trim().min(1, 'category is required').optional(),
     price: z.number().min(0, 'price must be greater than or equal to 0').optional(),
     imageUrl: z.string().trim().url('imageUrl must be a valid URL').optional(),

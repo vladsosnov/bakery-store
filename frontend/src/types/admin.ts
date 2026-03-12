@@ -62,6 +62,7 @@ export type AdminOrder = {
   customerName: string;
   customerPhone: string;
   status: AdminOrderStatus;
+  note: string;
   totalItems: number;
   totalPrice: number;
   createdAt: string;

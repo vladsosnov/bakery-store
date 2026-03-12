@@ -163,6 +163,7 @@ describe('order service business flows', () => {
         status: ORDER_STATUSES.placed,
         totalItems: 2,
         totalPrice: 16,
+        note: '',
         deliveryAddress: {
           zip: '10001',
           street: '5th Avenue 10',
@@ -212,6 +213,7 @@ describe('order service business flows', () => {
 
     await placeOrderFromCart('user-1', {
       useProfileAddress: false,
+      note: 'Leave at the side entrance.',
       deliveryAddress: {
         zip: ' 10001 ',
         street: ' Main street 1 ',
@@ -221,6 +223,7 @@ describe('order service business flows', () => {
 
     expect(orderCreateMock).toHaveBeenCalledWith(
       expect.objectContaining({
+        note: 'Leave at the side entrance.',
         deliveryAddress: {
           zip: '10001',
           street: 'Main street 1',
@@ -278,6 +281,23 @@ describe('order service business flows', () => {
     await expect(placeOrderFromCart('user-1')).rejects.toMatchObject({
       code: 'PRODUCT_UNAVAILABLE',
       statusCode: 409
+    });
+  });
+
+  it('throws VALIDATION_ERROR when note is longer than 500 characters', async () => {
+    const productId = new Types.ObjectId();
+    cartFindOneMock.mockResolvedValue({
+      items: [{ productId, quantity: 1 }]
+    } as never);
+
+    await expect(
+      placeOrderFromCart('user-1', {
+        useProfileAddress: true,
+        note: 'x'.repeat(501)
+      })
+    ).rejects.toMatchObject({
+      code: 'VALIDATION_ERROR',
+      statusCode: 400
     });
   });
 

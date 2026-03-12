@@ -12,6 +12,7 @@ type PlaceOrderResponse = {
 };
 type PlaceOrderRequest = {
   useProfileAddress: boolean;
+  note?: string;
   deliveryAddress?: {
     zip: string;
     street: string;

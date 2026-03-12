@@ -12,6 +12,7 @@ export type MyOrder = {
   totalItems: number;
   totalPrice: number;
   createdAt: string | null;
+  note: string;
   deliveryAddress: {
     zip: string;
     street: string;

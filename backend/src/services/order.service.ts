@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { ZodError, z } from 'zod';
 
 import { CartModel } from '../models/cart.model.js';
+import { ORDER_NOTE_MAX_LENGTH } from '../constants/validation.js';
 import { OrderModel } from '../models/order.model.js';
 import { ProductModel } from '../models/product.model.js';
 import { ORDER_STATUS_VALUES, ORDER_STATUSES, type OrderStatus } from '../types/order-status.js';
@@ -29,7 +30,8 @@ const orderDeliveryAddressSchema = z.object({
 });
 const placeOrderSchema = z.object({
   useProfileAddress: z.boolean().default(true),
-  deliveryAddress: orderDeliveryAddressSchema.optional()
+  deliveryAddress: orderDeliveryAddressSchema.optional(),
+  note: z.string().trim().max(ORDER_NOTE_MAX_LENGTH).optional()
 });
 const isAddressIncomplete = (address: { zip: string; street: string; city: string }) => {
   return address.zip.trim() === '' || address.street.trim() === '' || address.city.trim() === '';
@@ -60,6 +62,7 @@ const buildOrderView = (order: {
     street: string;
     city: string;
   } | null;
+  note?: string | null;
 }) => ({
   id: order.id ?? String(order._id),
   status: order.status,
@@ -73,6 +76,7 @@ const buildOrderView = (order: {
     quantity: item.quantity,
     lineTotal: item.lineTotal
   })),
+  note: order.note ?? '',
   deliveryAddress: {
     zip: order.deliveryAddress?.zip ?? '',
     street: order.deliveryAddress?.street ?? '',
@@ -88,6 +92,7 @@ export const placeOrderFromCart = async (userId: string, payload: unknown = { us
       street: string;
       city: string;
     };
+    note?: string;
   };
 
   try {
@@ -193,6 +198,7 @@ export const placeOrderFromCart = async (userId: string, payload: unknown = { us
     items: orderItems,
     totalItems,
     totalPrice,
+    note: data.note?.trim() ?? '',
     deliveryAddress
   });
 
@@ -258,6 +264,7 @@ export const listAllOrdersForDashboard = async () => {
         quantity: item.quantity,
         lineTotal: item.lineTotal
       })),
+      note: order.note ?? '',
       deliveryAddress: {
         zip: address?.zip ?? '',
         street: address?.street ?? '',

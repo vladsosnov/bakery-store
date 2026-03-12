@@ -56,6 +56,7 @@ export const OrdersTab: FC<OrdersTabProps> = ({
             </S.UserRow>
             <S.OrderDetails>
               <S.MutedText>Delivery: {getDeliveryAddressText(order)}</S.MutedText>
+              {order.note.trim() !== '' ? <S.MutedText>Note: {order.note}</S.MutedText> : null}
               <S.MutedText>
                 Phone: {order.customerPhone.trim() !== '' ? order.customerPhone : 'Phone is not set'}
               </S.MutedText>

@@ -42,6 +42,7 @@ describe('MyOrdersPage', () => {
         {
           id: 'order-id-123456',
           status: 'placed',
+          note: 'Please include extra napkins.',
           totalItems: 2,
           totalPrice: 16,
           createdAt: new Date().toISOString(),

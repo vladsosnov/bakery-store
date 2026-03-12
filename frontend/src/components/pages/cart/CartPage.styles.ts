@@ -133,6 +133,17 @@ export const AddressGrid = styled.div`
 
 export const AddressInput = styled(Input)``;
 
+export const NoteInput = styled.textarea`
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid ${colors.border};
+  background: ${colors.white};
+  color: ${colors.brown};
+  padding: 10px 12px;
+  min-height: 86px;
+  resize: vertical;
+`;
+
 export const CheckoutBar = styled.div`
   margin-top: 12px;
   display: flex;

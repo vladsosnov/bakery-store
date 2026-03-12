@@ -1,6 +1,7 @@
 import type { ChangeEvent, FC } from 'react';
 
 import { useCart } from '@src/components/pages/cart/useCart';
+import { ORDER_NOTE_MAX_LENGTH } from '@src/constants/validation';
 import * as S from '@src/components/pages/cart/CartPage.styles';
 
 export const CartPage: FC = () => {
@@ -14,9 +15,11 @@ export const CartPage: FC = () => {
     isOrdering,
     isAnyItemPending,
     useProfileAddress,
+    orderNote,
     deliveryAddress,
     handleUseProfileAddressChange,
     handleDeliveryAddressChange,
+    handleOrderNoteChange,
     handleIncreaseClick,
     handleDecreaseClick,
     handleRemoveClick,
@@ -173,6 +176,19 @@ export const CartPage: FC = () => {
                   />
                 </S.AddressGrid>
               )}
+            </S.DeliveryCard>
+            <S.DeliveryCard>
+              <S.DeliveryTitle>Note for the shop</S.DeliveryTitle>
+              <S.NoteInput
+                value={orderNote}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) => handleOrderNoteChange(event.target.value)}
+                placeholder="Add pickup or packing notes (optional)"
+                maxLength={ORDER_NOTE_MAX_LENGTH}
+                aria-label="Order note"
+              />
+              <S.Status>
+                {orderNote.length}/{ORDER_NOTE_MAX_LENGTH} characters
+              </S.Status>
             </S.DeliveryCard>
             <S.CheckoutBar>
               <S.CheckoutButton

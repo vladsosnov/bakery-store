@@ -99,6 +99,7 @@ export const MyOrdersPage: FC = () => {
                   <S.Status>{order.status}</S.Status>
                 </S.OrderHeader>
                 <S.Subtitle>Placed: {formatOrderDate(order.createdAt)}</S.Subtitle>
+                {order.note.trim() !== '' ? <S.Subtitle>Note: {order.note}</S.Subtitle> : null}
                 <S.Total>Total: ${order.totalPrice.toFixed(2)}</S.Total>
                 <S.ItemList>
                   {order.items.map((item) => (

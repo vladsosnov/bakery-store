@@ -1,4 +1,5 @@
 import { Schema, Types, model, type InferSchemaType } from 'mongoose';
+import { ORDER_NOTE_MAX_LENGTH } from '../constants/validation.js';
 import { ORDER_STATUS_VALUES, ORDER_STATUSES } from '../types/order-status.js';
 
 const orderItemSchema = new Schema(
@@ -55,6 +56,12 @@ const orderSchema = new Schema(
     totalPrice: {
       type: Number,
       required: true
+    },
+    note: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: ORDER_NOTE_MAX_LENGTH
     },
     deliveryAddress: {
       zip: {

@@ -435,6 +435,7 @@ describe('useCart', () => {
         order: {
           id: 'o1',
           status: 'placed',
+          note: '',
           totalItems: 2,
           totalPrice: 16,
           createdAt: new Date().toISOString(),
@@ -470,6 +471,52 @@ describe('useCart', () => {
       expect(result.current.items).toEqual([]);
       expect(result.current.totalPrice).toBe(0);
       expect(mockedToastSuccess).toHaveBeenCalledWith('Order placed successfully.');
+    });
+  });
+
+  it('sends trimmed order note when placing order', async () => {
+    mockedGetAuthSession.mockReturnValue(authenticatedSession);
+    mockedFetchCart.mockResolvedValue(cartWithOneItem);
+    mockedPlaceOrder.mockResolvedValue({
+      data: {
+        order: {
+          id: 'o1',
+          status: 'placed',
+          note: 'Please call when outside',
+          totalItems: 2,
+          totalPrice: 16,
+          createdAt: new Date().toISOString(),
+          deliveryAddress: {
+            zip: '10001',
+            street: 'Main st 1',
+            city: 'New York'
+          },
+          items: []
+        },
+        cart: {
+          items: [],
+          totalItems: 0,
+          totalPrice: 0
+        }
+      }
+    });
+
+    const { result } = renderHook(() => useCart());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    act(() => {
+      result.current.handleOrderNoteChange('  Please call when outside  ');
+      result.current.handlePlaceOrderClick();
+    });
+
+    await waitFor(() => {
+      expect(mockedPlaceOrder).toHaveBeenCalledWith({
+        useProfileAddress: true,
+        note: 'Please call when outside'
+      });
     });
   });
 

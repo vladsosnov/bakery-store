@@ -124,6 +124,7 @@ describe('CartPage', () => {
     expect(screen.getByRole('button', { name: /increase quantity/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /remove/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /place order/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/order note/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/use address from profile/i)).toBeChecked();
   });
 
@@ -208,6 +209,7 @@ describe('CartPage', () => {
         order: {
           id: 'o1',
           status: 'placed',
+          note: '',
           totalItems: 1,
           totalPrice: 8,
           createdAt: new Date().toISOString(),

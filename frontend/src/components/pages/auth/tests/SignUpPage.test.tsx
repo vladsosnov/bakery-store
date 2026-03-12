@@ -61,6 +61,8 @@ describe('SignUpPage', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/first name/i)).toHaveAttribute('maxLength', '60');
+    expect(screen.getByLabelText(/last name/i)).toHaveAttribute('maxLength', '60');
   });
 
   it('registers user and navigates home', async () => {

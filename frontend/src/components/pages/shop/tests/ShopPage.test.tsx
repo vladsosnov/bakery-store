@@ -223,6 +223,28 @@ describe('ShopPage', () => {
     expect(screen.queryByRole('img', { name: /butter croissant/i })).not.toBeInTheDocument();
   });
 
+  it('truncates long description and keeps full text in hover tooltip', async () => {
+    const longDescription = 'A'.repeat(210);
+    mockedListProducts.mockResolvedValue([
+      {
+        ...PRODUCTS_FIXTURE[0],
+        _id: 'long-description-product',
+        description: longDescription
+      }
+    ]);
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    const truncatedDescription = `${'A'.repeat(200)}...`;
+    const descriptionElement = await screen.findByText(truncatedDescription);
+
+    expect(descriptionElement).toHaveAttribute('title', longDescription);
+  });
+
   it('increments item quantity near add to cart button', async () => {
     const user = userEvent.setup();
     render(
