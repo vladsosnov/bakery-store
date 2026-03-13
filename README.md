@@ -19,6 +19,14 @@ Live links:
 - Admin dashboard (MP4): [docs/demo/admin-dashboard.mp4](docs/demo/admin-dashboard.mp4)
 - Moderator chat flow (MP4): [docs/demo/chat.mp4](docs/demo/chat.mp4)
 
+### System Design
+
+Role capabilities scheme (`customer` / `moderator` / `admin`):
+
+- Diagram source image: [docs/demo/Bakery.drawio.png](docs/demo/Bakery.drawio.png)
+
+![Bakery Store roles system design](docs/demo/Bakery.drawio.png)
+
 ## What Is Implemented
 
 - Authentication and authorization (customer, moderator, admin)
