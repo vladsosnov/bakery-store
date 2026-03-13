@@ -378,36 +378,66 @@ describe('order service business flows', () => {
     expect(result[0]?.deliveryAddress.city).toBe('New York');
   });
 
-  it('updates order status and prevents rollback', async () => {
+  it('updates order status with note and validates transitions', async () => {
     const orderSave = jest.fn().mockResolvedValue(undefined);
     orderFindByIdMock.mockResolvedValue({
       id: 'order-1',
       status: ORDER_STATUSES.placed,
+      note: '',
       save: orderSave
     } as never);
 
     const updated = await updateOrderStatusForDashboard(String(new Types.ObjectId()), {
-      status: ORDER_STATUSES.inProgress
+      status: ORDER_STATUSES.inProgress,
+      note: 'Preparing your order now.'
     });
     expect(updated.status).toBe(ORDER_STATUSES.inProgress);
+    expect(updated.note).toBe('Preparing your order now.');
     expect(orderSave).toHaveBeenCalledTimes(1);
 
     orderFindByIdMock.mockResolvedValue({
       id: 'order-2',
       status: ORDER_STATUSES.inDelivery,
+      note: '',
       save: jest.fn()
     } as never);
     await expect(
       updateOrderStatusForDashboard(String(new Types.ObjectId()), { status: ORDER_STATUSES.placed })
     ).rejects.toMatchObject({
-      code: 'ORDER_STATUS_ROLLBACK_FORBIDDEN',
+      code: 'ORDER_STATUS_TRANSITION_FORBIDDEN',
       statusCode: 409
     });
+  });
+
+  it('allows cancellation from in-progress state', async () => {
+    const saveMock = jest.fn().mockResolvedValue(undefined);
+    orderFindByIdMock.mockResolvedValue({
+      id: 'order-3',
+      status: ORDER_STATUSES.inProgress,
+      note: '',
+      save: saveMock
+    } as never);
+
+    const updated = await updateOrderStatusForDashboard(String(new Types.ObjectId()), {
+      status: ORDER_STATUSES.canceled,
+      note: 'Item unavailable today.'
+    });
+
+    expect(updated.status).toBe(ORDER_STATUSES.canceled);
+    expect(updated.note).toBe('Item unavailable today.');
+    expect(saveMock).toHaveBeenCalledTimes(1);
   });
 
   it('throws on invalid status payload and missing order', async () => {
     await expect(
       updateOrderStatusForDashboard(String(new Types.ObjectId()), { status: 'not-valid' })
+    ).rejects.toBeInstanceOf(OrderError);
+
+    await expect(
+      updateOrderStatusForDashboard(String(new Types.ObjectId()), {
+        status: ORDER_STATUSES.inProgress,
+        note: 'x'.repeat(501)
+      })
     ).rejects.toBeInstanceOf(OrderError);
 
     orderFindByIdMock.mockResolvedValue(null as never);

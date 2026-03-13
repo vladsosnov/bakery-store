@@ -84,12 +84,13 @@ describe('admin-api service', () => {
   });
 
   it('updates order status', async () => {
-    mockedApiAuthClient.patch.mockResolvedValue({ data: { data: { id: 'o1', status: 'placed' } } });
+    mockedApiAuthClient.patch.mockResolvedValue({ data: { data: { id: 'o1', status: 'placed', note: '' } } });
 
-    await updateAdminOrderStatus('o1', 'in progress');
+    await updateAdminOrderStatus('o1', 'in progress', 'Status changed by moderator');
 
     expect(mockedApiAuthClient.patch).toHaveBeenCalledWith('/api/admin/orders/o1/status', {
-      status: 'in progress'
+      status: 'in progress',
+      note: 'Status changed by moderator'
     });
   });
 });

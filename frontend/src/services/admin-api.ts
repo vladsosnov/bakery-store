@@ -37,6 +37,7 @@ type OrderStatusResponse = {
   data: {
     id: string;
     status: AdminOrderStatus;
+    note: string;
   };
 };
 
@@ -72,9 +73,10 @@ export const getAdminOrders = async () => {
   return response.data;
 };
 
-export const updateAdminOrderStatus = async (orderId: string, status: AdminOrderStatus) => {
+export const updateAdminOrderStatus = async (orderId: string, status: AdminOrderStatus, note: string) => {
   const response = await apiAuthClient.patch<OrderStatusResponse>(`/api/admin/orders/${orderId}/status`, {
-    status
+    status,
+    note
   });
   return response.data;
 };

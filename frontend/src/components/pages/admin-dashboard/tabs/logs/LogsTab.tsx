@@ -85,7 +85,7 @@ export const LogsTab: FC<LogsTabProps> = ({ orders, users }) => {
       acc[status] = orders.filter((order) => order.status === status).length;
       return acc;
     },
-    { placed: 0, 'in progress': 0, 'in delivery': 0 },
+    { placed: 0, 'in progress': 0, 'in delivery': 0, canceled: 0 },
   );
 
   const totalChatMessages = chatThreads.reduce((acc, thread) => acc + thread.messages.length, 0);

@@ -11,6 +11,7 @@ import { Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@src/app/routes';
+import { ORDER_NOTE_MAX_LENGTH } from '@src/constants/validation';
 import {
   createAdminProduct,
   deleteAdminProduct,
@@ -42,7 +43,12 @@ import { toErrorMessage } from '@src/utils/error';
 import * as S from './AdminDashboardPage.styles';
 
 type AdminTab = 'users' | 'orders' | 'chats' | 'logs' | 'shop';
-const ORDER_STATUS_FLOW: readonly AdminOrderStatus[] = ['placed', 'in progress', 'in delivery'];
+const ORDER_STATUS_TRANSITIONS: Record<AdminOrderStatus, readonly AdminOrderStatus[]> = {
+  placed: ['placed', 'in progress', 'canceled'],
+  'in progress': ['in progress', 'in delivery', 'canceled'],
+  'in delivery': ['in delivery'],
+  canceled: ['canceled'],
+};
 
 export const AdminDashboardPage: FC = () => {
   const session = useMemo(() => getAuthSession(), []);
@@ -182,14 +188,14 @@ export const AdminDashboardPage: FC = () => {
     if (!order) {
       return;
     }
-    if (ORDER_STATUS_FLOW.indexOf(nextStatus) < ORDER_STATUS_FLOW.indexOf(order.status)) {
-      toast.error('Order status can only move forward.');
+    if (!ORDER_STATUS_TRANSITIONS[order.status].includes(nextStatus)) {
+      toast.error('Invalid status transition.');
       return;
     }
 
     setPendingOrderId(orderId);
     try {
-      const response = await updateAdminOrderStatus(orderId, nextStatus);
+      const response = await updateAdminOrderStatus(orderId, nextStatus, order.note.trim());
       setOrders((prev) => {
         return prev.map((order) => {
           if (order.id !== orderId) {
@@ -199,6 +205,7 @@ export const AdminDashboardPage: FC = () => {
           return {
             ...order,
             status: response.data.status,
+            note: response.data.note,
           };
         });
       });
@@ -221,7 +228,28 @@ export const AdminDashboardPage: FC = () => {
   };
 
   const getAllowedStatusOptions = (status: AdminOrderStatus) => {
-    return ORDER_STATUS_FLOW.slice(ORDER_STATUS_FLOW.indexOf(status));
+    return ORDER_STATUS_TRANSITIONS[status];
+  };
+
+  const handleOrderNoteChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const orderId = event.currentTarget.dataset.orderId;
+    if (!orderId) {
+      return;
+    }
+
+    const nextNote = event.target.value.slice(0, ORDER_NOTE_MAX_LENGTH);
+    setOrders((prev) => {
+      return prev.map((order) => {
+        if (order.id !== orderId) {
+          return order;
+        }
+
+        return {
+          ...order,
+          note: nextNote,
+        };
+      });
+    });
   };
 
   const filteredOrders = useMemo(() => {
@@ -403,6 +431,7 @@ export const AdminDashboardPage: FC = () => {
           }
           onOrderSearchChange={(e) => setOrderSearchTerm(e.target.value)}
           onOrderStatusSelectChange={(e) => handleOrderStatusChange(e)}
+          onOrderNoteChange={(e) => handleOrderNoteChange(e)}
           getAllowedStatusOptions={getAllowedStatusOptions}
           getDeliveryAddressText={getDeliveryAddressText}
         />

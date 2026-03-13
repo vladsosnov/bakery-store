@@ -21,7 +21,8 @@ export class OrderError extends Error {
 }
 
 const updateOrderStatusSchema = z.object({
-  status: z.enum(ORDER_STATUS_VALUES as [OrderStatus, ...OrderStatus[]])
+  status: z.enum(ORDER_STATUS_VALUES as [OrderStatus, ...OrderStatus[]]),
+  note: z.string().trim().max(ORDER_NOTE_MAX_LENGTH).optional()
 });
 const orderDeliveryAddressSchema = z.object({
   zip: z.string().trim().min(1),
@@ -37,10 +38,11 @@ const isAddressIncomplete = (address: { zip: string; street: string; city: strin
   return address.zip.trim() === '' || address.street.trim() === '' || address.city.trim() === '';
 };
 
-const ORDER_STATUS_INDEX: Record<OrderStatus, number> = {
-  [ORDER_STATUSES.placed]: 0,
-  [ORDER_STATUSES.inProgress]: 1,
-  [ORDER_STATUSES.inDelivery]: 2
+const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  [ORDER_STATUSES.placed]: [ORDER_STATUSES.placed, ORDER_STATUSES.inProgress, ORDER_STATUSES.canceled],
+  [ORDER_STATUSES.inProgress]: [ORDER_STATUSES.inProgress, ORDER_STATUSES.inDelivery, ORDER_STATUSES.canceled],
+  [ORDER_STATUSES.inDelivery]: [ORDER_STATUSES.inDelivery],
+  [ORDER_STATUSES.canceled]: [ORDER_STATUSES.canceled]
 };
 
 const buildOrderView = (order: {
@@ -279,7 +281,7 @@ export const updateOrderStatusForDashboard = async (orderId: string, payload: un
     throw new OrderError('Invalid order id', 400, 'VALIDATION_ERROR');
   }
 
-  let data: { status: OrderStatus };
+  let data: { status: OrderStatus; note?: string };
 
   try {
     data = updateOrderStatusSchema.parse(payload);
@@ -297,16 +299,20 @@ export const updateOrderStatusForDashboard = async (orderId: string, payload: un
   }
 
   const currentStatus = order.status as OrderStatus;
-  if (ORDER_STATUS_INDEX[data.status] < ORDER_STATUS_INDEX[currentStatus]) {
-    throw new OrderError('Order status can only move forward', 409, 'ORDER_STATUS_ROLLBACK_FORBIDDEN');
+  if (!ORDER_STATUS_TRANSITIONS[currentStatus].includes(data.status)) {
+    throw new OrderError('Invalid status transition', 409, 'ORDER_STATUS_TRANSITION_FORBIDDEN');
   }
 
   order.status = data.status;
+  if (data.note !== undefined) {
+    order.note = data.note.trim();
+  }
   await order.save();
 
   return {
     id: order.id,
-    status: order.status
+    status: order.status,
+    note: order.note ?? ''
   };
 };
 

@@ -18,7 +18,7 @@ jest.mock('@src/services/admin-api', () => ({
   createAdminProduct: jest.fn(),
   updateAdminProduct: jest.fn(),
   deleteAdminProduct: jest.fn(),
-  ORDER_STATUS_OPTIONS: ['placed', 'in progress', 'in delivery'],
+  ORDER_STATUS_OPTIONS: ['placed', 'in progress', 'in delivery', 'canceled'],
   updateAdminOrderStatus: jest.fn()
 }));
 jest.mock('@src/services/chat-api', () => ({
@@ -271,7 +271,8 @@ describe('AdminDashboardPage', () => {
     updateAdminOrderStatusMock.mockResolvedValue({
       data: {
         id: 'order-1',
-        status: 'in progress'
+        status: 'in progress',
+        note: ''
       }
     });
 
@@ -288,7 +289,7 @@ describe('AdminDashboardPage', () => {
     expect(within(statusSelect).getByRole('option', { name: 'placed' })).toBeInTheDocument();
     await user.selectOptions(statusSelect, 'in progress');
 
-    expect(updateAdminOrderStatusMock).toHaveBeenCalledWith('order-1', 'in progress');
+    expect(updateAdminOrderStatusMock).toHaveBeenCalledWith('order-1', 'in progress', '');
   });
 
   it('does not allow rollback status options for progressed orders', async () => {

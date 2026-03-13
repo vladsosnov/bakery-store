@@ -191,7 +191,7 @@ const openApiDefinition = {
         type: 'object',
         properties: {
           id: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
-          status: { type: 'string', enum: ['placed', 'in progress', 'in delivery'], example: 'placed' },
+          status: { type: 'string', enum: ['placed', 'in progress', 'in delivery', 'canceled'], example: 'placed' },
           note: { type: 'string', example: 'Please leave at the side door.' },
           totalItems: { type: 'number', example: 2 },
           totalPrice: { type: 'number', example: 16 },
@@ -1030,15 +1030,20 @@ const openApiDefinition = {
             'application/json': {
               schema: {
                 type: 'object',
-                properties: {
-                  status: {
-                    type: 'string',
-                    enum: ['placed', 'in progress', 'in delivery'],
+                  properties: {
+                    status: {
+                      type: 'string',
+                    enum: ['placed', 'in progress', 'in delivery', 'canceled'],
                     example: 'in progress'
-                  }
-                },
-                required: ['status']
-              }
+                    },
+                    note: {
+                      type: 'string',
+                      maxLength: 500,
+                      example: 'Order delayed due to traffic.'
+                    }
+                  },
+                  required: ['status']
+                }
             }
           }
         },

@@ -51,6 +51,23 @@ const ORDERS_FIXTURE = [
       street: 'Main Street 1',
       city: 'Washington'
     }
+  },
+  {
+    id: 'order-3',
+    customerEmail: 'kate@bakery.local',
+    customerName: 'Kate P',
+    customerPhone: '',
+    status: 'canceled' as const,
+    note: 'Out of stock.',
+    totalItems: 1,
+    totalPrice: 7,
+    createdAt: new Date().toISOString(),
+    items: [],
+    deliveryAddress: {
+      zip: '30001',
+      street: 'Lake Street 2',
+      city: 'Austin'
+    }
   }
 ];
 
@@ -60,6 +77,7 @@ describe('OrdersTab', () => {
     const onOrderStatusFilterChange = jest.fn();
     const onOrderSearchChange = jest.fn();
     const onOrderStatusSelectChange = jest.fn();
+    const onOrderNoteChange = jest.fn();
 
     render(
       <OrdersTab
@@ -72,7 +90,8 @@ describe('OrdersTab', () => {
         onOrderStatusFilterChange={onOrderStatusFilterChange}
         onOrderSearchChange={onOrderSearchChange}
         onOrderStatusSelectChange={onOrderStatusSelectChange}
-        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery']}
+        onOrderNoteChange={onOrderNoteChange}
+        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery', 'canceled']}
         getDeliveryAddressText={(order) =>
           `${order.deliveryAddress.street}, ${order.deliveryAddress.city}, ${order.deliveryAddress.zip}`
         }
@@ -81,15 +100,18 @@ describe('OrdersTab', () => {
 
     expect(screen.getByRole('heading', { name: /active orders/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /in delivery/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /canceled/i })).toBeInTheDocument();
     expect(screen.getByText(/note: please call on arrival\./i)).toBeInTheDocument();
 
     await user.selectOptions(screen.getByRole('combobox', { name: /filter orders by status/i }), 'placed');
     await user.type(screen.getByRole('searchbox', { name: /search orders/i }), 'john');
+    await user.type(screen.getByRole('textbox', { name: /status note for john@bakery.local/i }), 'Updated');
     await user.selectOptions(screen.getByRole('combobox', { name: /order status for john@bakery.local/i }), 'in progress');
 
     expect(onOrderStatusFilterChange).toHaveBeenCalled();
     expect(onOrderSearchChange).toHaveBeenCalled();
     expect(onOrderStatusSelectChange).toHaveBeenCalled();
+    expect(onOrderNoteChange).toHaveBeenCalled();
   });
 
   it('shows no-match message when filtered list is empty', () => {
@@ -104,7 +126,8 @@ describe('OrdersTab', () => {
         onOrderStatusFilterChange={jest.fn()}
         onOrderSearchChange={jest.fn()}
         onOrderStatusSelectChange={jest.fn()}
-        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery']}
+        onOrderNoteChange={jest.fn()}
+        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery', 'canceled']}
         getDeliveryAddressText={() => ''}
       />
     );

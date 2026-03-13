@@ -1,7 +1,8 @@
 export const ORDER_STATUSES = {
   placed: 'placed',
   inProgress: 'in progress',
-  inDelivery: 'in delivery'
+  inDelivery: 'in delivery',
+  canceled: 'canceled'
 } as const;
 
 export type OrderStatus = (typeof ORDER_STATUSES)[keyof typeof ORDER_STATUSES];

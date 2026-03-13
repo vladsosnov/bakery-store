@@ -1,5 +1,6 @@
 import type { ChangeEventHandler, FC } from 'react';
 
+import { ORDER_NOTE_MAX_LENGTH } from '@src/constants/validation';
 import {
   ORDER_STATUS_OPTIONS,
   type AdminOrder,
@@ -17,6 +18,7 @@ type OrdersTabProps = {
   onOrderStatusFilterChange: ChangeEventHandler<HTMLSelectElement>;
   onOrderSearchChange: ChangeEventHandler<HTMLInputElement>;
   onOrderStatusSelectChange: ChangeEventHandler<HTMLSelectElement>;
+  onOrderNoteChange: ChangeEventHandler<HTMLTextAreaElement>;
   getAllowedStatusOptions: (status: AdminOrderStatus) => readonly AdminOrderStatus[];
   getDeliveryAddressText: (order: AdminOrder) => string;
 };
@@ -31,11 +33,13 @@ export const OrdersTab: FC<OrdersTabProps> = ({
   onOrderStatusFilterChange,
   onOrderSearchChange,
   onOrderStatusSelectChange,
+  onOrderNoteChange,
   getAllowedStatusOptions,
   getDeliveryAddressText
 }) => {
-  const activeOrders = filteredOrders.filter((order) => order.status !== 'in delivery');
+  const activeOrders = filteredOrders.filter((order) => order.status !== 'in delivery' && order.status !== 'canceled');
   const inDeliveryOrders = filteredOrders.filter((order) => order.status === 'in delivery');
+  const canceledOrders = filteredOrders.filter((order) => order.status === 'canceled');
 
   const renderOrderList = (list: AdminOrder[]) => {
     if (list.length === 0) {
@@ -60,6 +64,18 @@ export const OrdersTab: FC<OrdersTabProps> = ({
               <S.MutedText>
                 Phone: {order.customerPhone.trim() !== '' ? order.customerPhone : 'Phone is not set'}
               </S.MutedText>
+              <S.Label>
+                Status note for customer
+                <S.TextArea
+                  data-order-id={order.id}
+                  value={order.note}
+                  onChange={onOrderNoteChange}
+                  aria-label={`Status note for ${order.customerEmail}`}
+                  placeholder="Optional note visible to customer"
+                  maxLength={ORDER_NOTE_MAX_LENGTH}
+                  disabled={pendingOrderId === order.id}
+                />
+              </S.Label>
               <S.OrderItemList>
                 {order.items.map((item) => (
                   <S.OrderItem key={`${order.id}-${item.productId}`}>
@@ -127,6 +143,10 @@ export const OrdersTab: FC<OrdersTabProps> = ({
           <S.Subsection>
             <S.BlockTitle>In delivery</S.BlockTitle>
             {renderOrderList(inDeliveryOrders)}
+          </S.Subsection>
+          <S.Subsection>
+            <S.BlockTitle>Canceled</S.BlockTitle>
+            {renderOrderList(canceledOrders)}
           </S.Subsection>
         </S.SectionList>
       )}

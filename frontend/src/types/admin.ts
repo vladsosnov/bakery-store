@@ -53,7 +53,7 @@ export type UpdateAdminProductRequest = Partial<CreateAdminProductRequest> & {
   slug?: string;
 };
 
-export const ORDER_STATUS_OPTIONS = ['placed', 'in progress', 'in delivery'] as const;
+export const ORDER_STATUS_OPTIONS = ['placed', 'in progress', 'in delivery', 'canceled'] as const;
 export type AdminOrderStatus = (typeof ORDER_STATUS_OPTIONS)[number];
 
 export type AdminOrder = {
