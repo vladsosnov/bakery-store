@@ -94,7 +94,7 @@ describe('ShopTab', () => {
     expect(screen.getByRole('button', { name: /creating/i })).toBeDisabled();
   });
 
-  it('supports product quick actions (hide/show and delete)', async () => {
+  it('supports product quick actions (disable/enable and delete)', async () => {
     const user = userEvent.setup();
     const onUpdateProduct = jest.fn().mockResolvedValue(undefined);
     const onDeleteProduct = jest.fn().mockResolvedValue(undefined);
@@ -110,7 +110,7 @@ describe('ShopTab', () => {
       />
     );
 
-    await user.click(screen.getByRole('button', { name: /^hide$/i }));
+    await user.click(screen.getByRole('button', { name: /^disable$/i }));
     expect(onUpdateProduct).toHaveBeenCalledWith('p1', { isAvailable: false });
 
     await user.click(screen.getByRole('button', { name: /^delete$/i }));
@@ -127,7 +127,7 @@ describe('ShopTab', () => {
       />
     );
 
-    await user.click(screen.getByRole('button', { name: /^show$/i }));
+    await user.click(screen.getByRole('button', { name: /^enable$/i }));
     expect(onUpdateProduct).toHaveBeenCalledWith('p2', { isAvailable: true });
   });
 

@@ -200,7 +200,7 @@ export const ShopTab: FC<ShopTabProps> = ({
 
         <S.InlineCheckboxLabel>
           <input type="checkbox" checked={form.isAvailable} onChange={handleFormChange('isAvailable')} />
-          Available in shop
+          Enabled in shop
         </S.InlineCheckboxLabel>
 
         <S.CreateButton type="submit" disabled={pendingProductId === 'new'}>
@@ -230,7 +230,7 @@ export const ShopTab: FC<ShopTabProps> = ({
                     <S.ProductMeta title={descriptionPreview.isTruncated ? product.description : undefined}>
                       Description: {descriptionPreview.text}
                     </S.ProductMeta>
-                    <S.ProductMeta>{product.isAvailable ? 'visible in shop' : 'hidden from shop'}</S.ProductMeta>
+                    <S.ProductMeta>{product.isAvailable ? 'enabled in shop' : 'disabled in shop'}</S.ProductMeta>
                   </div>
 
                   <S.ProductActions>
@@ -244,7 +244,7 @@ export const ShopTab: FC<ShopTabProps> = ({
                       }}
                       disabled={isPending}
                     >
-                      {product.isAvailable ? 'Hide' : 'Show'}
+                      {product.isAvailable ? 'Disable' : 'Enable'}
                     </S.ActionButton>
                     <S.ActionButton
                       type="button"
@@ -310,7 +310,7 @@ export const ShopTab: FC<ShopTabProps> = ({
 
                     <S.InlineCheckboxLabel>
                       <input type="checkbox" checked={editForm.isAvailable} onChange={handleEditFormChange('isAvailable')} />
-                      Available in shop
+                      Enabled in shop
                     </S.InlineCheckboxLabel>
 
                     <S.Actions>
