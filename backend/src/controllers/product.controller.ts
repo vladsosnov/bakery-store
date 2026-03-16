@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { createOrUpdateProductReview, listProducts } from '../services/product.service.js';
+import { createOrUpdateProductReview, listProductReviews, listProducts } from '../services/product.service.js';
 
 export const listProductsController = async (req: Request, res: Response) => {
   const products = await listProducts(req.query);
@@ -15,5 +15,13 @@ export const createOrUpdateProductReviewController = async (req: Request, res: R
 
   return res.status(200).json({
     data: result
+  });
+};
+
+export const listProductReviewsController = async (req: Request, res: Response) => {
+  const reviews = await listProductReviews(req.params.productId);
+
+  return res.status(200).json({
+    data: reviews
   });
 };

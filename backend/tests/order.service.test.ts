@@ -421,6 +421,17 @@ describe('order service business flows', () => {
       id: 'order-2',
       status: ORDER_STATUSES.inDelivery,
       note: '',
+      save: jest.fn().mockResolvedValue(undefined)
+    } as never);
+    const delivered = await updateOrderStatusForDashboard(String(new Types.ObjectId()), {
+      status: ORDER_STATUSES.delivered
+    });
+    expect(delivered.status).toBe(ORDER_STATUSES.delivered);
+
+    orderFindByIdMock.mockResolvedValue({
+      id: 'order-2b',
+      status: ORDER_STATUSES.delivered,
+      note: '',
       save: jest.fn()
     } as never);
     await expect(

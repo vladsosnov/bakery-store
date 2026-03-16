@@ -4,6 +4,7 @@ import {
   createOrUpdateProductReview,
   createProduct,
   deleteProduct,
+  listProductReviews,
   listProducts,
   listProductsForAdmin,
   updateProduct
@@ -257,5 +258,65 @@ describe('product service business flows', () => {
     expect(existingReview.rating).toBe(4);
     expect(existingReview.comment).toBe('Much better on the second try.');
     expect(product.averageRating).toBe(4);
+  });
+
+  it('rejects review creation when order is not delivered', async () => {
+    const productId = '507f1f77bcf86cd799439011';
+    const userId = '507f191e810c19729de860ea';
+
+    findByIdMock.mockResolvedValue({
+      id: productId,
+      reviews: [],
+      averageRating: 0,
+      reviewCount: 0,
+      save: jest.fn()
+    } as never);
+    userFindByIdMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        firstName: 'Vlad',
+        lastName: 'Sosnov',
+        email: 'vlad@bakery.local'
+      })
+    } as never);
+    orderFindOneMock.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue(null)
+      })
+    } as never);
+
+    await expect(createOrUpdateProductReview(productId, userId, { rating: 5 })).rejects.toMatchObject({
+      code: 'REVIEW_NOT_ALLOWED',
+      statusCode: 403
+    });
+  });
+
+  it('lists reviews sorted by updatedAt descending', async () => {
+    const productId = '507f1f77bcf86cd799439011';
+    findByIdMock.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({
+          reviews: [
+            {
+              userId: new Types.ObjectId('507f191e810c19729de860ea'),
+              userName: 'Anna Baker',
+              rating: 4,
+              comment: 'Very good.',
+              updatedAt: new Date('2026-01-02T10:00:00.000Z')
+            },
+            {
+              userId: new Types.ObjectId('507f191e810c19729de860eb'),
+              userName: 'John Dough',
+              rating: 5,
+              comment: 'Excellent.',
+              updatedAt: new Date('2026-01-03T10:00:00.000Z')
+            }
+          ]
+        })
+      })
+    } as never);
+
+    const result = await listProductReviews(productId);
+
+    expect(result.map((review) => review.userName)).toEqual(['John Dough', 'Anna Baker']);
   });
 });

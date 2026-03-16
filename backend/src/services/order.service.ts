@@ -41,7 +41,8 @@ const isAddressIncomplete = (address: { zip: string; street: string; city: strin
 const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   [ORDER_STATUSES.placed]: [ORDER_STATUSES.placed, ORDER_STATUSES.inProgress, ORDER_STATUSES.canceled],
   [ORDER_STATUSES.inProgress]: [ORDER_STATUSES.inProgress, ORDER_STATUSES.inDelivery, ORDER_STATUSES.canceled],
-  [ORDER_STATUSES.inDelivery]: [ORDER_STATUSES.inDelivery],
+  [ORDER_STATUSES.inDelivery]: [ORDER_STATUSES.inDelivery, ORDER_STATUSES.delivered],
+  [ORDER_STATUSES.delivered]: [ORDER_STATUSES.delivered],
   [ORDER_STATUSES.canceled]: [ORDER_STATUSES.canceled]
 };
 

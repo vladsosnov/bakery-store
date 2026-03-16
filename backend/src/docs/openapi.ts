@@ -223,7 +223,11 @@ const openApiDefinition = {
         type: 'object',
         properties: {
           id: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
-          status: { type: 'string', enum: ['placed', 'in progress', 'in delivery', 'canceled'], example: 'placed' },
+          status: {
+            type: 'string',
+            enum: ['placed', 'in progress', 'in delivery', 'delivered', 'canceled'],
+            example: 'placed'
+          },
           note: { type: 'string', example: 'Please leave at the side door.' },
           totalItems: { type: 'number', example: 2 },
           totalPrice: { type: 'number', example: 16 },
@@ -664,6 +668,45 @@ const openApiDefinition = {
       }
     },
     '/api/products/{productId}/reviews': {
+      get: {
+        tags: ['Products'],
+        summary: 'List product reviews',
+        parameters: [
+          {
+            in: 'path',
+            name: 'productId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        responses: {
+          200: {
+            description: 'List of product reviews',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/ProductReviewSummary' }
+                    }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Product not found',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      },
       post: {
         tags: ['Products'],
         summary: 'Create or update a review for a purchased product',
@@ -1139,7 +1182,7 @@ const openApiDefinition = {
                   properties: {
                     status: {
                       type: 'string',
-                    enum: ['placed', 'in progress', 'in delivery', 'canceled'],
+                    enum: ['placed', 'in progress', 'in delivery', 'delivered', 'canceled'],
                     example: 'in progress'
                     },
                     note: {

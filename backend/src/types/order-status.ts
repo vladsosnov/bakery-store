@@ -2,6 +2,7 @@ export const ORDER_STATUSES = {
   placed: 'placed',
   inProgress: 'in progress',
   inDelivery: 'in delivery',
+  delivered: 'delivered',
   canceled: 'canceled'
 } as const;
 

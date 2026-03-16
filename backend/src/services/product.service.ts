@@ -6,6 +6,7 @@ import { ProductModel } from '../models/product.model.js';
 import { PRODUCT_DESCRIPTION_MAX_LENGTH, REVIEW_COMMENT_MAX_LENGTH } from '../constants/validation.js';
 import { SHOP_TAGS } from '../types/shop-tag.js';
 import { UserModel } from '../models/user.model.js';
+import { ORDER_STATUSES } from '../types/order-status.js';
 
 const productListQuerySchema = z.object({
   category: z.string().trim().min(1).optional(),
@@ -84,6 +85,13 @@ export type ProductListQuery = z.infer<typeof productListQuerySchema>;
 export type ProductCreateInput = z.infer<typeof productCreateSchema>;
 export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
 export type ReviewCreateInput = z.infer<typeof reviewCreateSchema>;
+export type ProductReviewView = {
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  updatedAt: string | null;
+};
 
 export class ProductError extends Error {
   statusCode: number;
@@ -198,6 +206,20 @@ const parseCreateReviewInput = (payload: unknown): ReviewCreateInput => {
     throw error;
   }
 };
+
+const mapProductReview = (review: {
+  userId: Types.ObjectId | string;
+  userName: string;
+  rating: number;
+  comment?: string | null;
+  updatedAt?: Date | null;
+}): ProductReviewView => ({
+  userId: String(review.userId),
+  userName: review.userName,
+  rating: review.rating,
+  comment: review.comment ?? '',
+  updatedAt: review.updatedAt?.toISOString() ?? null
+});
 
 export const listProducts = async (payload: unknown) => {
   const query = parseProductListQuery(payload);
@@ -325,6 +347,7 @@ export const createOrUpdateProductReview = async (productId: string, userId: str
     UserModel.findById(userId).lean(),
     OrderModel.findOne({
       userId: new Types.ObjectId(userId),
+      status: ORDER_STATUSES.delivered,
       'items.productId': productObjectId
     })
       .select('_id')
@@ -372,16 +395,28 @@ export const createOrUpdateProductReview = async (productId: string, userId: str
     productId: product.id,
     averageRating: product.averageRating,
     reviewCount: product.reviewCount,
-    review: savedReview
-      ? {
-          userId,
-          userName: savedReview.userName,
-          rating: savedReview.rating,
-          comment: savedReview.comment ?? '',
-          updatedAt: savedReview.updatedAt?.toISOString() ?? new Date().toISOString()
-        }
-      : null
+    review: savedReview ? mapProductReview(savedReview) : null
   };
+};
+
+export const listProductReviews = async (productId: string) => {
+  if (!Types.ObjectId.isValid(productId)) {
+    throw new ProductError('Product not found', 404, 'PRODUCT_NOT_FOUND');
+  }
+
+  const product = await ProductModel.findById(productId).select('reviews').lean();
+
+  if (!product) {
+    throw new ProductError('Product not found', 404, 'PRODUCT_NOT_FOUND');
+  }
+
+  return [...product.reviews]
+    .sort((left, right) => {
+      const leftTime = left.updatedAt instanceof Date ? left.updatedAt.getTime() : 0;
+      const rightTime = right.updatedAt instanceof Date ? right.updatedAt.getTime() : 0;
+      return rightTime - leftTime;
+    })
+    .map(mapProductReview);
 };
 
 export const deleteProduct = async (productId: string) => {
