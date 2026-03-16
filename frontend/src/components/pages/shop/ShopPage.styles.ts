@@ -232,6 +232,13 @@ export const ProductMeta = styled.p`
   font-size: 0.92rem;
 `;
 
+export const ProductRating = styled.p`
+  margin: 8px 0 0;
+  color: ${colors.brown};
+  font-size: 0.9rem;
+  font-weight: 600;
+`;
+
 export const ProductPrice = styled.p`
   margin: 10px 0 0;
   font-weight: 700;

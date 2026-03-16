@@ -4,6 +4,11 @@ export type OrderItem = {
   price: number;
   quantity: number;
   lineTotal: number;
+  review: {
+    rating: number;
+    comment: string;
+    updatedAt: string | null;
+  } | null;
 };
 
 export type MyOrder = {

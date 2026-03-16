@@ -1,4 +1,4 @@
-import { apiClient } from './api-client';
+import { apiAuthClient, apiClient } from './api-client';
 
 export type ApiProduct = {
   _id: string;
@@ -11,9 +11,28 @@ export type ApiProduct = {
   tags: string[];
   isAvailable: boolean;
   stock: number;
+  averageRating: number;
+  reviewCount: number;
   dietary?: {
     vegan: boolean;
     glutenFree: boolean;
+  };
+};
+
+type ProductReview = {
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  updatedAt: string;
+};
+
+type SaveProductReviewResponse = {
+  data: {
+    productId: string;
+    averageRating: number;
+    reviewCount: number;
+    review: ProductReview | null;
   };
 };
 
@@ -25,4 +44,10 @@ export const listProducts = async () => {
   const response = await apiClient.get<ProductListResponse>('/api/products');
 
   return response.data.data;
+};
+
+export const saveProductReview = async (productId: string, payload: { rating: number; comment?: string }) => {
+  const response = await apiAuthClient.post<SaveProductReviewResponse>(`/api/products/${productId}/reviews`, payload);
+
+  return response.data;
 };

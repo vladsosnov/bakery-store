@@ -20,6 +20,8 @@ describe('ShopPage.utils', () => {
       tags: ['Best seller'],
       isAvailable: true,
       stock: 10,
+      averageRating: 4.8,
+      reviewCount: 12,
       dietary: {
         vegan: false,
         glutenFree: false
@@ -35,6 +37,8 @@ describe('ShopPage.utils', () => {
       image: 'https://example.com/p1.jpg',
       description: 'Classic pastry',
       tags: ['Best seller'],
+      averageRating: 4.8,
+      reviewCount: 12,
       dietary: {
         vegan: false,
         glutenFree: false
@@ -53,7 +57,9 @@ describe('ShopPage.utils', () => {
       imageUrl: 'https://example.com/p2.jpg',
       tags: ['New'],
       isAvailable: true,
-      stock: 7
+      stock: 7,
+      averageRating: 0,
+      reviewCount: 0
     });
 
     expect(mapped.category).toBe('Pastries');
@@ -72,7 +78,9 @@ describe('ShopPage.utils', () => {
         image: '',
         description: '',
         tags: ['New', 'Bread'],
-        dietary: { vegan: false, glutenFree: false }
+        dietary: { vegan: false, glutenFree: false },
+        averageRating: 0,
+        reviewCount: 0
       },
       {
         id: '2',
@@ -83,7 +91,9 @@ describe('ShopPage.utils', () => {
         image: '',
         description: '',
         tags: ['Party', 'Bread'],
-        dietary: { vegan: false, glutenFree: false }
+        dietary: { vegan: false, glutenFree: false },
+        averageRating: 0,
+        reviewCount: 0
       },
       {
         id: '3',
@@ -94,7 +104,9 @@ describe('ShopPage.utils', () => {
         image: '',
         description: '',
         tags: ['Seasonal'],
-        dietary: { vegan: false, glutenFree: false }
+        dietary: { vegan: false, glutenFree: false },
+        averageRating: 0,
+        reviewCount: 0
       }
     ];
 
@@ -113,7 +125,9 @@ describe('ShopPage.utils', () => {
         image: '',
         description: 'Soft swirl pastry',
         tags: ['New'],
-        dietary: { vegan: true, glutenFree: false }
+        dietary: { vegan: true, glutenFree: false },
+        averageRating: 0,
+        reviewCount: 0
       },
       {
         id: '2',
@@ -124,7 +138,9 @@ describe('ShopPage.utils', () => {
         image: '',
         description: 'Naturally fermented bread',
         tags: ['Bread'],
-        dietary: { vegan: true, glutenFree: false }
+        dietary: { vegan: true, glutenFree: false },
+        averageRating: 0,
+        reviewCount: 0
       },
       {
         id: '3',
@@ -135,7 +151,9 @@ describe('ShopPage.utils', () => {
         image: '',
         description: 'Rich cocoa sponge',
         tags: ['Party'],
-        dietary: { vegan: false, glutenFree: false }
+        dietary: { vegan: false, glutenFree: false },
+        averageRating: 0,
+        reviewCount: 0
       }
     ];
 

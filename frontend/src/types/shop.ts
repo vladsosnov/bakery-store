@@ -15,4 +15,6 @@ export type Product = {
     vegan: boolean;
     glutenFree: boolean;
   };
+  averageRating: number;
+  reviewCount: number;
 };

@@ -43,7 +43,9 @@ const PRODUCTS_FIXTURE = [
     imageUrl: 'https://example.com/butter-croissant.jpg',
     tags: ['Best seller'],
     isAvailable: true,
-    stock: 30
+    stock: 30,
+    averageRating: 4.8,
+    reviewCount: 12
   },
   {
     _id: '2',
@@ -55,7 +57,9 @@ const PRODUCTS_FIXTURE = [
     imageUrl: 'https://example.com/chocolate-cake.jpg',
     tags: ['Party'],
     isAvailable: true,
-    stock: 12
+    stock: 12,
+    averageRating: 0,
+    reviewCount: 0
   },
   {
     _id: '3',
@@ -67,7 +71,9 @@ const PRODUCTS_FIXTURE = [
     imageUrl: 'https://example.com/sourdough.jpg',
     tags: ['Bread', 'Artisan'],
     isAvailable: true,
-    stock: 25
+    stock: 25,
+    averageRating: 4.5,
+    reviewCount: 4
   },
   {
     _id: '4',
@@ -79,7 +85,9 @@ const PRODUCTS_FIXTURE = [
     imageUrl: 'https://example.com/cinnamon-roll.jpg',
     tags: ['New'],
     isAvailable: true,
-    stock: 22
+    stock: 22,
+    averageRating: 0,
+    reviewCount: 0
   }
 ];
 
@@ -143,6 +151,7 @@ describe('ShopPage', () => {
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cakes' })).toBeInTheDocument();
     await screen.findByText(/butter croissant/i);
+    expect(screen.getByText(/rating: 4\.8 \/ 5 \(12 reviews\)/i)).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /add to cart/i }).length).toBeGreaterThan(0);
   });
 

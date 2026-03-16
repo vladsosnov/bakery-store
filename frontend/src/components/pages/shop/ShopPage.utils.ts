@@ -50,7 +50,9 @@ export const mapApiProduct = (product: ApiProduct): Product => {
     image: product.imageUrl,
     description: product.description,
     tags: product.tags,
-    dietary: inferDietary(product)
+    dietary: inferDietary(product),
+    averageRating: product.averageRating,
+    reviewCount: product.reviewCount
   };
 };
 
