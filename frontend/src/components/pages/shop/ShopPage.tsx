@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { addToCart, fetchCart } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
-import { listProducts } from '@src/services/product-api';
+import { getProductReviews, listProducts } from '@src/services/product-api';
 import { toErrorMessage } from '@src/utils/error';
 import { ShopFilters } from '@src/components/pages/shop/ShopFilters';
 import {
@@ -41,6 +41,12 @@ export const ShopPage: FC = () => {
   const [addingProductId, setAddingProductId] = useState<string | null>(null);
   const [cartByProduct, setCartByProduct] = useState<Record<string, number>>({});
   const [imageLoadFailedByProduct, setImageLoadFailedByProduct] = useState<Record<string, boolean>>({});
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+  const [reviewsModalProductName, setReviewsModalProductName] = useState<string | null>(null);
+  const [isLoadingModalReviews, setIsLoadingModalReviews] = useState(false);
+  const [modalReviews, setModalReviews] = useState<
+    Array<{ userId: string; userName: string; rating: number; comment: string; updatedAt: string }>
+  >([]);
   const availableTags = useMemo(() => getAvailableTags(products), [products]);
   const isResetDisabled =
     search.trim() === '' &&
@@ -146,6 +152,29 @@ export const ShopPage: FC = () => {
     };
 
     updateCart();
+  };
+
+  const handleOpenReviewsModal = async (productId: string, productName: string) => {
+    setReviewsModalProductName(productName);
+    setIsReviewsModalOpen(true);
+    setIsLoadingModalReviews(true);
+
+    try {
+      const response = await getProductReviews(productId);
+      setModalReviews(response.data);
+    } catch (error) {
+      toast.error(toErrorMessage(error, 'Failed to load product reviews.'));
+      setModalReviews([]);
+    } finally {
+      setIsLoadingModalReviews(false);
+    }
+  };
+
+  const handleCloseReviewsModal = () => {
+    setIsReviewsModalOpen(false);
+    setReviewsModalProductName(null);
+    setModalReviews([]);
+    setIsLoadingModalReviews(false);
   };
 
   useEffect(() => {
@@ -290,13 +319,16 @@ export const ShopPage: FC = () => {
                           <S.ProductMeta title={descriptionPreview.isTruncated ? product.description : undefined}>
                             {descriptionPreview.text}
                           </S.ProductMeta>
-                          <S.ProductRating>
+                          <S.ProductRatingButton
+                            type="button"
+                            onClick={() => handleOpenReviewsModal(product.id, product.name)}
+                          >
                             {product.reviewCount > 0
                               ? `Rating: ${product.averageRating.toFixed(1)} / 5 (${product.reviewCount} review${
-                                product.reviewCount === 1 ? '' : 's'
-                              })`
+                                  product.reviewCount === 1 ? '' : 's'
+                                })`
                               : 'No reviews yet'}
-                          </S.ProductRating>
+                          </S.ProductRatingButton>
                           <S.ProductPrice>${product.price.toFixed(2)}</S.ProductPrice>
                           <S.ProductTags>
                             <S.ProductTag>{product.category}</S.ProductTag>
@@ -347,6 +379,37 @@ export const ShopPage: FC = () => {
           )}
         </ShopFilters>
       </S.Layout>
+      {isReviewsModalOpen ? (
+        <S.ModalOverlay role="presentation" onClick={handleCloseReviewsModal}>
+          <S.ModalCard role="dialog" aria-modal="true" aria-label="Shop product reviews dialog" onClick={(event) => event.stopPropagation()}>
+            <S.ModalHeader>
+              <div>
+                <S.ModalTitle>Reviews</S.ModalTitle>
+                <S.Subtitle>{reviewsModalProductName ?? 'Product reviews'}</S.Subtitle>
+              </div>
+              <S.SecondaryButton type="button" onClick={handleCloseReviewsModal}>
+                Close
+              </S.SecondaryButton>
+            </S.ModalHeader>
+            {isLoadingModalReviews ? (
+              <S.ModalText>Loading reviews...</S.ModalText>
+            ) : modalReviews.length === 0 ? (
+              <S.ModalText>No reviews yet for this product.</S.ModalText>
+            ) : (
+              <S.ModalList>
+                {modalReviews.map((review) => (
+                  <S.ModalListItem key={`${review.userId}-${review.updatedAt}`}>
+                    <S.ProductRating>{review.userName}</S.ProductRating>
+                    <S.ModalText>Rating: {review.rating} / 5</S.ModalText>
+                    <S.ModalText>{review.comment.trim() !== '' ? review.comment : 'No written comment.'}</S.ModalText>
+                    <S.ModalText>Updated: {new Date(review.updatedAt).toLocaleString()}</S.ModalText>
+                  </S.ModalListItem>
+                ))}
+              </S.ModalList>
+            )}
+          </S.ModalCard>
+        </S.ModalOverlay>
+      ) : null}
     </S.Main>
   );
 };

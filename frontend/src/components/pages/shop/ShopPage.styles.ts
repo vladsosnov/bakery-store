@@ -239,6 +239,20 @@ export const ProductRating = styled.p`
   font-weight: 600;
 `;
 
+export const ProductRatingButton = styled.button`
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${colors.brown};
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+`;
+
 export const ProductPrice = styled.p`
   margin: 10px 0 0;
   font-weight: 700;
@@ -292,6 +306,16 @@ export const AddToCartButton = styled.button`
   }
 `;
 
+export const SecondaryButton = styled.button`
+  border-radius: 10px;
+  border: 1px solid ${colors.border};
+  background: ${colors.surface};
+  color: ${colors.brown};
+  padding: 9px 12px;
+  font-weight: 600;
+  cursor: pointer;
+`;
+
 export const ProductTag = styled.span`
   border-radius: 999px;
   background: ${colors.surface};
@@ -320,4 +344,58 @@ export const ResultTransition = styled.div`
       transition: none !important;
     }
   }
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 18, 10, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 50;
+`;
+
+export const ModalCard = styled.div`
+  width: min(680px, 100%);
+  max-height: min(80vh, 720px);
+  overflow: auto;
+  border-radius: 18px;
+  background: ${colors.white};
+  border: 1px solid ${colors.border};
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+`;
+
+export const ModalHeader = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const ModalTitle = styled.h2`
+  margin: 0;
+`;
+
+export const ModalList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+`;
+
+export const ModalListItem = styled.li`
+  border-radius: 12px;
+  border: 1px solid ${colors.border};
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+`;
+
+export const ModalText = styled.p`
+  margin: 0;
+  color: ${colors.brownLight};
 `;

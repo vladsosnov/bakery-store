@@ -6,11 +6,12 @@ import { toast } from 'sonner';
 import { shopRoutes } from '@src/app/routes';
 import { addToCart, fetchCart } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
-import { listProducts } from '@src/services/product-api';
+import { getProductReviews, listProducts } from '@src/services/product-api';
 import { ShopPage } from '../ShopPage';
 
 jest.mock('@src/services/product-api', () => ({
-  listProducts: jest.fn()
+  listProducts: jest.fn(),
+  getProductReviews: jest.fn()
 }));
 jest.mock('@src/services/cart-api', () => ({
   fetchCart: jest.fn(),
@@ -27,6 +28,7 @@ jest.mock('sonner', () => ({
 }));
 
 const mockedListProducts = jest.mocked(listProducts);
+const mockedGetProductReviews = jest.mocked(getProductReviews);
 const mockedFetchCart = jest.mocked(fetchCart);
 const mockedAddToCart = jest.mocked(addToCart);
 const mockedGetAuthSession = jest.mocked(getAuthSession);
@@ -128,12 +130,16 @@ describe('ShopPage', () => {
         totalPrice: 4.5
       }
     });
+    mockedGetProductReviews.mockResolvedValue({
+      data: [{ userId: 'u1', userName: 'Anna Baker', rating: 5, comment: 'Perfect.', updatedAt: '2026-01-01T10:00:00.000Z' }]
+    });
   });
 
   afterEach(() => {
     mockedListProducts.mockReset();
     mockedFetchCart.mockReset();
     mockedAddToCart.mockReset();
+    mockedGetProductReviews.mockReset();
     mockedGetAuthSession.mockReset();
     mockedToastError.mockReset();
   });
@@ -151,8 +157,25 @@ describe('ShopPage', () => {
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cakes' })).toBeInTheDocument();
     await screen.findByText(/butter croissant/i);
-    expect(screen.getByText(/rating: 4\.8 \/ 5 \(12 reviews\)/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /rating: 4\.8 \/ 5 \(12 reviews\)/i })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /add to cart/i }).length).toBeGreaterThan(0);
+  });
+
+  it('opens reviews modal from the shop page', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    await screen.findByText(/butter croissant/i);
+    await user.click(screen.getByRole('button', { name: /rating: 4\.8 \/ 5 \(12 reviews\)/i }));
+
+    expect(await screen.findByRole('dialog', { name: /shop product reviews dialog/i })).toBeInTheDocument();
+    expect(screen.getByText(/anna baker/i)).toBeInTheDocument();
+    expect(mockedGetProductReviews).toHaveBeenCalledWith('1');
   });
 
   it('filters products by search text', async () => {
