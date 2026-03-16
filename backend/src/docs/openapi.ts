@@ -183,9 +183,41 @@ const openApiDefinition = {
           name: { type: 'string', example: 'Sourdough loaf' },
           price: { type: 'number', example: 8 },
           quantity: { type: 'number', example: 2 },
-          lineTotal: { type: 'number', example: 16 }
+          lineTotal: { type: 'number', example: 16 },
+          review: {
+            anyOf: [{ $ref: '#/components/schemas/ProductReviewSummary' }, { type: 'null' }]
+          }
         },
         required: ['productId', 'name', 'price', 'quantity', 'lineTotal']
+      },
+      ProductReviewSummary: {
+        type: 'object',
+        properties: {
+          rating: { type: 'number', example: 5 },
+          comment: { type: 'string', example: 'Fresh and perfectly crisp.' },
+          updatedAt: { type: 'string', format: 'date-time' }
+        },
+        required: ['rating', 'comment', 'updatedAt']
+      },
+      ProductReviewMutation: {
+        type: 'object',
+        properties: {
+          productId: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ea' },
+          averageRating: { type: 'number', example: 4.8 },
+          reviewCount: { type: 'number', example: 12 },
+          review: {
+            type: 'object',
+            properties: {
+              userId: { type: 'string', example: '67cc3987ec8b91b8ef6fc9aa' },
+              userName: { type: 'string', example: 'Vlad Sosnov' },
+              rating: { type: 'number', example: 5 },
+              comment: { type: 'string', example: 'Fresh and perfectly crisp.' },
+              updatedAt: { type: 'string', format: 'date-time' }
+            },
+            required: ['userId', 'userName', 'rating', 'comment', 'updatedAt']
+          }
+        },
+        required: ['productId', 'averageRating', 'reviewCount', 'review']
       },
       Order: {
         type: 'object',
@@ -235,6 +267,8 @@ const openApiDefinition = {
           },
           isAvailable: { type: 'boolean', example: true },
           stock: { type: 'number', example: 30 },
+          averageRating: { type: 'number', example: 4.8 },
+          reviewCount: { type: 'number', example: 12 },
           createdAt: { type: 'string', format: 'date-time' },
           updatedAt: { type: 'string', format: 'date-time' }
         },
@@ -249,6 +283,8 @@ const openApiDefinition = {
           'tags',
           'isAvailable',
           'stock',
+          'averageRating',
+          'reviewCount',
           'createdAt',
           'updatedAt'
         ]
@@ -618,6 +654,76 @@ const openApiDefinition = {
           },
           500: {
             description: 'Internal server error',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/products/{productId}/reviews': {
+      post: {
+        tags: ['Products'],
+        summary: 'Create or update a review for a purchased product',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'productId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  rating: { type: 'number', minimum: 1, maximum: 5, example: 5 },
+                  comment: { type: 'string', maxLength: 300, example: 'Fresh and perfectly crisp.' }
+                },
+                required: ['rating']
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Review saved',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { $ref: '#/components/schemas/ProductReviewMutation' }
+                  },
+                  required: ['data']
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          403: {
+            description: 'Only purchased products can be reviewed',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          404: {
+            description: 'Product not found',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }

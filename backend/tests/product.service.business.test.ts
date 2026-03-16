@@ -1,5 +1,16 @@
-import { createProduct, deleteProduct, listProducts, listProductsForAdmin, updateProduct } from '../src/services/product.service.js';
+import { Types } from 'mongoose';
+
+import {
+  createOrUpdateProductReview,
+  createProduct,
+  deleteProduct,
+  listProducts,
+  listProductsForAdmin,
+  updateProduct
+} from '../src/services/product.service.js';
+import { OrderModel } from '../src/models/order.model.js';
 import { ProductModel } from '../src/models/product.model.js';
+import { UserModel } from '../src/models/user.model.js';
 
 jest.mock('../src/models/product.model.js', () => ({
   ProductModel: {
@@ -11,12 +22,26 @@ jest.mock('../src/models/product.model.js', () => ({
   }
 }));
 
+jest.mock('../src/models/order.model.js', () => ({
+  OrderModel: {
+    findOne: jest.fn()
+  }
+}));
+
+jest.mock('../src/models/user.model.js', () => ({
+  UserModel: {
+    findById: jest.fn()
+  }
+}));
+
 describe('product service business flows', () => {
   const createMock = ProductModel.create as jest.MockedFunction<typeof ProductModel.create>;
   const findMock = ProductModel.find as jest.MockedFunction<typeof ProductModel.find>;
   const findOneMock = ProductModel.findOne as jest.MockedFunction<typeof ProductModel.findOne>;
   const findByIdMock = ProductModel.findById as jest.MockedFunction<typeof ProductModel.findById>;
   const findByIdAndDeleteMock = ProductModel.findByIdAndDelete as jest.MockedFunction<typeof ProductModel.findByIdAndDelete>;
+  const orderFindOneMock = OrderModel.findOne as jest.MockedFunction<typeof OrderModel.findOne>;
+  const userFindByIdMock = UserModel.findById as jest.MockedFunction<typeof UserModel.findById>;
 
   beforeEach(() => {
     createMock.mockReset();
@@ -24,6 +49,8 @@ describe('product service business flows', () => {
     findOneMock.mockReset();
     findByIdMock.mockReset();
     findByIdAndDeleteMock.mockReset();
+    orderFindOneMock.mockReset();
+    userFindByIdMock.mockReset();
   });
 
   it('lists products with default filters', async () => {
@@ -113,6 +140,9 @@ describe('product service business flows', () => {
       tags: ['Old'],
       isAvailable: true,
       stock: 1,
+      reviews: [],
+      averageRating: 0,
+      reviewCount: 0,
       save: saveMock,
       toObject: () => ({ _id: '507f1f77bcf86cd799439011', name: 'New name', slug: 'new-name' })
     } as never);
@@ -136,5 +166,96 @@ describe('product service business flows', () => {
 
     await deleteProduct('507f1f77bcf86cd799439011');
     expect(findByIdAndDeleteMock).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
+  });
+
+  it('creates a review for a purchased product and updates aggregates', async () => {
+    const productId = '507f1f77bcf86cd799439011';
+    const userId = '507f191e810c19729de860ea';
+    const saveMock = jest.fn().mockResolvedValue(undefined);
+    const product = {
+      id: productId,
+      reviews: [],
+      averageRating: 0,
+      reviewCount: 0,
+      save: saveMock
+    };
+
+    findByIdMock.mockResolvedValue(product as never);
+    userFindByIdMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        firstName: 'Vlad',
+        lastName: 'Sosnov',
+        email: 'vlad@bakery.local'
+      })
+    } as never);
+    orderFindOneMock.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ _id: 'order-1' })
+      })
+    } as never);
+
+    const result = await createOrUpdateProductReview(productId, userId, {
+      rating: 5,
+      comment: 'Excellent crumb.'
+    });
+
+    expect(saveMock).toHaveBeenCalledTimes(1);
+    expect(product.reviewCount).toBe(1);
+    expect(product.averageRating).toBe(5);
+    expect(result).toEqual(
+      expect.objectContaining({
+        productId,
+        averageRating: 5,
+        reviewCount: 1,
+        review: expect.objectContaining({
+          userId,
+          rating: 5,
+          comment: 'Excellent crumb.'
+        })
+      })
+    );
+  });
+
+  it('updates an existing review instead of creating a duplicate', async () => {
+    const productId = '507f1f77bcf86cd799439011';
+    const userId = '507f191e810c19729de860ea';
+    const existingReview = {
+      userId: new Types.ObjectId(userId),
+      userName: 'Vlad Sosnov',
+      rating: 3,
+      comment: 'Good',
+      updatedAt: new Date('2026-01-01T10:00:00.000Z')
+    };
+    const product = {
+      id: productId,
+      reviews: [existingReview],
+      averageRating: 3,
+      reviewCount: 1,
+      save: jest.fn().mockResolvedValue(undefined)
+    };
+
+    findByIdMock.mockResolvedValue(product as never);
+    userFindByIdMock.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({
+        firstName: 'Vlad',
+        lastName: 'Sosnov',
+        email: 'vlad@bakery.local'
+      })
+    } as never);
+    orderFindOneMock.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ _id: 'order-1' })
+      })
+    } as never);
+
+    await createOrUpdateProductReview(productId, userId, {
+      rating: 4,
+      comment: 'Much better on the second try.'
+    });
+
+    expect(product.reviews).toHaveLength(1);
+    expect(existingReview.rating).toBe(4);
+    expect(existingReview.comment).toBe('Much better on the second try.');
+    expect(product.averageRating).toBe(4);
   });
 });

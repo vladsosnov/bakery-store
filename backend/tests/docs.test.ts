@@ -14,6 +14,7 @@ describe('API docs', () => {
     expect(response.body.paths['/api/auth/me']).toBeDefined();
     expect(response.body.paths['/api/auth/profile']).toBeDefined();
     expect(response.body.paths['/api/products']).toBeDefined();
+    expect(response.body.paths['/api/products/{productId}/reviews']).toBeDefined();
     expect(response.body.paths['/api/cart']).toBeDefined();
     expect(response.body.paths['/api/cart/items']).toBeDefined();
     expect(response.body.paths['/api/cart/items/{productId}']).toBeDefined();

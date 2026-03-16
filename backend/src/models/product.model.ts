@@ -1,5 +1,36 @@
 import { Schema, model, type InferSchemaType } from 'mongoose';
-import { PRODUCT_DESCRIPTION_MAX_LENGTH } from '../constants/validation.js';
+import { PRODUCT_DESCRIPTION_MAX_LENGTH, REVIEW_COMMENT_MAX_LENGTH } from '../constants/validation.js';
+
+const productReviewSchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    userName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5
+    },
+    comment: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: REVIEW_COMMENT_MAX_LENGTH
+    }
+  },
+  {
+    timestamps: true,
+    versionKey: false
+  }
+);
 
 const productSchema = new Schema(
   {
@@ -47,6 +78,24 @@ const productSchema = new Schema(
       required: true
     },
     stock: {
+      type: Number,
+      default: 0,
+      min: 0,
+      required: true
+    },
+    reviews: {
+      type: [productReviewSchema],
+      default: [],
+      required: true
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+      required: true
+    },
+    reviewCount: {
       type: Number,
       default: 0,
       min: 0,

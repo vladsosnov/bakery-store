@@ -58,6 +58,11 @@ const buildOrderView = (order: {
     price: number;
     quantity: number;
     lineTotal: number;
+    review?: {
+      rating: number;
+      comment: string;
+      updatedAt: string | null;
+    } | null;
   }>;
   deliveryAddress?: {
     zip: string;
@@ -76,7 +81,8 @@ const buildOrderView = (order: {
     name: item.name,
     price: item.price,
     quantity: item.quantity,
-    lineTotal: item.lineTotal
+    lineTotal: item.lineTotal,
+    review: item.review ?? null
   })),
   note: order.note ?? '',
   deliveryAddress: {
@@ -219,7 +225,47 @@ export const placeOrderFromCart = async (userId: string, payload: unknown = { us
 
 export const listMyOrders = async (userId: string) => {
   const orders = await OrderModel.find({ userId }).sort({ createdAt: -1 }).lean();
-  return orders.map((order) => buildOrderView(order));
+  const productIds = Array.from(new Set(orders.flatMap((order) => order.items.map((item) => String(item.productId)))));
+  const validProductIds = productIds
+    .filter((productId) => Types.ObjectId.isValid(productId))
+    .map((productId) => new Types.ObjectId(productId));
+
+  const reviewedProducts =
+    validProductIds.length === 0 || !Types.ObjectId.isValid(userId)
+      ? []
+      : await ProductModel.find({
+          _id: { $in: validProductIds },
+          'reviews.userId': new Types.ObjectId(userId)
+        })
+          .select('_id reviews')
+          .lean();
+
+  const reviewByProductId = new Map(
+    reviewedProducts.map((product) => {
+      const review = product.reviews.find((entry) => String(entry.userId) === userId);
+
+      return [
+        String(product._id),
+        review
+          ? {
+              rating: review.rating,
+              comment: review.comment ?? '',
+              updatedAt: review.updatedAt?.toISOString() ?? null
+            }
+          : null
+      ];
+    })
+  );
+
+  return orders.map((order) =>
+    buildOrderView({
+      ...order,
+      items: order.items.map((item) => ({
+        ...item,
+        review: reviewByProductId.get(String(item.productId)) ?? null
+      }))
+    })
+  );
 };
 
 export const listAllOrdersForDashboard = async () => {

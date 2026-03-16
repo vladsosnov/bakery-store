@@ -337,10 +337,32 @@ describe('order service business flows', () => {
         ])
       })
     } as never);
+    productFindMock.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue([
+          {
+            _id: productId,
+            reviews: [
+              {
+                userId: new Types.ObjectId('507f191e810c19729de860ea'),
+                rating: 5,
+                comment: 'Excellent crumb.',
+                updatedAt: new Date('2026-01-02T10:00:00.000Z')
+              }
+            ]
+          }
+        ])
+      })
+    } as never);
 
-    const result = await listMyOrders('user-1');
+    const result = await listMyOrders('507f191e810c19729de860ea');
     expect(result).toHaveLength(1);
     expect(result[0]?.status).toBe(ORDER_STATUSES.placed);
+    expect(result[0]?.items[0]?.review).toEqual({
+      rating: 5,
+      comment: 'Excellent crumb.',
+      updatedAt: '2026-01-02T10:00:00.000Z'
+    });
   });
 
   it('lists all orders for dashboard with user details', async () => {
