@@ -331,6 +331,7 @@ describe('AdminDashboardPage', () => {
     expect(within(statusSelect).queryByRole('option', { name: 'placed' })).not.toBeInTheDocument();
     expect(within(statusSelect).getByRole('option', { name: 'in progress' })).toBeInTheDocument();
     expect(within(statusSelect).getByRole('option', { name: 'in delivery' })).toBeInTheDocument();
+    expect(within(statusSelect).queryByRole('option', { name: 'delivered' })).not.toBeInTheDocument();
   });
 
   it('filters by status and searches by customer or order number', async () => {
@@ -376,6 +377,7 @@ describe('AdminDashboardPage', () => {
     await user.click(await screen.findByRole('button', { name: /all orders/i }));
     expect(screen.getByRole('heading', { name: /active orders/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /in delivery/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /delivered/i })).toBeInTheDocument();
     expect(await screen.findByText(/john doe/i)).toBeInTheDocument();
     expect(screen.getByText(/anna smith/i)).toBeInTheDocument();
 

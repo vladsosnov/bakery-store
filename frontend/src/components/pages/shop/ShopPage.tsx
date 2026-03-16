@@ -293,8 +293,8 @@ export const ShopPage: FC = () => {
                           <S.ProductRating>
                             {product.reviewCount > 0
                               ? `Rating: ${product.averageRating.toFixed(1)} / 5 (${product.reviewCount} review${
-                                  product.reviewCount === 1 ? '' : 's'
-                                })`
+                                product.reviewCount === 1 ? '' : 's'
+                              })`
                               : 'No reviews yet'}
                           </S.ProductRating>
                           <S.ProductPrice>${product.price.toFixed(2)}</S.ProductPrice>

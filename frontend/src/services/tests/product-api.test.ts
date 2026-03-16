@@ -1,4 +1,4 @@
-import { listProducts, saveProductReview } from '../product-api';
+import { getProductReviews, listProducts, saveProductReview } from '../product-api';
 import { apiAuthClient, apiClient } from '../api-client';
 
 jest.mock('../api-client', () => ({
@@ -60,5 +60,17 @@ describe('product-api service', () => {
       rating: 5,
       comment: 'Great'
     });
+  });
+
+  it('loads product reviews', async () => {
+    mockedApiClient.get.mockResolvedValue({
+      data: {
+        data: [{ userId: 'u1', userName: 'Vlad', rating: 5, comment: 'Great', updatedAt: '2026-01-01T10:00:00.000Z' }]
+      }
+    });
+
+    await getProductReviews('p1');
+
+    expect(mockedApiClient.get).toHaveBeenCalledWith('/api/products/p1/reviews');
   });
 });

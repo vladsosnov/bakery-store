@@ -46,7 +46,8 @@ type AdminTab = 'users' | 'orders' | 'chats' | 'logs' | 'shop';
 const ORDER_STATUS_TRANSITIONS: Record<AdminOrderStatus, readonly AdminOrderStatus[]> = {
   placed: ['placed', 'in progress', 'canceled'],
   'in progress': ['in progress', 'in delivery', 'canceled'],
-  'in delivery': ['in delivery'],
+  'in delivery': ['in delivery', 'delivered'],
+  delivered: ['delivered'],
   canceled: ['canceled'],
 };
 

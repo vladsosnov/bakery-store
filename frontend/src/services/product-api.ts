@@ -27,6 +27,10 @@ type ProductReview = {
   updatedAt: string;
 };
 
+type ProductReviewsResponse = {
+  data: ProductReview[];
+};
+
 type SaveProductReviewResponse = {
   data: {
     productId: string;
@@ -48,6 +52,12 @@ export const listProducts = async () => {
 
 export const saveProductReview = async (productId: string, payload: { rating: number; comment?: string }) => {
   const response = await apiAuthClient.post<SaveProductReviewResponse>(`/api/products/${productId}/reviews`, payload);
+
+  return response.data;
+};
+
+export const getProductReviews = async (productId: string) => {
+  const response = await apiClient.get<ProductReviewsResponse>(`/api/products/${productId}/reviews`);
 
   return response.data;
 };

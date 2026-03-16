@@ -4,13 +4,14 @@ import { toast } from 'sonner';
 
 import { AUTH_STORAGE_KEY } from '@src/services/auth-session';
 import { getMyOrders } from '@src/services/order-api';
-import { saveProductReview } from '@src/services/product-api';
+import { getProductReviews, saveProductReview } from '@src/services/product-api';
 import { MyOrdersPage } from './MyOrdersPage';
 
 jest.mock('@src/services/order-api', () => ({
   getMyOrders: jest.fn()
 }));
 jest.mock('@src/services/product-api', () => ({
+  getProductReviews: jest.fn(),
   saveProductReview: jest.fn()
 }));
 jest.mock('sonner', () => ({
@@ -21,6 +22,7 @@ jest.mock('sonner', () => ({
 }));
 
 const mockedGetMyOrders = jest.mocked(getMyOrders);
+const mockedGetProductReviews = jest.mocked(getProductReviews);
 const mockedSaveProductReview = jest.mocked(saveProductReview);
 const mockedToastSuccess = jest.mocked(toast.success);
 
@@ -28,6 +30,7 @@ describe('MyOrdersPage', () => {
   afterEach(() => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     mockedGetMyOrders.mockReset();
+    mockedGetProductReviews.mockReset();
     mockedSaveProductReview.mockReset();
     mockedToastSuccess.mockReset();
   });
@@ -85,7 +88,7 @@ describe('MyOrdersPage', () => {
 
     expect(await screen.findByText(/order #123456/i)).toBeInTheDocument();
     expect(screen.getByText(/sourdough loaf x 2/i)).toBeInTheDocument();
-    expect(screen.getByText(/^placed$/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/^placed$/i)).toHaveLength(2);
   });
 
   it('submits a review for an order item', async () => {
@@ -108,7 +111,7 @@ describe('MyOrdersPage', () => {
       data: [
         {
           id: 'order-id-123456',
-          status: 'placed',
+          status: 'delivered',
           note: '',
           totalItems: 1,
           totalPrice: 8,
@@ -161,5 +164,62 @@ describe('MyOrdersPage', () => {
     expect(await screen.findByText(/rating: 5 \/ 5/i)).toBeInTheDocument();
     expect(screen.getByText(/excellent crumb\./i)).toBeInTheDocument();
     expect(mockedToastSuccess).toHaveBeenCalledWith('Review saved.');
+  });
+
+  it('filters orders by status and opens reviews modal', async () => {
+    const user = userEvent.setup();
+
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({
+        accessToken: 'token',
+        user: {
+          id: 'customer-id',
+          firstName: 'Vlad',
+          lastName: 'Sosnov',
+          email: 'vlad@bakery.local',
+          role: 'customer'
+        }
+      })
+    );
+    mockedGetMyOrders.mockResolvedValue({
+      data: [
+        {
+          id: 'order-id-123456',
+          status: 'placed',
+          note: '',
+          totalItems: 1,
+          totalPrice: 8,
+          createdAt: new Date().toISOString(),
+          deliveryAddress: { zip: '10001', street: 'Main st 1', city: 'New York' },
+          items: [{ productId: 'p1', name: 'Sourdough loaf', price: 8, quantity: 1, lineTotal: 8, review: null }]
+        },
+        {
+          id: 'order-id-654321',
+          status: 'delivered',
+          note: '',
+          totalItems: 1,
+          totalPrice: 4,
+          createdAt: new Date().toISOString(),
+          deliveryAddress: { zip: '10001', street: 'Main st 1', city: 'New York' },
+          items: [{ productId: 'p2', name: 'Croissant', price: 4, quantity: 1, lineTotal: 4, review: null }]
+        }
+      ]
+    });
+    mockedGetProductReviews.mockResolvedValue({
+      data: [{ userId: 'u1', userName: 'Anna Baker', rating: 5, comment: 'Perfect.', updatedAt: '2026-01-01T10:00:00.000Z' }]
+    });
+
+    render(<MyOrdersPage />);
+
+    expect(await screen.findByText(/order #123456/i)).toBeInTheDocument();
+    await user.selectOptions(screen.getByRole('combobox', { name: /filter my orders by status/i }), 'delivered');
+    expect(screen.queryByText(/order #123456/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/order #654321/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /check reviews/i }));
+    expect(await screen.findByRole('dialog', { name: /product reviews dialog/i })).toBeInTheDocument();
+    expect(screen.getByText(/anna baker/i)).toBeInTheDocument();
+    expect(mockedGetProductReviews).toHaveBeenCalledWith('p2');
   });
 });

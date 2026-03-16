@@ -54,6 +54,23 @@ const ORDERS_FIXTURE = [
   },
   {
     id: 'order-3',
+    customerEmail: 'mia@bakery.local',
+    customerName: 'Mia Stone',
+    customerPhone: '',
+    status: 'delivered' as const,
+    note: '',
+    totalItems: 1,
+    totalPrice: 11,
+    createdAt: new Date().toISOString(),
+    items: [],
+    deliveryAddress: {
+      zip: '25001',
+      street: 'Pearl Street 5',
+      city: 'Boston'
+    }
+  },
+  {
+    id: 'order-4',
     customerEmail: 'kate@bakery.local',
     customerName: 'Kate P',
     customerPhone: '',
@@ -91,7 +108,7 @@ describe('OrdersTab', () => {
         onOrderSearchChange={onOrderSearchChange}
         onOrderStatusSelectChange={onOrderStatusSelectChange}
         onOrderNoteChange={onOrderNoteChange}
-        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery', 'canceled']}
+        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery', 'delivered', 'canceled']}
         getDeliveryAddressText={(order) =>
           `${order.deliveryAddress.street}, ${order.deliveryAddress.city}, ${order.deliveryAddress.zip}`
         }
@@ -100,6 +117,7 @@ describe('OrdersTab', () => {
 
     expect(screen.getByRole('heading', { name: /active orders/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /in delivery/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /delivered/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /canceled/i })).toBeInTheDocument();
     expect(screen.getByText(/note: please call on arrival\./i)).toBeInTheDocument();
 
@@ -127,7 +145,7 @@ describe('OrdersTab', () => {
         onOrderSearchChange={jest.fn()}
         onOrderStatusSelectChange={jest.fn()}
         onOrderNoteChange={jest.fn()}
-        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery', 'canceled']}
+        getAllowedStatusOptions={() => ['placed', 'in progress', 'in delivery', 'delivered', 'canceled']}
         getDeliveryAddressText={() => ''}
       />
     );

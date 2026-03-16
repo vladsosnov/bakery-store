@@ -37,8 +37,11 @@ export const OrdersTab: FC<OrdersTabProps> = ({
   getAllowedStatusOptions,
   getDeliveryAddressText
 }) => {
-  const activeOrders = filteredOrders.filter((order) => order.status !== 'in delivery' && order.status !== 'canceled');
+  const activeOrders = filteredOrders.filter(
+    (order) => order.status !== 'in delivery' && order.status !== 'delivered' && order.status !== 'canceled'
+  );
   const inDeliveryOrders = filteredOrders.filter((order) => order.status === 'in delivery');
+  const deliveredOrders = filteredOrders.filter((order) => order.status === 'delivered');
   const canceledOrders = filteredOrders.filter((order) => order.status === 'canceled');
 
   const renderOrderList = (list: AdminOrder[]) => {
@@ -143,6 +146,10 @@ export const OrdersTab: FC<OrdersTabProps> = ({
           <S.Subsection>
             <S.BlockTitle>In delivery</S.BlockTitle>
             {renderOrderList(inDeliveryOrders)}
+          </S.Subsection>
+          <S.Subsection>
+            <S.BlockTitle>Delivered</S.BlockTitle>
+            {renderOrderList(deliveredOrders)}
           </S.Subsection>
           <S.Subsection>
             <S.BlockTitle>Canceled</S.BlockTitle>
