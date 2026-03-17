@@ -193,11 +193,12 @@ const openApiDefinition = {
       ProductReviewSummary: {
         type: 'object',
         properties: {
+          id: { type: 'string', example: '67cc3987ec8b91b8ef6fc9ab' },
           rating: { type: 'number', example: 5 },
           comment: { type: 'string', example: 'Fresh and perfectly crisp.' },
           updatedAt: { type: 'string', format: 'date-time' }
         },
-        required: ['rating', 'comment', 'updatedAt']
+        required: ['id', 'rating', 'comment', 'updatedAt']
       },
       ProductReviewMutation: {
         type: 'object',
@@ -767,6 +768,56 @@ const openApiDefinition = {
           },
           404: {
             description: 'Product not found',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/products/{productId}/reviews/{reviewId}': {
+      delete: {
+        tags: ['Products'],
+        summary: 'Remove a product review (admin/moderator)',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'productId',
+            required: true,
+            schema: { type: 'string' }
+          },
+          {
+            in: 'path',
+            name: 'reviewId',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        responses: {
+          200: {
+            description: 'Review removed'
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          403: {
+            description: 'Forbidden',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ErrorResponse' }
+              }
+            }
+          },
+          404: {
+            description: 'Product or review not found',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ErrorResponse' }

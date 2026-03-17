@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express';
 
-import { createOrUpdateProductReview, listProductReviews, listProducts } from '../services/product.service.js';
+import {
+  createOrUpdateProductReview,
+  listProductReviews,
+  listProducts,
+  removeProductReview
+} from '../services/product.service.js';
 
 export const listProductsController = async (req: Request, res: Response) => {
   const products = await listProducts(req.query);
@@ -23,5 +28,13 @@ export const listProductReviewsController = async (req: Request, res: Response) 
 
   return res.status(200).json({
     data: reviews
+  });
+};
+
+export const removeProductReviewController = async (req: Request, res: Response) => {
+  const result = await removeProductReview(req.params.productId, req.params.reviewId);
+
+  return res.status(200).json({
+    data: result
   });
 };

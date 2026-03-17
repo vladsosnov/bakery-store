@@ -20,6 +20,7 @@ export type ApiProduct = {
 };
 
 type ProductReview = {
+  id: string;
   userId: string;
   userName: string;
   rating: number;
@@ -37,6 +38,14 @@ type SaveProductReviewResponse = {
     averageRating: number;
     reviewCount: number;
     review: ProductReview | null;
+  };
+};
+
+type RemoveProductReviewResponse = {
+  data: {
+    productId: string;
+    averageRating: number;
+    reviewCount: number;
   };
 };
 
@@ -58,6 +67,12 @@ export const saveProductReview = async (productId: string, payload: { rating: nu
 
 export const getProductReviews = async (productId: string) => {
   const response = await apiClient.get<ProductReviewsResponse>(`/api/products/${productId}/reviews`);
+
+  return response.data;
+};
+
+export const removeProductReview = async (productId: string, reviewId: string) => {
+  const response = await apiAuthClient.delete<RemoveProductReviewResponse>(`/api/products/${productId}/reviews/${reviewId}`);
 
   return response.data;
 };

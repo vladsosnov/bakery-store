@@ -140,6 +140,7 @@ describe('MyOrdersPage', () => {
         averageRating: 5,
         reviewCount: 1,
         review: {
+          id: 'r1',
           userId: 'customer-id',
           userName: 'Vlad Sosnov',
           rating: 5,
@@ -207,7 +208,7 @@ describe('MyOrdersPage', () => {
       ]
     });
     mockedGetProductReviews.mockResolvedValue({
-      data: [{ userId: 'u1', userName: 'Anna Baker', rating: 5, comment: 'Perfect.', updatedAt: '2026-01-01T10:00:00.000Z' }]
+      data: [{ id: 'r2', userId: 'u1', userName: 'Anna Baker', rating: 5, comment: 'Perfect.', updatedAt: '2026-01-01T10:00:00.000Z' }]
     });
 
     render(<MyOrdersPage />);

@@ -6,12 +6,13 @@ import { toast } from 'sonner';
 import { shopRoutes } from '@src/app/routes';
 import { addToCart, fetchCart } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
-import { getProductReviews, listProducts } from '@src/services/product-api';
+import { getProductReviews, listProducts, removeProductReview } from '@src/services/product-api';
 import { ShopPage } from '../ShopPage';
 
 jest.mock('@src/services/product-api', () => ({
   listProducts: jest.fn(),
-  getProductReviews: jest.fn()
+  getProductReviews: jest.fn(),
+  removeProductReview: jest.fn()
 }));
 jest.mock('@src/services/cart-api', () => ({
   fetchCart: jest.fn(),
@@ -29,6 +30,7 @@ jest.mock('sonner', () => ({
 
 const mockedListProducts = jest.mocked(listProducts);
 const mockedGetProductReviews = jest.mocked(getProductReviews);
+const mockedRemoveProductReview = jest.mocked(removeProductReview);
 const mockedFetchCart = jest.mocked(fetchCart);
 const mockedAddToCart = jest.mocked(addToCart);
 const mockedGetAuthSession = jest.mocked(getAuthSession);
@@ -131,7 +133,10 @@ describe('ShopPage', () => {
       }
     });
     mockedGetProductReviews.mockResolvedValue({
-      data: [{ userId: 'u1', userName: 'Anna Baker', rating: 5, comment: 'Perfect.', updatedAt: '2026-01-01T10:00:00.000Z' }]
+      data: [{ id: 'r1', userId: 'u1', userName: 'Anna Baker', rating: 5, comment: 'Perfect.', updatedAt: '2026-01-01T10:00:00.000Z' }]
+    });
+    mockedRemoveProductReview.mockResolvedValue({
+      data: { productId: '1', averageRating: 0, reviewCount: 0 }
     });
   });
 
@@ -140,6 +145,7 @@ describe('ShopPage', () => {
     mockedFetchCart.mockReset();
     mockedAddToCart.mockReset();
     mockedGetProductReviews.mockReset();
+    mockedRemoveProductReview.mockReset();
     mockedGetAuthSession.mockReset();
     mockedToastError.mockReset();
   });
@@ -176,6 +182,32 @@ describe('ShopPage', () => {
     expect(await screen.findByRole('dialog', { name: /shop product reviews dialog/i })).toBeInTheDocument();
     expect(screen.getByText(/anna baker/i)).toBeInTheDocument();
     expect(mockedGetProductReviews).toHaveBeenCalledWith('1');
+  });
+
+  it('shows remove review action for moderators and deletes review', async () => {
+    const user = userEvent.setup();
+    mockedGetAuthSession.mockReturnValue({
+      accessToken: 'token',
+      user: {
+        id: 'u2',
+        firstName: 'Marta',
+        lastName: 'Baker',
+        email: 'marta@bakery.local',
+        role: 'moderator'
+      }
+    });
+
+    render(
+      <MemoryRouter>
+        <ShopPage />
+      </MemoryRouter>
+    );
+
+    await screen.findByText(/butter croissant/i);
+    await user.click(screen.getByRole('button', { name: /rating: 4\.8 \/ 5 \(12 reviews\)/i }));
+    await user.click(await screen.findByRole('button', { name: /remove review/i }));
+
+    expect(mockedRemoveProductReview).toHaveBeenCalledWith('1', 'r1');
   });
 
   it('filters products by search text', async () => {

@@ -7,6 +7,7 @@ import {
   listProductReviews,
   listProducts,
   listProductsForAdmin,
+  removeProductReview,
   updateProduct
 } from '../src/services/product.service.js';
 import { OrderModel } from '../src/models/order.model.js';
@@ -297,6 +298,7 @@ describe('product service business flows', () => {
         lean: jest.fn().mockResolvedValue({
           reviews: [
             {
+              _id: new Types.ObjectId('507f191e810c19729de860aa'),
               userId: new Types.ObjectId('507f191e810c19729de860ea'),
               userName: 'Anna Baker',
               rating: 4,
@@ -304,6 +306,7 @@ describe('product service business flows', () => {
               updatedAt: new Date('2026-01-02T10:00:00.000Z')
             },
             {
+              _id: new Types.ObjectId('507f191e810c19729de860ab'),
               userId: new Types.ObjectId('507f191e810c19729de860eb'),
               userName: 'John Dough',
               rating: 5,
@@ -318,5 +321,46 @@ describe('product service business flows', () => {
     const result = await listProductReviews(productId);
 
     expect(result.map((review) => review.userName)).toEqual(['John Dough', 'Anna Baker']);
+  });
+
+  it('removes a review and recalculates aggregates', async () => {
+    const productId = '507f1f77bcf86cd799439011';
+    const reviewId = '507f191e810c19729de860aa';
+    const product = {
+      id: productId,
+      reviews: [
+        {
+          _id: new Types.ObjectId(reviewId),
+          userId: new Types.ObjectId('507f191e810c19729de860ea'),
+          userName: 'Anna Baker',
+          rating: 2,
+          comment: 'Bad words',
+          updatedAt: new Date('2026-01-02T10:00:00.000Z')
+        },
+        {
+          _id: new Types.ObjectId('507f191e810c19729de860ab'),
+          userId: new Types.ObjectId('507f191e810c19729de860eb'),
+          userName: 'John Dough',
+          rating: 4,
+          comment: 'Fine',
+          updatedAt: new Date('2026-01-03T10:00:00.000Z')
+        }
+      ],
+      averageRating: 3,
+      reviewCount: 2,
+      save: jest.fn().mockResolvedValue(undefined)
+    };
+    findByIdMock.mockResolvedValue(product as never);
+
+    const result = await removeProductReview(productId, reviewId);
+
+    expect(product.reviews).toHaveLength(1);
+    expect(product.reviewCount).toBe(1);
+    expect(product.averageRating).toBe(4);
+    expect(result).toEqual({
+      productId,
+      averageRating: 4,
+      reviewCount: 1
+    });
   });
 });

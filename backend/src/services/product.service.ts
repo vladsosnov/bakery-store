@@ -86,6 +86,7 @@ export type ProductCreateInput = z.infer<typeof productCreateSchema>;
 export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
 export type ReviewCreateInput = z.infer<typeof reviewCreateSchema>;
 export type ProductReviewView = {
+  id: string;
   userId: string;
   userName: string;
   rating: number;
@@ -208,12 +209,15 @@ const parseCreateReviewInput = (payload: unknown): ReviewCreateInput => {
 };
 
 const mapProductReview = (review: {
+  id?: string;
+  _id?: Types.ObjectId | string;
   userId: Types.ObjectId | string;
   userName: string;
   rating: number;
   comment?: string | null;
   updatedAt?: Date | null;
 }): ProductReviewView => ({
+  id: review.id ?? String(review._id),
   userId: String(review.userId),
   userName: review.userName,
   rating: review.rating,
@@ -417,6 +421,41 @@ export const listProductReviews = async (productId: string) => {
       return rightTime - leftTime;
     })
     .map(mapProductReview);
+};
+
+export const removeProductReview = async (productId: string, reviewId: string) => {
+  if (!Types.ObjectId.isValid(productId)) {
+    throw new ProductError('Product not found', 404, 'PRODUCT_NOT_FOUND');
+  }
+
+  if (!Types.ObjectId.isValid(reviewId)) {
+    throw new ProductError('Review not found', 404, 'REVIEW_NOT_FOUND');
+  }
+
+  const product = await ProductModel.findById(productId);
+
+  if (!product) {
+    throw new ProductError('Product not found', 404, 'PRODUCT_NOT_FOUND');
+  }
+
+  const reviewIndex = product.reviews.findIndex((review) => String(review._id) === reviewId);
+
+  if (reviewIndex === -1) {
+    throw new ProductError('Review not found', 404, 'REVIEW_NOT_FOUND');
+  }
+
+  product.reviews.splice(reviewIndex, 1);
+  const summary = recalculateReviewSummary(product.reviews);
+  product.averageRating = summary.averageRating;
+  product.reviewCount = summary.reviewCount;
+
+  await product.save();
+
+  return {
+    productId: product.id,
+    averageRating: product.averageRating,
+    reviewCount: product.reviewCount
+  };
 };
 
 export const deleteProduct = async (productId: string) => {

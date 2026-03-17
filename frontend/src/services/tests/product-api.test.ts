@@ -1,4 +1,4 @@
-import { getProductReviews, listProducts, saveProductReview } from '../product-api';
+import { getProductReviews, listProducts, removeProductReview, saveProductReview } from '../product-api';
 import { apiAuthClient, apiClient } from '../api-client';
 
 jest.mock('../api-client', () => ({
@@ -6,7 +6,8 @@ jest.mock('../api-client', () => ({
     get: jest.fn()
   },
   apiAuthClient: {
-    post: jest.fn()
+    post: jest.fn(),
+    delete: jest.fn()
   }
 }));
 
@@ -17,6 +18,7 @@ describe('product-api service', () => {
   afterEach(() => {
     mockedApiClient.get.mockReset();
     mockedApiAuthClient.post.mockReset();
+    mockedApiAuthClient.delete.mockReset();
   });
 
   it('loads product list from products endpoint', async () => {
@@ -65,12 +67,24 @@ describe('product-api service', () => {
   it('loads product reviews', async () => {
     mockedApiClient.get.mockResolvedValue({
       data: {
-        data: [{ userId: 'u1', userName: 'Vlad', rating: 5, comment: 'Great', updatedAt: '2026-01-01T10:00:00.000Z' }]
+        data: [{ id: 'r1', userId: 'u1', userName: 'Vlad', rating: 5, comment: 'Great', updatedAt: '2026-01-01T10:00:00.000Z' }]
       }
     });
 
     await getProductReviews('p1');
 
     expect(mockedApiClient.get).toHaveBeenCalledWith('/api/products/p1/reviews');
+  });
+
+  it('removes product review', async () => {
+    mockedApiAuthClient.delete.mockResolvedValue({
+      data: {
+        data: { productId: 'p1', averageRating: 4, reviewCount: 1 }
+      }
+    } as never);
+
+    await removeProductReview('p1', 'r1');
+
+    expect(mockedApiAuthClient.delete).toHaveBeenCalledWith('/api/products/p1/reviews/r1');
   });
 });

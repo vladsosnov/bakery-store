@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { addToCart, fetchCart } from '@src/services/cart-api';
 import { getAuthSession } from '@src/services/auth-session';
-import { getProductReviews, listProducts } from '@src/services/product-api';
+import { getProductReviews, listProducts, removeProductReview } from '@src/services/product-api';
 import { toErrorMessage } from '@src/utils/error';
 import { ShopFilters } from '@src/components/pages/shop/ShopFilters';
 import {
@@ -27,6 +27,7 @@ import * as S from './ShopPage.styles';
 export const ShopPage: FC = () => {
   const session = useMemo(() => getAuthSession(), []);
   const isCustomer = session?.user.role === 'customer';
+  const canModerateReviews = session?.user.role === 'admin' || session?.user.role === 'moderator';
   const isBlockedCartRole = Boolean(session) && !isCustomer;
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
@@ -43,9 +44,11 @@ export const ShopPage: FC = () => {
   const [imageLoadFailedByProduct, setImageLoadFailedByProduct] = useState<Record<string, boolean>>({});
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [reviewsModalProductName, setReviewsModalProductName] = useState<string | null>(null);
+  const [reviewsModalProductId, setReviewsModalProductId] = useState<string | null>(null);
   const [isLoadingModalReviews, setIsLoadingModalReviews] = useState(false);
+  const [removingReviewId, setRemovingReviewId] = useState<string | null>(null);
   const [modalReviews, setModalReviews] = useState<
-    Array<{ userId: string; userName: string; rating: number; comment: string; updatedAt: string }>
+    Array<{ id: string; userId: string; userName: string; rating: number; comment: string; updatedAt: string }>
   >([]);
   const availableTags = useMemo(() => getAvailableTags(products), [products]);
   const isResetDisabled =
@@ -155,6 +158,7 @@ export const ShopPage: FC = () => {
   };
 
   const handleOpenReviewsModal = async (productId: string, productName: string) => {
+    setReviewsModalProductId(productId);
     setReviewsModalProductName(productName);
     setIsReviewsModalOpen(true);
     setIsLoadingModalReviews(true);
@@ -172,9 +176,45 @@ export const ShopPage: FC = () => {
 
   const handleCloseReviewsModal = () => {
     setIsReviewsModalOpen(false);
+    setReviewsModalProductId(null);
     setReviewsModalProductName(null);
     setModalReviews([]);
     setIsLoadingModalReviews(false);
+    setRemovingReviewId(null);
+  };
+
+  const handleRemoveReview = async (reviewId: string) => {
+    if (!reviewsModalProductId) {
+      return;
+    }
+
+    try {
+      setRemovingReviewId(reviewId);
+      await removeProductReview(reviewsModalProductId, reviewId);
+      const remainingReviews = modalReviews.filter((review) => review.id !== reviewId);
+      setModalReviews(remainingReviews);
+      setProducts((previous) =>
+        previous.map((product) => {
+          if (product.id !== reviewsModalProductId) {
+            return product;
+          }
+
+          return {
+            ...product,
+            reviewCount: remainingReviews.length,
+            averageRating:
+              remainingReviews.length === 0
+                ? 0
+                : Number((remainingReviews.reduce((sum, review) => sum + review.rating, 0) / remainingReviews.length).toFixed(1))
+          };
+        })
+      );
+      toast.success('Review removed.');
+    } catch (error) {
+      toast.error(toErrorMessage(error, 'Failed to remove review.'));
+    } finally {
+      setRemovingReviewId(null);
+    }
   };
 
   useEffect(() => {
@@ -398,11 +438,20 @@ export const ShopPage: FC = () => {
             ) : (
               <S.ModalList>
                 {modalReviews.map((review) => (
-                  <S.ModalListItem key={`${review.userId}-${review.updatedAt}`}>
+                  <S.ModalListItem key={review.id}>
                     <S.ProductRating>{review.userName}</S.ProductRating>
                     <S.ModalText>Rating: {review.rating} / 5</S.ModalText>
                     <S.ModalText>{review.comment.trim() !== '' ? review.comment : 'No written comment.'}</S.ModalText>
                     <S.ModalText>Updated: {new Date(review.updatedAt).toLocaleString()}</S.ModalText>
+                    {canModerateReviews ? (
+                      <S.SecondaryButton
+                        type="button"
+                        onClick={() => handleRemoveReview(review.id)}
+                        disabled={removingReviewId === review.id}
+                      >
+                        {removingReviewId === review.id ? 'Removing...' : 'Remove review'}
+                      </S.SecondaryButton>
+                    ) : null}
                   </S.ModalListItem>
                 ))}
               </S.ModalList>
