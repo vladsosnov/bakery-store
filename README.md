@@ -66,6 +66,12 @@ cd frontend && yarn
 cd ../backend && yarn
 ```
 
+Enable local git hooks so commits run the same lint checks as CI:
+
+```bash
+./scripts/setup-git-hooks.sh
+```
+
 Run locally (in separate terminals):
 
 ```bash

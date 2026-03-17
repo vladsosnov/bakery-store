@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+
+echo "Running frontend lint..."
+(cd "$repo_root/frontend" && npm run lint)
+
+echo "Running backend lint..."
+(cd "$repo_root/backend" && npm run lint)
