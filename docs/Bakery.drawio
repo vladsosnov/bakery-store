@@ -1,101 +1,101 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.6.1">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="27.1.4">
   <diagram name="Page-1" id="QowbOuabb8E4rEcPbjrZ">
-    <mxGraphModel dx="2455" dy="2036" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="986" dy="1886" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="_ydshar_vNk6zm7VtFiF-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="💬 Realtime support chat" vertex="1">
-          <mxGeometry height="40" width="150" x="660" y="-1110" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-8" value="💬 Realtime support chat" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="660" y="-1110" width="150" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-27" parent="1" style="text;whiteSpace=wrap;" value="1. Send message to support&#xa;2. Receive responses&#xa;3. View chat history" vertex="1">
-          <mxGeometry height="60" width="150" x="660" y="-1055" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-27" value="1. Send message to support&#xa;2. Receive responses&#xa;3. View chat history" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="660" y="-1055" width="150" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jxdIDvs7aIicjbbcgDfT-4" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="📦 Orders" vertex="1">
-          <mxGeometry height="40" width="120" x="500" y="-1110" as="geometry" />
+        <mxCell id="jxdIDvs7aIicjbbcgDfT-4" value="📦 Orders" style="whiteSpace=wrap;html=1;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="500" y="-1110" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="jxdIDvs7aIicjbbcgDfT-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🔐 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Authentication&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="20" y="-1110" as="geometry" />
+        <mxCell id="jxdIDvs7aIicjbbcgDfT-6" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🔐 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Authentication&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="20" y="-1110" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="jxdIDvs7aIicjbbcgDfT-9" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;👤 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Profile m&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;anagement&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="140" x="170" y="-1110" as="geometry" />
+        <mxCell id="jxdIDvs7aIicjbbcgDfT-9" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;👤 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Profile m&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;anagement&lt;/span&gt;" style="whiteSpace=wrap;html=1;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="170" y="-1110" width="140" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-4" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;strong data-start=&quot;868&quot; data-end=&quot;878&quot;&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Actor:&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt; &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Customer&lt;/span&gt;" vertex="1">
-          <mxGeometry height="20" width="95" x="370.5" y="-1150" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-4" value="&lt;strong data-start=&quot;868&quot; data-end=&quot;878&quot;&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Actor:&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt; &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Customer&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="370.5" y="-1150" width="95" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-6" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🛒 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Shopping c&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;art&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="340" y="-1110" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-6" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🛒 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Shopping c&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;art&lt;/span&gt;" style="whiteSpace=wrap;html=1;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="340" y="-1110" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-14" parent="1" style="text;whiteSpace=wrap;" value="1. View profile information&#xa;2. Edit personal details&#xa;3. Update shipping address" vertex="1">
-          <mxGeometry height="60" width="140" x="170" y="-1055" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-14" value="1. View profile information&#xa;2. Edit personal details&#xa;3. Update shipping address" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="170" y="-1055" width="140" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-15" parent="1" style="text;whiteSpace=wrap;" value="1. Register account&#xa;2. Login&#xa;3. Reset password&#xa;4. Update password" vertex="1">
-          <mxGeometry height="70" width="130" x="20" y="-1055" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-15" value="1. Register account&#xa;2. Login&#xa;3. Reset password&#xa;4. Update password" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="20" y="-1055" width="130" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-16" parent="1" style="text;whiteSpace=wrap;" value="1. Add item to cart&#xa;2. Remove item from cart&#xa;3. Update item quantity&#xa;4. View cart contents" vertex="1">
-          <mxGeometry height="70" width="150" x="340" y="-1055" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-16" value="1. Add item to cart&#xa;2. Remove item from cart&#xa;3. Update item quantity&#xa;4. View cart contents&#xa;5. Review products" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="340" y="-1055" width="150" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-26" parent="1" style="text;whiteSpace=wrap;" value="1. Place order&#xa;2. Add note to order&#xa;3. Change shipping address before confirmation&#xa;4. View own orders&#xa;5. View order details &amp; status" vertex="1">
-          <mxGeometry height="100" width="160" x="500" y="-1055" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-26" value="1. Place order&#xa;2. Add note to order&#xa;3. Change shipping address before confirmation&#xa;4. View own orders&#xa;5. View order details &amp; status" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="500" y="-1055" width="160" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-28" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;strong data-start=&quot;868&quot; data-end=&quot;878&quot;&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Actor:&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt; &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Moderator&lt;/span&gt;" vertex="1">
-          <mxGeometry height="20" width="104" x="366" y="-950" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-28" value="&lt;strong data-start=&quot;868&quot; data-end=&quot;878&quot;&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Actor:&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt; &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Moderator&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="366" y="-950" width="104" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-29" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🔐 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Authentication&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="40" y="-910" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-29" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🔐 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Authentication&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="-910" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-30" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="📦 Orders" vertex="1">
-          <mxGeometry height="40" width="120" x="220" y="-910" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-30" value="📦 Orders" style="whiteSpace=wrap;html=1;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="220" y="-910" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-31" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🛍 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Product m&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;anagement&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="160" x="400" y="-910" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-31" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🛍 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Product m&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;anagement&lt;/span&gt;" style="whiteSpace=wrap;html=1;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="400" y="-910" width="160" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-32" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;💬 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Support c&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;hat&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="620" y="-910" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-32" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;💬 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Support c&lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;hat&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="620" y="-910" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-33" parent="1" style="text;whiteSpace=wrap;" value="1. Receive customer messages&#xa;2. Respond to customer inquiries&#xa;3. Provide assistance regarding orders or products" vertex="1">
-          <mxGeometry height="70" width="201" x="620" y="-860" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-33" value="1. Receive customer messages&#xa;2. Respond to customer inquiries&#xa;3. Provide assistance regarding orders or products" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="620" y="-860" width="201" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-34" parent="1" style="text;whiteSpace=wrap;" value="1. Add new products&#xa;2. Edit existing product details&#xa;3. Update price, description, or stock availability, visibility in shop&#xa;4. Remove or deactivate products" vertex="1">
-          <mxGeometry height="90" width="190" x="400" y="-850" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-34" value="1. Add new products&#xa;2. Edit existing product details&#xa;3. Update price, description, or stock availability, visibility in shop&#xa;4. Remove or deactivate products&#xa;5. Remove reviews" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="400" y="-850" width="190" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-35" parent="1" style="text;whiteSpace=wrap;" value="1. Login&#xa;2. Reset password&#xa;3. Update password" vertex="1">
-          <mxGeometry height="60" width="130" x="40" y="-860" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-35" value="1. Login&#xa;2. Reset password&#xa;3. Update password" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="40" y="-860" width="130" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-36" parent="1" style="text;whiteSpace=wrap;" value="1. Login&#xa;2. Reset password&#xa;3. Update password" vertex="1">
-          <mxGeometry height="60" width="130" x="220" y="-860" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-36" value="1. Login&#xa;2. Reset password&#xa;3. Update password" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="220" y="-860" width="130" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-37" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;strong data-start=&quot;868&quot; data-end=&quot;878&quot;&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Actor:&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt; &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Admin&lt;/span&gt;" vertex="1">
-          <mxGeometry height="20" width="85" x="366" y="-720" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-37" value="&lt;strong data-start=&quot;868&quot; data-end=&quot;878&quot;&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Actor:&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt; &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Admin&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="366" y="-720" width="85" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-39" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🔐 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Authentication&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="30" y="-680" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-39" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;🔐 &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Authentication&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="30" y="-680" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-40" parent="1" style="text;whiteSpace=wrap;" value="1. Login&#xa;2. Reset password&#xa;3. Update password" vertex="1">
-          <mxGeometry height="60" width="130" x="30" y="-620" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-40" value="1. Login&#xa;2. Reset password&#xa;3. Update password" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="30" y="-620" width="130" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-42" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;span style=&quot;text-align: left;&quot;&gt;👩‍💼 Moderator management&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="155" x="180" y="-680" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-42" value="&lt;span style=&quot;text-align: left;&quot;&gt;👩‍💼 Moderator management&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="180" y="-680" width="155" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-43" parent="1" style="text;whiteSpace=wrap;" value="1. Create moderator accounts&#xa;2. Edit moderator information&#xa;3. Enable / Disable moderator accounts" vertex="1">
-          <mxGeometry height="60" width="160" x="180" y="-620" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-43" value="1. Create moderator accounts&#xa;2. Edit moderator information&#xa;3. Enable / Disable moderator accounts&#xa;4. Remove reviews" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="180" y="-620" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-45" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;span style=&quot;text-align: left;&quot;&gt;👥 User management&lt;/span&gt;" vertex="1">
-          <mxGeometry height="40" width="140" x="360" y="-680" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-45" value="&lt;span style=&quot;text-align: left;&quot;&gt;👥 User management&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="-680" width="140" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-46" parent="1" style="text;whiteSpace=wrap;" value="1. View registered users&#xa;2. Monitor user activity" vertex="1">
-          <mxGeometry height="80" width="150" x="360" y="-620" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-46" value="1. View registered users&#xa;2. Monitor user activity" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="360" y="-620" width="150" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-49" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;📦 System Monitoring&lt;/span&gt;&lt;/div&gt;" vertex="1">
-          <mxGeometry height="40" width="130" x="520" y="-680" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-49" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;📦 System Monitoring&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="520" y="-680" width="130" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-50" parent="1" style="text;whiteSpace=wrap;" value="1. View all orders&#xa;2. Monitor order activities&#xa;3. Monitor chat activities" vertex="1">
-          <mxGeometry height="60" width="140" x="520" y="-620" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-50" value="1. View all orders&#xa;2. Monitor order activities&#xa;3. Monitor chat activities" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="520" y="-620" width="140" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-52" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;text-align: left;&quot;&gt;📊 Logs &amp;amp; activity tracking&lt;/div&gt;" vertex="1">
-          <mxGeometry height="40" width="160" x="680" y="-680" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-52" value="&lt;div style=&quot;text-align: left;&quot;&gt;📊 Logs &amp;amp; activity tracking&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="680" y="-680" width="160" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="_ydshar_vNk6zm7VtFiF-53" parent="1" style="text;whiteSpace=wrap;" value="1. Access system logs&#xa;2. View user actions&#xa;3. View moderator actions&#xa;4. Track order and chat activity history" vertex="1">
-          <mxGeometry height="70" width="160" x="680" y="-620" as="geometry" />
+        <mxCell id="_ydshar_vNk6zm7VtFiF-53" value="1. Access system logs&#xa;2. View user actions&#xa;3. View moderator actions&#xa;4. Track order and chat activity history" style="text;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="680" y="-620" width="160" height="70" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
